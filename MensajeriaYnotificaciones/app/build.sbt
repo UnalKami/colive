@@ -1,15 +1,13 @@
-name := "COLiveServer"
+name := "COLiveMensajeriaYnotificaciones"
 
 version := "0.1.0"
 
-scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "3.7.0"
 
-// Dependencias mínimas para Akka clásico y HTTP con JSON
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor"              % "2.6.21",
-  "com.typesafe.akka" %% "akka-http"               % "10.2.10",
-  "com.typesafe.akka" %% "akka-http-spray-json"    % "10.2.10"
+  "com.typesafe.akka" %% "akka-actor-typed" % "2.8.5",
+  "com.typesafe.akka" %% "akka-stream" % "2.8.5",
+  "com.typesafe.akka" %% "akka-http" % "10.5.2",
+  "com.typesafe.akka" %% "akka-http-spray-json"  % "10.5.2"
 )
-
-// Clase principal para 'run'
-Compile / mainClass := Some("com.COLive.Main")
+Compile / run / mainClass := Some("com.COLive.Main")
