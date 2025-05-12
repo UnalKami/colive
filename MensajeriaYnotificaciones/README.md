@@ -1,0 +1,1 @@
+podman build -f Dockerfile.sbt-alpine -t sbt-alpine:1.10.11 .

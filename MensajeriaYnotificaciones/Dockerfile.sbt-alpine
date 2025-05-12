@@ -1,0 +1,20 @@
+# Dockerfile mínimo para sbt + JDK17 sobre Alpine
+FROM openjdk:17-alpine
+
+# Dependencias básicas
+RUN apk add --no-cache curl bash
+
+# Instala sbt
+ENV SBT_VERSION=1.10.11
+RUN mkdir /usr/share/sbt \
+ && curl -SL https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz \
+    | tar xz --strip-components=1 -C /usr/share/sbt
+
+# Pon sbt en el PATH
+ENV PATH=/usr/share/sbt/bin:$PATH
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Por defecto levanta sbt shell
+ENTRYPOINT ["sbt"]
