@@ -1,0 +1,40 @@
+version: '3.7'
+
+services:
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - 8080:80
+    volumes:
+      - ./joomla:/var/www/html
+      - ./Api_Gateway/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - joomla
+
+  joomla:
+    imaga: joomla:5.3.0-php8.3-fpm-alpine
+    #image: joomla:3.9.5-php7.3-fpm-alpine
+    restart: always
+    environment:
+      - JOOMLA_DB_HOST=db
+      - JOOMLA_DB_USER=postgres
+      - JOOMLA_DB_PASSWORD=cincopatodos
+      - JOOMLA_DB_NAME=db
+    volumes:
+      - ./joomla:/var/www/html
+    depends_on:
+      - db
+
+  db:
+    ports:
+      - 5432:5432
+    image: postgres:13.21-alpine3.20
+    #image: postgres:11.2-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=cincopatodos
+    volumes:
+      - ./dbPostgres:/var/lib/postgresql/data
