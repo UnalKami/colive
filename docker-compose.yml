@@ -26,3 +26,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  residence-creator:
+    container_name: ResidenceCreator-ms
+    build:
+      context: ./ResidenceCreator-ms  
+    environment:
+      - MONGO_URI=mongodb://host.docker.internal:27017/residencial_db  # Conexión al MongoDB local
+      - PORT=3000
+    ports:
+      - "3001:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # Permite acceder al host desde el contenedor
