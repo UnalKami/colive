@@ -1,5 +1,6 @@
 services:
   springboot-app:
+    image: openjdk:17-jdk-alpine
     container_name: SpringBoot-Auth-ms
     build:
       context: ./auth-java-component  
@@ -26,14 +27,28 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  residence-creator:
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongo_db
+    ports:
+      - "27017:27017" 
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
+      - MONGO_INITDB_DATABASE=residence_db
+
+  residence-creator-ms:
+    image: node:18
     container_name: ResidenceCreator-ms
     build:
       context: ./ResidenceCreator-ms  
     environment:
-      - MONGO_URI=mongodb://host.docker.internal:27017/residencial_db  # Conexión al MongoDB local
-      - PORT=3000
+      - MONGO_URI=mongodb://root:example@mongo_db:27017/residence_db?authSource=admin
+      - PORT=3001
     ports:
-      - "3001:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"  # Permite acceder al host desde el contenedor
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    env_file:
+      - ./ResidenceCreator-ms/.env
