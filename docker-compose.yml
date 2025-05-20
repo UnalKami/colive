@@ -1,6 +1,6 @@
 services:
   springboot-app:
-    image: openjdk:17-jdk-alpine
+    image: openjdk:24-slim-bookworm
     container_name: SpringBoot-Auth-ms
     build:
       context: ./auth-java-component  
@@ -14,7 +14,7 @@ services:
     container_name: PostgreSQL-db
     ports:
       - 5432:5432
-    image: postgres:13.21-alpine3.20    
+    image: postgres:16.9-alpine3.21 
     restart: unless-stopped
     environment:
       - POSTGRES_DB=db
@@ -29,7 +29,7 @@ services:
       retries: 5
 
   mongodb:
-    image: mongo:latest
+    image: mongo:8.0.9-noble
     container_name: mongo_db
     ports:
       - "27017:27017" 
@@ -39,7 +39,7 @@ services:
       - MONGO_INITDB_DATABASE=residence_db
 
   residence-creator-ms:
-    image: node:18
+    image: node:23.11.1-alpine3.21
     container_name: ResidenceCreator-ms
     build:
       context: ./ResidenceCreator-ms  
