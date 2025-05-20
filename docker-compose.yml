@@ -56,7 +56,7 @@ services:
     build:
       context: ./ResidenceCreator-ms  
     environment:
-      - MONGO_URI=mongodb://root:example@mongo_db:27017/residence_db?authSource=admin
+      - MONGO_URI=mongodb://root:cincopatodos@mongo_db:27017/residence_db?authSource=admin
       - PORT=3001
     ports:
       - "3001:3001"

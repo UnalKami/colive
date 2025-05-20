@@ -1,35 +1,6 @@
-//Define la estructura de un conjunto residencial en la BD
+// Define la estructura simplificada de un conjunto residencial
 
 const { Schema, model } = require('mongoose');
-
-const AmenitySchema = new Schema({
-  nombre: { 
-    type: String, 
-    required: true,
-    trim: true
-  },
-  horario: {
-    dias: { type: String, required: true }, // Ej: "Lunes-Viernes"
-    horas: { type: String, required: true } // Ej: "8:00-20:00"
-  },
-  estado: {
-    type: String,
-    required: true,
-    enum: ['disponible', 'en_mantenimiento', 'cerrado', 'reservado'],
-    default: 'disponible'
-  },
-  costo: {
-    type: Number,
-    required: true,
-    min: 0,
-    default: 0
-  },
-  capacidad: {
-    type: Number,
-    required: true,
-    min: 1
-  }
-});
 
 const ConjuntoSchema = new Schema({
   nombre: { 
@@ -49,18 +20,22 @@ const ConjuntoSchema = new Schema({
     trim: true,
     maxlength: 50
   },
-  amenidades: [AmenitySchema],
-  configuraciones: {
-    torresNumeradas: { type: Boolean, default: false },
-    accesoControlado: { type: Boolean, default: true }
-  }
+  amenidades: [{  
+    type: String,
+    trim: true,
+    lowercase: true
+  }],
+  divisiones: [{ 
+    tipo: { type: String, required: true }, // El nombre de la division, como torre, apartamento, bloque, manzana, etc.
+    cantidad: { type: Number, required: true } // Número de torres, apartamentos, bloques, etc.
+  }]
+
 }, {
-  timestamps: true 
+  timestamps: true // Mantiene createdAt y updatedAt
 });
 
 ConjuntoSchema.path('amenidades').validate(function(amenidades) {
-  const nombres = amenidades.map(a => a.nombre.toLowerCase());
-  return new Set(nombres).size === nombres.length;
+  return new Set(amenidades.map(a => a.toLowerCase())).size === amenidades.length;
 }, 'Cada amenidad debe tener un nombre único dentro del conjunto');
 
 module.exports = model('Conjunto', ConjuntoSchema);

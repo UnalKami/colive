@@ -1,14 +1,15 @@
 # ResidenceCreator-ms/Dockerfile
-FROM node:16-alpine
+FROM node:23.11.1-alpine3.21
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+# Instala tanto dependencias como devDependencies
+RUN npm install --include=dev
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 3001
 
-CMD ["npx", "nodemon", "src/app.js"]
+CMD ["npm", "start"]  
