@@ -1,4 +1,4 @@
-FROM node:18-alpine AS build
+FROM node:23.11.1-alpine3.21 AS build
 WORKDIR /app
 COPY react-app/package*.json ./
 RUN npm install
