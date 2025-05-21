@@ -72,14 +72,13 @@ export default function Login() {
             <div className='register-container' id="login">
                 <ToastContainer position='bottom-right'/>
                 <div id="background">
-                    <div id="shape"></div>
-                    <div id="shape"></div>
+                    
                 </div>
                 <title>Login | Natu</title>
                             <form id="login-form">
                                 <div id="logo">   
                                 </div>
-                                <img src="Natu_Logo_.png" id="img-centrada" />
+                                <img src="Colive_logo_.png" id="img-centrada" />
                                 <label htmlFor="username">Correo de usuario</label>
                                 <input 
                                     type="text" 
@@ -109,9 +108,7 @@ export default function Login() {
                                 >
                                     Iniciar sesión
                                 </button>
-                                <a id="link2" href="register">
-                                    ¿Aun no estoy registrado?
-                                </a>
+                                
                             </form>
             </div>
     );

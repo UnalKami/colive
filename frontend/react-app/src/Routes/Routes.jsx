@@ -46,7 +46,7 @@ export default function Routing() {
       <BrowserRouter >
         <Routes>
           <Route path="/" element={<Layout />} >
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<About />} />
             <Route path="productDet/:id" element={<ProductDet />} />
             <Route path="register" element={<Register />} />
             <Route path="register-admin" element={<RegisterAdmin />} />

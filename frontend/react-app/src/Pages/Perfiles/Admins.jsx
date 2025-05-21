@@ -1,339 +1,131 @@
-import React, { useEffect, useState } from 'react';
-import '../Perfiles/Perfiles.css'; // Asegúrate de que la ruta del archivo CSS sea correcta
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Row from 'react-bootstrap/Row';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import React from 'react';
+import './About.css'; 
 
-export default function Admins() {
-  const api_url = process.env.REACT_APP_API_URL;
-  const token = localStorage.getItem('token');
-  const id = localStorage.getItem('id');
-
-  // --- Estados de los campos del formulario de registro --- //
-  const [Nombres, setNombres] = useState('');
-  const [Apellidos, setApellidos] = useState('');
-  const [Nombre_tienda, setNombre_tienda] = useState('');
-  const [Documento, setDocumento] = useState('');
-  const [Email, setEmail] = useState('');
-  const [Telefono, setTelefono] = useState('');
-  const [FechaNacimiento, setFechaNacimiento] = useState('');
-  const [Departamento, setDepartamento] = useState('');
-  const [Municipio, setMunicipio] = useState('');
-  const [Direccion, setDireccion] = useState('');
-  const [Descripcion, setDescripcion] = useState('');
-
-  const [Departamentos, setDepartamentos] = useState([]);
-  const [Municipios, setMunicipios] = useState([]);
-
-  // Estado para habilitar o deshabilitar la edición
-  const [editMode, setEditMode] = useState(false);
-
-  // Estado para controlar la validación del formulario
-  const [validated, setValidated] = useState(false);
-
-  // --- Fetch de datos iniciales --- //
-  useEffect(() => {
-    fetch(`${api_url}/admins/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      const vendedor = data.body[0];  // Acceder al primer objeto del arreglo
-      setNombres(vendedor.Nombre_vendedor || '');
-      setApellidos(vendedor.Apellidos_vendedor || '');
-      setNombre_tienda(vendedor.Nombre_tienda || '');
-      setDocumento(vendedor.Documento_vendedor || '');
-      setEmail(vendedor.Correo_usuario || '');
-      setTelefono(vendedor.Telefono_vendedor || '');
-      setFechaNacimiento(vendedor.FechaNacimiento_vendedor ? vendedor.FechaNacimiento_vendedor.split('T')[0] : '');
-      setDepartamento(vendedor.DEPARTAMENTO_ID_Departamento || '');
-      setMunicipio(vendedor.MUNICIPIO_ID_Municipio || '');
-      setDireccion(vendedor.Direccion || '');
-      setDescripcion(vendedor.Descripcion_adicional || '');
-    })
-  }, [token, id]);
-  
-
-  // --- Fetch de Departamentos --- //
-  useEffect(() => {
-    fetch(`${api_url}/departamentos`)
-      .then((response) => response.json())
-      .then((data) => {
-        setDepartamentos(data.body || []);
-      })
-      .catch((error) => console.error('Error fetching departamentos:', error));
-  }, [api_url]);
-
-  // --- Fetch de Municipios basado en el Departamento seleccionado --- //
-  useEffect(() => {
-    const endpoint = Departamento
-      ? `${api_url}/municipios/filter/${Departamento}`
-      : `${api_url}/municipios`;
-
-    fetch(endpoint)
-      .then((response) => response.json())
-      .then((data) => {
-        setMunicipios(data.body || []);
-      })
-      .catch((error) => console.error('Error fetching municipios:', error));
-  }, [api_url, Departamento]);
-
-  // --- Función para manejar el envío del formulario --- //
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-
-    if (form.checkValidity() === false) {
-      event.stopPropagation();
-    } else {
-      // Aquí puedes hacer el fetch para actualizar los datos del vendedor
-      console.log(Municipio)
-      fetch(`${api_url}/vendedores/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          Nombre_vendedor: Nombres,
-          Apellidos_vendedor: Apellidos,
-          Nombre_tienda: Nombre_tienda,
-          Documento_vendedor: Documento,
-          Telefono_vendedor: Telefono,
-          FechaNacimiento_vendedor: FechaNacimiento,
-          MUNICIPIO_ID_Municipio: Municipio,
-          Direccion: Direccion,
-          Descripcion_adicional: Descripcion,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (!data.error) {
-            toast.success('Datos actualizados correctamente');
-            setEditMode(false);
-          } else {
-            toast.error('Error al actualizar los datos');
-          }
-        })
-        .catch((error) => {
-          console.error('Error updating data:', error);
-          toast.error('Error al actualizar los datos');
-        });
-    }
-
-    setValidated(true);
-  };
-
-  // --- Función para alternar entre modo visualización y edición --- //
-  const toggleEditMode = () => {
-    setEditMode(!editMode);
-  };
-
+export default function About() {
   return (
-    <div className='register-container'>
-      <ToastContainer position='bottom-right' />
-      <div id="background1">
-        <div id="shape1" />
-        <div id="shape1" />
-      </div>
-      <div id="register-container">
-        <img src="Natu_Logo_.png" alt="image" />
-        <Form noValidate validated={validated} onSubmit={handleSubmit} id='register-form'>
-          <h3>Datos personales del vendedor</h3>
-          <Row className="mb-3">
-            <Form.Group as={Col} md="6" controlId="validationCustom01">
-              <Form.Label>Nombres</Form.Label>
-              <Form.Control
-                maxLength={60}
-                required
-                type="text"
-                placeholder={Nombres}
-                value={Nombres}
-                onChange={(e) => setNombres(e.target.value)}
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa tus nombres.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} md="6" controlId="validationCustom02">
-              <Form.Label>Apellidos</Form.Label>
-              <Form.Control
-                maxLength={60}
-                required
-                type="text"
-                placeholder="Apellidos"
-                value={Apellidos}
-                onChange={(e) => setApellidos(e.target.value)}
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa tus apellidos.</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="4" controlId="validationCustomUsername">
-              <Form.Label>Documento</Form.Label>
-              <InputGroup hasValidation>
-                <Form.Control
-                  maxLength={14}
-                  type="number"
-                  placeholder="Documento"
-                  aria-describedby="inputGroupPrepend"
-                  value={Documento}
-                  onChange={(e) => setDocumento(e.target.value)}
-                  required
-                  disabled
-                />
-                <Form.Control.Feedback type="invalid">Por favor ingresa tu número de documento.</Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
-            <Form.Group as={Col} md="8" controlId="validationCustom03">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                maxLength={60}
-                type="email"
-                placeholder="Email"
-                value={Email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa un correo electrónico válido.</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="6" controlId="validationCustom04">
-              <Form.Label>Teléfono</Form.Label>
-              <Form.Control
-                type="number"
-                placeholder="Teléfono"
-                value={Telefono}
-                onChange={(e) => setTelefono(e.target.value)}
-                required
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa tu número de teléfono.</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} md="6" controlId="validationCustom05">
-              <Form.Label>Fecha de Nacimiento</Form.Label>
-              <Form.Control
-                type="date"
-                placeholder="Fecha de Nacimiento"
-                value={FechaNacimiento}
-                onChange={(e) => setFechaNacimiento(e.target.value)}
-                required
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa tu fecha de nacimiento.</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-
-          <h3>Información de la tienda</h3>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="12" controlId="validationCustom06">
-              <Form.Label>Nombre de la Tienda</Form.Label>
-              <Form.Control
-                maxLength={60}
-                type="text"
-                placeholder="Nombre de la tienda"
-                value={Nombre_tienda}
-                onChange={(e) => setNombre_tienda(e.target.value)}
-                required
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa el nombre de tu tienda.</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="6" controlId="validationCustom07">
-              <Form.Label>Departamento</Form.Label>
-              <Form.Select
-                aria-label="Selecciona un departamen"
-                value={Departamento}
-                onChange={(e) => setDepartamento(e.target.value)}
-                disabled={!editMode}
-              >
-                <option>Selecciona un departamen</option>
-                {Departamentos.map((dept) => (
-                  <option key={dept.ID_Departamento} value={dept.ID_Departamento}>
-                    {dept.Nombre_departamento}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-            <Form.Group as={Col} md="6" controlId="validationCustom08">
-              <Form.Label>Municipio</Form.Label>
-              <Form.Select
-                aria-label="Selecciona un municipio"
-                value={Municipio}
-                onChange={(e) => setMunicipio(e.target.value)}
-                disabled={!editMode}
-              >
-                <option>Selecciona un municipio</option>
-                {Municipios.map((mun) => (
-                  <option key={mun.ID_Municipio} value={mun.ID_Municipio}>
-                    {mun.Nombre_municipio}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="12" controlId="validationCustom09">
-              <Form.Label>Dirección</Form.Label>
-              <Form.Control
-                maxLength={100}
-                type="text"
-                placeholder="Dirección"
-                value={Direccion}
-                onChange={(e) => setDireccion(e.target.value)}
-                required
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa la dirección de tu tienda.</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="12" controlId="validationCustom10">
-              <Form.Label>Descripción Adicional</Form.Label>
-              <Form.Control
-                as="textarea"
-                maxLength={200}
-                placeholder="Descripción adicional"
-                value={Descripcion}
-                onChange={(e) => setDescripcion(e.target.value)}
-                disabled={!editMode}
-              />
-            </Form.Group>
-          </Row>
-
-          <div className="d-flex justify-content-end">
-            {editMode ? (
-              <>
-                <Button variant="secondary" className="me-2" onClick={toggleEditMode}>
-                  Cancelar
-                </Button>
-                <Button type="submit">Guardar Cambios</Button>
-              </>
-            ) : (
-              <Button variant="primary" onClick={toggleEditMode}>
-                Editar Información
-              </Button>
-            )}
+    <div className="nosotros-container">
+      <div id="mer-container2">
+        <div id="context-container2">
+          <div id="contenedor-imagenes2">
+            <img src="Colive_Logo_.png" id="img-centrada2" alt="Logo" />
           </div>
-        </Form>
+
+          <h2 id='titulo2'>Acerca de nosotros</h2>
+          <p className='vision'>
+            Este proyecto nace con el propósito de optimizar la gestión de copropiedades residenciales mediante una plataforma web configurable según las necesidades de cada comunidad. Nuestra solución permite a los usuarios realizar reservas, gestionar zonas comunes, registrar visitantes, reportar incidentes, comunicarse internamente y llevar el control de pagos. Ofrecemos una herramienta versátil, centrada en la eficiencia operativa, la mejora continua y el bienestar de las personas que integran cada copropiedad.
+          </p>
+
+          <h2 id='titulo2'>Visión</h2>
+          <p className='vision'>
+            Para 2028, seremos una plataforma líder en gestión de copropiedades residenciales en Colombia, reconocida por su adaptabilidad, seguridad y escalabilidad. Buscamos atender a más de 2000 residencias en simultáneo, garantizando una experiencia intuitiva y funcional para usuarios de todos los perfiles.
+          </p>
+
+          <h2 id='titulo2'>Misión</h2>
+          <p className='mision'>
+            Desarrollamos soluciones tecnológicas que contribuyen al orden, la convivencia y la transparencia en la administración de espacios residenciales. Nos comprometemos a brindar herramientas efectivas y personalizadas, orientadas al usuario y en constante evolución.
+          </p>
+        </div>
+
+        <div id="about-us-container2">
+          <h2 id='titulo2'>Nuestro Equipo</h2>
+          <p className='acerca'>
+            Somos estudiantes de la Universidad Nacional, conformando un equipo interdisciplinario de desarrolladores comprometidos con la innovación, la colaboración y la excelencia en el desarrollo de software.
+          </p>
+
+          <div id="team-container2">
+            {/* Integrante 1 */}
+            <div id="team-member2">
+              <img src="https://media.licdn.com/dms/image/v2/D4E03AQGWNZAEWFe67A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1690652960251?e=1729123200&v=beta&t=LRkywxK-HXttGvDH2Hjv_nxtozFELhbi_JY60hYqERk" alt="David Rodriguez" />
+              <h3>Integrante 1</h3>
+              <p>Desarrollador Full-Stack</p>
+              <a href="https://github.com/Davidrg02" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/david-steven-rodr%C3%ADguez-guzm%C3%A1n-b7828a264/" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+            {/* Integrante 2 */}
+            <div id="team-member2">
+              <img src="https://media.licdn.com/dms/image/D4E03AQFGSt6YIQSBBw/profile-displayphoto-shrink_800_800/0/1711971949970?e=1729123200&v=beta&t=PGXFg_etn8uwLOGK6iw53eU5DwRVmElQjgphvqRnBM4" alt="Nicolás Hernandez" />
+              <h3>Integrante 1</h3>
+              <p>Desarrollador Backend</p>
+              <a href="https://github.com/nihernandezv" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/nihernandezv/" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+            {/* Integrante 3 */}
+            <div id="team-member2">
+              <img src="https://media.licdn.com/dms/image/v2/D4E03AQE45_Vg-VZWHg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1724764046475?e=1730332800&v=beta&t=GH23xjl1WwvQe94Jv9Da3FB6wfndFp38QOwf72Ilu-Q" alt="Brayan Maldonado" />
+              <h3>Integrante 2</h3>
+              <p>Desarrollador Frontend</p>
+              <a href="https://github.com/BryanSantiagoo" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/brayan-santiago-maldonado-aparicio-549336276/" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+            {/* Integrante 4 */}
+            <div id="team-member2">
+              <img src="https://media.licdn.com/dms/image/v2/D4E03AQEB9kkB7CQcPg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1714028763561?e=1729123200&v=beta&t=DLZS3F4OdCtd4YGn7mQ9RE2bcN5LEsqVh-HG4bUCvyY" alt="Ivan Sepulveda" />
+              <h3>Integrante 3</h3>
+              <p>Desarrollador Frontend</p>
+              <a href="https://github.com/ivanyspaez" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="https://www.linkedin.com/in/ivan-sepulveda-paez/" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+            {/* Integrante 5 */}
+            <div id="team-member2">
+              <img src="FALTA_URL_IMAGEN" alt="Integrante 5" />
+              <h3>Nombre del Integrante 5</h3>
+              <p>Rol del Integrante 5</p>
+              <a href="FALTA_GITHUB" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="FALTA_LINKEDIN" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+            {/* Integrante 6 */}
+            <div id="team-member2">
+              <img src="FALTA_URL_IMAGEN" alt="Integrante 6" />
+              <h3>Nombre del Integrante 6</h3>
+              <p>Rol del Integrante 6</p>
+              <a href="FALTA_GITHUB" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="FALTA_LINKEDIN" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+            {/* Integrante 7 */}
+            <div id="team-member2">
+              <img src="FALTA_URL_IMAGEN" alt="Integrante 7" />
+              <h3>Nombre del Integrante 7</h3>
+              <p>Rol del Integrante 7</p>
+              <a href="FALTA_GITHUB" target="_blank" rel="noreferrer" className='giro' style={{ fontSize: '1.8em' }}>
+                <i className="fab fa-github"></i>
+              </a>
+              <a href="FALTA_LINKEDIN" target="_blank" rel="noreferrer" style={{ color: '#0077B5', fontSize: '1.8em' }}>
+                <i className="fab fa-linkedin"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
       </div>
     </div>
   );
