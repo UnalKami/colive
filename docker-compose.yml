@@ -1,25 +1,23 @@
 services:
   network-manager:
-    image: nginx:1.28.0-alpine-perl
-    container_name: nginx
+    build:
+      context: ./frontend
+    image: nginx-react-frontend
+    container_name: NetworkManager
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./NetworkManager/nginx.conf:/etc/nginx/nginx.conf
-      - ./NetworkManager/nginx/certs:/etc/nginx/certs
-      - ./NetworkManager/nginx/conf.d:/etc/nginx/conf.d
-      - ./frontend/react-app/build/html:/usr/share/nginx/html
+      - ./NetworkManager/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./NetworkManager/nginx/certs:/etc/nginx/certs:ro
 
   springboot-app:
     image: openjdk:24-slim-bookworm
-    container_name: SpringBoot-Auth-ms
+    container_name: auth-java-component
     build:
-      context: ./auth-java-component  
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/db
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=cincopatodos
+      context: ./auth-java-component
+    env_file:
+      - ./auth-java-component/.env      
     ports:
       - "8080:8080"
   db:
@@ -28,36 +26,26 @@ services:
       - 5432:5432
     image: postgres:16.9-alpine3.21 
     restart: unless-stopped
-    environment:
-      - POSTGRES_DB=db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=cincopatodos
+    env_file:
+      - ./dbPostgres/.env
     volumes:
-      - ./dbPostgres:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      - ./dbPostgres:/var/lib/postgresql/
 
   mongodb:
     image: mongo:8.0.9-noble
     container_name: mongo_db
     ports:
       - "27017:27017" 
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
-      - MONGO_INITDB_DATABASE=residence_db
+    env_file:
+      - ./dbMongo/.env
+    volumes:
+      - dbMongo-data:/data/db
 
   residence-creator-ms:
     image: node:23.11.1-alpine3.21
     container_name: ResidenceCreator-ms
     build:
-      context: ./ResidenceCreator-ms  
-    environment:
-      - MONGO_URI=mongodb://root:cincopatodos@mongo_db:27017/residence_db?authSource=admin
-      - PORT=3001
+      context: ./ResidenceCreator-ms 
     ports:
       - "3001:3001"
     depends_on:
