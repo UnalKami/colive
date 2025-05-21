@@ -1,79 +1,34 @@
-// models/Residence.js
-// Esquema unificado para residencias con todas las propiedades requeridas
-
+//Define la estructura de una vivienda (apartamento/casa)
 const { Schema, model } = require('mongoose');
 
+const PagoSchema = new Schema({
+  monto: { type: Number, required: true },
+  fecha: { type: Date, required: true },
+  metodo: { type: String, required: true },
+  comprobante: { type: String }
+}, { _id: false });
+
+const AdministracionSchema = new Schema({
+  valorMensual: { type: Number, required: true },
+  ultimoPago: { type: PagoSchema, required: true },
+  moraAcumulada: { type: Number, default: 0 },
+  historialPagos: [PagoSchema]
+}, { _id: false });
+
+const ReciboServicioSchema = new Schema({
+  tipoServicio: { type: String, required: true },
+  fechaLlegada: { type: Date, required: true },
+  estado: { type: String, required: true },
+  observaciones: { type: String }
+}, { _id: false });
+
 const ResidenceSchema = new Schema({
-  code: { 
-    type: String, 
-    required: true, 
-    unique: true,
-    trim: true,
-    uppercase: true
-  },
-
-  conjuntoId: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'Conjunto', 
-    required: true 
-  },
-
-  parqueaderos: [{ 
-    type: String,
-    trim: true
-  }],
-
-  bodegas: [{
-    type: String,
-    trim: true
-  }],
-
-  administracion: {
-    valorMensual: { type: Number, required: false, min: 0 },
-    ultimoPago: {
-      fecha: Date,
-      monto: Number,
-      metodo: { type: String, enum: ['efectivo', 'transferencia', 'tarjeta'] }
-    },
-    moraAcumulada: { type: Number, default: 0, min: 0 },
-    historialPagos: [{
-      monto: Number,
-      fecha: { type: Date, default: Date.now },
-      metodo: String,
-      comprobante: String
-    }]
-  },
-
-  recibosServicios: [{
-    tipoServicio: { 
-      type: String, 
-      required: false,
-      enum: ['agua', 'luz', 'gas', 'internet', 'ascensor'] 
-    },
-    fechaLlegada: { type: Date, required: false },
-    estado: {
-      type: String,
-      required: false,
-      enum: ['pendiente', 'recibido', 'reclamado'],
-      default: 'pendiente'
-    },
-    observaciones: String
-  }],
-
-  // Metadata
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-}, {
-  versionKey: false
-});
-
-// Actualizar automáticamente updatedAt
-ResidenceSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
-});
-
-// Validación para códigos únicos por conjunto
-ResidenceSchema.index({ code: 1, conjuntoId: 1 }, { unique: true });
+  code: { type: String, required: true, unique: true },
+  conjuntoId: { type: Schema.Types.ObjectId, ref: 'Conjunto', required: true },
+  parqueaderos: [{ type: String }],
+  bodegas: [{ type: String }],
+  administracion: { type: AdministracionSchema, required: true },
+  recibosServicios: [ReciboServicioSchema]
+}, { timestamps: true });
 
 module.exports = model('Residence', ResidenceSchema);

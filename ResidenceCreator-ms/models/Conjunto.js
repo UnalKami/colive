@@ -1,41 +1,52 @@
 // Define la estructura simplificada de un conjunto residencial
 
-const { Schema, model } = require('mongoose');
+const mongoose = require('mongoose');
 
-const ConjuntoSchema = new Schema({
+const AmenitySchema = new mongoose.Schema({
   nombre: { 
     type: String, 
     required: true,
-    trim: true,
-    maxlength: 100
-  },
-  direccion: {
-    type: String,
-    required: true,
     trim: true
   },
-  ciudad: {
+  horario: {
+    dias: { type: String, required: true }, // Ej: "Lunes-Viernes"
+    horas: { type: String, required: true } // Ej: "8:00-20:00"
+  },
+  estado: {
     type: String,
     required: true,
-    trim: true,
-    maxlength: 50
+    enum: ['disponible', 'en_mantenimiento', 'cerrado', 'reservado'],
+    default: 'disponible'
   },
-  amenidades: [{  
-    type: String,
-    trim: true,
-    lowercase: true
-  }],
-  divisiones: [{ 
-    tipo: { type: String, required: true }, // El nombre de la division, como torre, apartamento, bloque, manzana, etc.
-    cantidad: { type: Number, required: true } // Número de torres, apartamentos, bloques, etc.
-  }]
+  costo: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 0
+  },
+  capacidad: {
+    type: Number,
+    required: true,
+    min: 1
+  }
+});
 
-}, {
-  timestamps: true // Mantiene createdAt y updatedAt
+const ConfiguracionesSchema = new mongoose.Schema({
+  torresNumeradas: Boolean,
+  accesoControlado: Boolean,
+}, { _id: false });
+
+
+const ConjuntoSchema = new mongoose.Schema({
+  nombre: { type: String, required: true },
+  direccion: { type: String, required: true },
+  ciudad: { type: String, required: true },
+  amenidades: [AmenitySchema],
+  configuraciones: ConfiguracionesSchema
 });
 
 ConjuntoSchema.path('amenidades').validate(function(amenidades) {
   return new Set(amenidades.map(a => a.toLowerCase())).size === amenidades.length;
 }, 'Cada amenidad debe tener un nombre único dentro del conjunto');
 
-module.exports = model('Conjunto', ConjuntoSchema);
+module.exports = mongoose.model('Conjunto', ConjuntoSchema);
