@@ -6,7 +6,7 @@
   padding: 15px;
   border: 1px solid #cccccc;
   border-radius: 15px;
-  box-shadow: 0 2px 5px rgba(7, 176, 35, 0.308);
+  box-shadow: 0 2px 5px rgba(18, 7, 176, 0.308);
 }
 /* Animación de fondo */
 .nosotros-container {
@@ -63,6 +63,8 @@
 @media (max-width: 368px) {
   #mer-container2 {
     padding: 0 10px;
+    background-color: #cce7ff; /* <- tono verdoso típico */
+
   }
 }
 
@@ -104,7 +106,7 @@
 #team-member2:hover {
   background-color: white;
   transform: translateY(-6px);
-  box-shadow: 2px 5px 10px rgba(224, 163, 39, 0.6);
+  box-shadow: 2px 5px 10px rgba(39, 73, 224, 0.6);
 
 }
 
@@ -121,7 +123,7 @@
   font-size: clamp(1.8vw, 5vw, 1.5rem); 
   font-weight: bold;
   line-height: 1.1; 
-  color: #aa5629;
+  color: #3c3d75a8;
   margin-bottom: 5px;
   margin-top: 10px;
   
@@ -175,7 +177,7 @@
   font-size: clamp(2.2vw, 5vw, 1.5rem); 
   font-weight: bold;
   line-height: 1.1; 
-  color: #33784acf;
+  color: #111b7b;
   margin-bottom: 5px;
   margin-top: 10px;
   margin-left: 20px;
@@ -186,7 +188,7 @@
   font-family: 'Montserrat', sans-serif; 
   font-size: clamp(1.2vw, 2.8vw, 1rem); 
   line-height: 1.5; 
-  color: #666;
+  color: #000000ce;
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 10px;
@@ -196,7 +198,7 @@
   font-family: 'Montserrat', sans-serif; 
   font-size: clamp(1.2vw, 2.8vw, 1rem); 
   line-height: 1.5; 
-  color: #666;
+  color: #000000cb;
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 10px;
@@ -206,7 +208,7 @@
   font-family: 'Montserrat', sans-serif; 
   font-size: clamp(1.2vw, 2.8vw, 1rem); 
   line-height: 1.5; 
-  color: #666;
+  color: #000000c0;
   margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 10px;
@@ -224,9 +226,3 @@
   margin-top: 38px;
 }
 
-
-
-
-
-
-  /* prueba */

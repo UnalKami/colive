@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from '../Pages/Home/Home.jsx';
 import ProductDet from '../Pages/Product/ProductDet.jsx';
 import Register from '../Pages/Register/Register.jsx';
-import RegisterBuyer from "../Pages/Register/Buyer/RegisterBuyer.jsx";
-import RegisterSeller from "../Pages/Register/Seller/RegisterSeller.jsx";
+import RegisterAdmin from "../Pages/Register/Admin/RegisterAdmin.jsx";
+import RegisterUser from "../Pages/Register/User/RegisterUser.jsx";
 import Login from '../Pages/Login/Login.jsx';
 import Layout from '../Pages/Layout/Layout.jsx';
 import Reset from '../Pages/Recover/Reset.jsx';
@@ -11,13 +11,15 @@ import ProductosVista from '../Pages/Catalog/ProductosVista.jsx';
 import ProductosCategoria from '../Pages/Catalog/ProductosCategoria.jsx';
 import ProductosBusqueda from '../Pages/Catalog/ProductosBusqueda.jsx';
 import About from '../Pages/About/About.jsx';
+
 import Admin from '../Pages/Admin/Admin.jsx';
+
 import VendedorProducts from '../Pages/Vendedor/ProductsPage/ProductsPage.jsx';
 import PrivateRoute from '../utils/PrivateRoute.jsx';
 import NotFound from "../Pages/NotFound/NotFound.jsx";
 //import VistaCarrito from "../Pages/VistaCarrito/VistaCarrito.jsx";
-import Comprador from "../Pages/Perfiles/Comprador.jsx";
-import Vendedor from "../Pages/Perfiles/Vendedor.jsx";
+import User from "../Pages/Perfiles/User.jsx";
+import Admins from "../Pages/Perfiles/Admins.jsx";
 import Shopping  from "../Pages/Shopping/Shopping.jsx";
 import Sales  from "../Pages/Sales/Sales.jsx";
 import Soporte  from "../Pages/Soporte/Soporte.jsx";
@@ -47,8 +49,8 @@ export default function Routing() {
             <Route path="/" element={<Home />} />
             <Route path="productDet/:id" element={<ProductDet />} />
             <Route path="register" element={<Register />} />
-            <Route path="register-buyer" element={<RegisterBuyer />} />
-            <Route path="register-seller" element={<RegisterSeller />} />
+            <Route path="register-admin" element={<RegisterAdmin />} />
+            <Route path="register-user" element={<RegisterUser />} />
             <Route path="login" element={<Login />} />
             <Route path="reset" element={<Reset />} />
             <Route path="products" element={<ProductosVista />} />
@@ -58,10 +60,10 @@ export default function Routing() {
             <Route path="admin" element={<Admin />} />
             <Route path="cart" element={<Carrito />} />
             <Route path="checkout" element={<Checkout />} />
-            <Route path="comprador" element={<Comprador />} />
-            <Route path="vendedor" element={<Vendedor />} />
-            <Route path="Preguntas" element={<Preguntas/>}/>
 
+            <Route path="user" element={<User />} />
+            <Route path="admins" element={<Admins />} />
+            <Route path="Preguntas" element={<Preguntas/>}/>
            
             <Route path="campo" element={<Campo />} />
             <Route path="locales" element={<Locales />} />
@@ -70,7 +72,6 @@ export default function Routing() {
             <Route path="nutritivos" element={<Nutritivos />} />
             <Route path="prevenir" element={<Prevenir />} />
            
-
             {/* Rutas protegidas */}
             <Route path="seller" element = {<PrivateRoute roles={["Vendedor"]} />}>
               <Route path="my-products" element={<VendedorProducts />} exact/>

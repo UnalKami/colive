@@ -45,7 +45,7 @@ export default function Header() {
     };
 
     return (
-        <Navbar expand="lg" className="bg-body-tertiary shadow fontHeader">
+        <Navbar expand="lg" className="custom-navbar shadow fontHeader">
             <Container fluid>
                 <Navbar.Brand>
                     <Link to="/">

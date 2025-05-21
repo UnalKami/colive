@@ -10,11 +10,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import TerminosCondiciones from '../TerminosCondiciones/TerminosCondiciones';
 
-/**
- * @file Register.jsx
- * @desc This file contains the Register component, which is responsible for rendering and handling the registration form.
- */
-export default function RegisterBuyer() {
+export default function RegisterUser() {
+
     const api_url = process.env.REACT_APP_API_URL;
 
     //--- Valores de los campos del formulario de registro ---//
@@ -22,6 +19,7 @@ export default function RegisterBuyer() {
     // Datos Personales
     const [Nombres, setNombres] = useState(''); // Agregué el estado Nombres
     const [Apellidos, setApellidos] = useState(''); // Agregué el estado Apellidos
+    const [TipoDocumento, setTipoDocumento] = useState(''); // Agregué el estado Departamento
     const [Documento, setDocumento] = useState(null); // Agregué el estado Documento
     const [Email, setEmail] = useState(''); // Agregué el estado Email
     const [Telefono, setTelefono] = useState(null); // Agregué el estado Telefono
@@ -29,6 +27,7 @@ export default function RegisterBuyer() {
 
     // Datos de la Dirección
 
+    const [Nombre_tienda, setNombre_tienda] = useState(''); // Agregué el estado Nombre_tienda
     const [Departamento, setDepartamento] = useState(''); // Agregué el estado Departamento
     const [Municipio, setMunicipio] = useState(''); // Agregué el estado Municipio
     const [Direccion, setDireccion] = useState(''); // Agregué el estado Direccion
@@ -82,22 +81,6 @@ export default function RegisterBuyer() {
 
     //--- Validación de los campos del formulario de registro ---//
 
-    const [validated, setValidated] = useState(false);
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-
-        setValidated(true);
-
-        if (form.checkValidity() === true && !confirmPasswordError) {
-            registerUser();
-        }
-    };
 
     // Estado para la validación de la contraseña
     const [passwordValidation, setPasswordValidation] = useState({
@@ -110,13 +93,12 @@ export default function RegisterBuyer() {
 
     // Función para validar la contraseña
     const validatePassword = (password) => {
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/;
         setPasswordValidation({
             minLength: password.length >= 6,
             hasLetter: /[a-zA-Z]/.test(password),
             hasNumber: /\d/.test(password),
             hasUpperCase: /[A-Z]/.test(password),
-            hasSpecialChar: /[@$!%*#?&-_]/.test(password)
+            hasSpecialChar: /[@$!%*#?&]/.test(password)
         });
     };
 
@@ -152,8 +134,27 @@ export default function RegisterBuyer() {
         if (!hasLetter) return 'La contraseña debe contener al menos una letra.';
         if (!hasNumber) return 'La contraseña debe contener al menos un número.';
         if (!hasUpperCase) return 'La contraseña debe contener al menos una letra mayúscula.';
-        if (!hasSpecialChar) return 'La contraseña debe contener al menos un carácter especial (@$!%*#?&-_).';
+        if (!hasSpecialChar) return 'La contraseña debe contener al menos un carácter especial (@$!%*#?&).';
         return null;
+    };
+
+    //--- Validación del formulario de registro ---//
+
+    const [validated, setValidated] = useState(false);
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const form = event.currentTarget;
+        if (form.checkValidity() === false) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        setValidated(true);
+
+        if (form.checkValidity() === true && !confirmPasswordError) {
+            registerUser();
+        }
     };
 
 
@@ -161,43 +162,73 @@ export default function RegisterBuyer() {
 
     const registerUser = async () => {
         const data = {
-            Nombres_comprador: Nombres,
-            Apellidos_comprador: Apellidos,
-            Documento_comprador: Documento,
+            Nombres_vendedor: Nombres,
+            Apellidos_vendedor: Apellidos,
+            Tipo_documento: TipoDocumento,
+            Documento_vendedor: Documento,
             Correo_usuario: Email,
-            Telefono_comprador: Telefono,
-            Fecha_nacimiento_comprador: FechaNacimiento,
+            Telefono_vendedor: Telefono,
+            FechaNacimiento_vendedor: FechaNacimiento,
+            Nombre_tienda: Nombre_tienda,
+            Departamento: Departamento,
             MUNICIPIO_ID_Municipio: Municipio,
             Direccion: Direccion,
             Descripcion_adicional: Descripcion,
             Contraseña_encriptada: Password
         };
 
-        const response = await fetch(`${api_url}/compradores`, {
+        fetch(`${api_url}/vendedores`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(data)
-        });
-
-        const responseData = await response.json();
-        if (responseData.error) {
-            if(responseData.body.includes("Duplicate entry")) {
-                toast.error("El correo electrónico ya está registrado.");
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error === false) {
+                clearForm();
+                toast.success(data.body);
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 3000);
             } else {
-                toast.error(responseData.body);
+                if (data.body.includes('Duplicate entry')) {
+                    console.error('Error:', data.body);
+                    toast.error('El correo electrónico ingresado ya se encuentra registrado.');
+                } else {
+                    console.error('Error:', data.body);
+                    toast.error('Ocurrió un error al intentar registrarte. Por favor intenta nuevamente.');
+                }
             }
-        } else {
-            toast.success("Usuario registrado exitosamente.");
-        }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            toast.error('Ocurrió un error al intentar registrarte. Por favor intenta nuevamente.');
+        });
+    };
 
-        console.log(responseData);
-    }
+    // Función para limpiar el formulario
 
+    const clearForm = () => {
+        setNombres('');
+        setApellidos('');
+        setDocumento(null);
+        setTipoDocumento('');
+        setEmail('');
+        setTelefono(null);
+        setFechaNacimiento(null);
+        setNombre_tienda('');
+        setDepartamento('');
+        setMunicipio('');
+        setDireccion('');
+        setDescripcion('');
+        setPassword('');
+        setConfirmPassword('');
+        setValidated(false);
+    };
 
-
-    return (
+  return (
         <div className='register-container'>
             <ToastContainer position='bottom-right'/>
             {/* Scripts */}
@@ -206,9 +237,11 @@ export default function RegisterBuyer() {
                 <div id="shape1" />
             </div>
             <div id="register-container">
-                <img src="Natu_Logo_.png" alt="image" />
+                <img src="Colive_Logo_.png" alt="image" />
                 <Form noValidate validated={validated} onSubmit={handleSubmit} id='register-form'>
-                    <h3 >Datos Personales</h3>
+
+                    <h3 >Datos personales del vendedor</h3>
+
                     <Row className="mb-3">
                         <Form.Group as={Col} md="6" controlId="validationCustom01">
                             <Form.Label>Nombres</Form.Label>
@@ -236,7 +269,42 @@ export default function RegisterBuyer() {
                         </Form.Group>
                         
                     </Row>
-                    <Row className="mb-3">
+                    {/* /// */}
+<Row className="mb-3">
+    <Form.Group as={Col} md="6" controlId="validationTipoDocumento">
+        <Form.Label>Tipo de Documento</Form.Label>
+        <Form.Select
+            required
+            value={TipoDocumento}
+            onChange={(e) => setTipoDocumento(e.target.value)}
+        >
+            <option value="">Selecciona un tipo de documento</option>
+            <option value="CC">Cédula de ciudadanía</option>
+            <option value="CE">Cédula de extranjería</option>
+            <option value="NIT">NIT</option>
+            <option value="TI">Tarjeta de identidad</option>
+            <option value="PAS">Pasaporte</option>
+        </Form.Select>
+        <Form.Control.Feedback type="invalid">Por favor selecciona un tipo de documento.</Form.Control.Feedback>
+    </Form.Group>
+
+    {/* <Form.Group as={Col} md="6" controlId="validationNumeroDocumento">
+        <Form.Label>Número de Documento</Form.Label>
+        <Form.Control
+            type="text"
+            required
+            maxLength={15}
+            pattern="[0-9]*"
+            value={Documento}
+            onChange={(e) => setDocumento(e.target.value)}
+            placeholder="1234567890"
+        />
+        <Form.Control.Feedback type="invalid">Ingresa un número válido.</Form.Control.Feedback>
+    </Form.Group> */}
+{/* </Row>
+
+        
+                    <Row className="mb-3"> */}
                         <Form.Group as={Col} md="4" controlId="validationCustomUsername">
                             <Form.Label>Documento</Form.Label>
                             <InputGroup hasValidation>
@@ -290,7 +358,9 @@ export default function RegisterBuyer() {
                             <Form.Control.Feedback type="invalid">Por favor selecciona tu fecha de nacimiento.</Form.Control.Feedback>
                         </Form.Group>
                     </Row>
-                    <h3 >Datos de la Dirección</h3>
+
+                    <h3 >Datos del apartamento</h3>
+                    
                     <Row className="mb-3">
                         <Form.Group as={Col} md="6" controlId="validationCustom06">
                             <Form.Label>Departamento</Form.Label>
@@ -345,39 +415,41 @@ export default function RegisterBuyer() {
                             />
                         </Form.Group>
                     </Row>
-                    <h3 >Datos de la Cuenta</h3>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} md="6" controlId="validationCustom10">
-                                <Form.Label>Contraseña</Form.Label>
-                                <Form.Control
-                                    maxLength={100}
-                                    type="password"
-                                    placeholder="Contraseña"
-                                    value={Password}
-                                    onChange={handlePasswordChange}
-                                    
-                                    isInvalid={!isPasswordValid()}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {renderPasswordValidationFeedback()}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group as={Col} md="6" controlId="validationCustom11">
-                                <Form.Label>Confirmar Contraseña</Form.Label>
-                                <Form.Control
-                                    maxLength={100}
-                                    type="password"
-                                    placeholder="Confirmar Contraseña"
-                                    value={ConfirmPassword}
-                                    onChange={handleConfirmPasswordChange}
-                                    required
-                                    isInvalid={confirmPasswordError}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    La confirmación de contraseña no coincide.
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                        </Row>
+                    
+                    <h3 >Datos de la cuenta</h3>
+
+                    <Row className="mb-3">
+                        <Form.Group as={Col} md="6" controlId="validationCustom10">
+                            <Form.Label>Contraseña</Form.Label>
+                            <Form.Control
+                                maxLength={100}
+                                type="password"
+                                placeholder="Contraseña"
+                                value={Password}
+                                onChange={handlePasswordChange}
+                                
+                                isInvalid={!isPasswordValid()}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                {renderPasswordValidationFeedback()}
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                        <Form.Group as={Col} md="6" controlId="validationCustom11">
+                            <Form.Label>Confirmar Contraseña</Form.Label>
+                            <Form.Control
+                                maxLength={100}
+                                type="password"
+                                placeholder="Confirmar Contraseña"
+                                value={ConfirmPassword}
+                                onChange={handleConfirmPasswordChange}
+                                required
+                                isInvalid={confirmPasswordError}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                La confirmación de contraseña no coincide.
+                            </Form.Control.Feedback>
+                        </Form.Group>
+                    </Row>
                     <div style={{display:"flex", flexDirection:"column" , alignItems:"center", justifyContent: "center", width: "100%", marginTop: "50px"}}>
                         <Form.Group className="mb-3" style={{display:"flex", flexDirection:"row", justifyContent:"center", alignCenter:"center", }}>
                             <Form.Check
@@ -413,5 +485,5 @@ export default function RegisterBuyer() {
                 </Modal.Footer>
             </Modal>
         </div>
-    );
+  );
 }

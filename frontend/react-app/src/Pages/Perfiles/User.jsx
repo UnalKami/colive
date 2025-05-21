@@ -8,7 +8,7 @@ import Row from 'react-bootstrap/Row';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function Vendedor() {
+export default function User() {
   const api_url = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem('token');
   const id = localStorage.getItem('id');
@@ -16,7 +16,6 @@ export default function Vendedor() {
   // --- Estados de los campos del formulario de registro --- //
   const [Nombres, setNombres] = useState('');
   const [Apellidos, setApellidos] = useState('');
-  const [Nombre_tienda, setNombre_tienda] = useState('');
   const [Documento, setDocumento] = useState('');
   const [Email, setEmail] = useState('');
   const [Telefono, setTelefono] = useState('');
@@ -37,7 +36,7 @@ export default function Vendedor() {
 
   // --- Fetch de datos iniciales --- //
   useEffect(() => {
-    fetch(`${api_url}/vendedores/${id}`, {
+    fetch(`${api_url}/compradores/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -46,18 +45,17 @@ export default function Vendedor() {
     })
     .then(response => response.json())
     .then(data => {
-      const vendedor = data.body[0];  // Acceder al primer objeto del arreglo
-      setNombres(vendedor.Nombre_vendedor || '');
-      setApellidos(vendedor.Apellidos_vendedor || '');
-      setNombre_tienda(vendedor.Nombre_tienda || '');
-      setDocumento(vendedor.Documento_vendedor || '');
-      setEmail(vendedor.Correo_usuario || '');
-      setTelefono(vendedor.Telefono_vendedor || '');
-      setFechaNacimiento(vendedor.FechaNacimiento_vendedor ? vendedor.FechaNacimiento_vendedor.split('T')[0] : '');
-      setDepartamento(vendedor.DEPARTAMENTO_ID_Departamento || '');
-      setMunicipio(vendedor.MUNICIPIO_ID_Municipio || '');
-      setDireccion(vendedor.Direccion || '');
-      setDescripcion(vendedor.Descripcion_adicional || '');
+      const comprador = data.body[0];  // Acceder al primer objeto del arreglo
+      setNombres(comprador.Nombres_comprador || '');
+      setApellidos(comprador.Apellidos_comprador || '');
+      setDocumento(comprador.Documento_comprador || '');
+      setEmail(comprador.Correo_usuario || '');
+      setTelefono(comprador.Telefono_comprador || '');
+      setFechaNacimiento(comprador.Fecha_nacimiento_comprador ? comprador.Fecha_nacimiento_comprador.split('T')[0] : '');
+      setDepartamento(comprador.DEPARTAMENTO_ID_Departamento || '');
+      setMunicipio(comprador.MUNICIPIO_ID_Municipio || '');
+      setDireccion(comprador.Direccion || '');
+      setDescripcion(comprador.Descripcion_adicional || '');
     })
   }, [token, id]);
   
@@ -94,21 +92,20 @@ export default function Vendedor() {
     if (form.checkValidity() === false) {
       event.stopPropagation();
     } else {
-      // Aquí puedes hacer el fetch para actualizar los datos del vendedor
+      // Aquí puedes hacer el fetch para actualizar los datos del comprador
       console.log(Municipio)
-      fetch(`${api_url}/vendedores/${id}`, {
+      fetch(`${api_url}/compradores/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
-          Nombre_vendedor: Nombres,
-          Apellidos_vendedor: Apellidos,
-          Nombre_tienda: Nombre_tienda,
-          Documento_vendedor: Documento,
-          Telefono_vendedor: Telefono,
-          FechaNacimiento_vendedor: FechaNacimiento,
+          Nombres_comprador: Nombres,
+          Apellidos_comprador: Apellidos,
+          Documento_comprador: Documento,
+          Telefono_comprador: Telefono,
+          Fecha_nacimiento_comprador: FechaNacimiento,
           MUNICIPIO_ID_Municipio: Municipio,
           Direccion: Direccion,
           Descripcion_adicional: Descripcion,
@@ -147,7 +144,7 @@ export default function Vendedor() {
       <div id="register-container">
         <img src="Natu_Logo_.png" alt="image" />
         <Form noValidate validated={validated} onSubmit={handleSubmit} id='register-form'>
-          <h3>Datos personales del vendedor</h3>
+          <h3>Mis datos personales</h3>
           <Row className="mb-3">
             <Form.Group as={Col} md="6" controlId="validationCustom01">
               <Form.Label>Nombres</Form.Label>
@@ -233,24 +230,6 @@ export default function Vendedor() {
                 disabled={!editMode}
               />
               <Form.Control.Feedback type="invalid">Por favor ingresa tu fecha de nacimiento.</Form.Control.Feedback>
-            </Form.Group>
-          </Row>
-
-          <h3>Información de la tienda</h3>
-
-          <Row className="mb-3">
-            <Form.Group as={Col} md="12" controlId="validationCustom06">
-              <Form.Label>Nombre de la Tienda</Form.Label>
-              <Form.Control
-                maxLength={60}
-                type="text"
-                placeholder="Nombre de la tienda"
-                value={Nombre_tienda}
-                onChange={(e) => setNombre_tienda(e.target.value)}
-                required
-                disabled={!editMode}
-              />
-              <Form.Control.Feedback type="invalid">Por favor ingresa el nombre de tu tienda.</Form.Control.Feedback>
             </Form.Group>
           </Row>
 

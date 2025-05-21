@@ -48,7 +48,7 @@ export default function Register() {
                                             />
 
                             </Card.Text>
-                            <Link to="/register-buyer">
+                            <Link to="/register-admin">
                                 <Button variant='outline-primary'>Registrarse</Button>
                             </Link>
                         </Card.Body>
@@ -64,27 +64,12 @@ export default function Register() {
                                             style={{ width: '80px', height: '80px' }} 
                                             />
                             </Card.Text>
-                            <Link to="/register-seller">
+                            <Link to="/register-user">
                                 <Button variant='outline-primary'>Registrarse</Button>
                             </Link>
                         </Card.Body>
                     </Card>
-                    <Card className='mb-3'>
-                        <Card.Body align="center">
-                            <Card.Title>Arrendatario</Card.Title>
-                            <Card.Text>
-                                {/* <StorefrontIcon sx={{fontSize: "5rem", color: "#EB6613"}}/> */}
-                                            <img 
-                                            src={arrendatarioImg} 
-                                            alt="Administrador" 
-                                            style={{ width: '80px', height: '80px' }} 
-                                            />
-                            </Card.Text>
-                            <Link to="/register-seller">
-                                <Button variant='outline-primary'>Registrarse</Button>
-                            </Link>
-                        </Card.Body>
-                    </Card>
+
                 </Row>
             </div>
         </div>
