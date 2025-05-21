@@ -50,7 +50,7 @@ export default function Header() {
                 <Navbar.Brand>
                     <Link to="/">
                         <img
-                            src="/natu_logo.png"
+                            src="/colive_logo.png"
                             width="200"
                         />
                     </Link>
