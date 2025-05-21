@@ -1,7 +1,7 @@
 package com.javacomponent.authjavacomponent.config;
 
-import com.javacomponent.authjavacomponent.security.CustomUserDetailsService;
-import com.javacomponent.authjavacomponent.security.JwtAuthenticationFilter;
+/*import com.javacomponent.authjavacomponent.security.CustomUserDetailsService;
+import com.javacomponent.authjavacomponent.security.JwtAuthenticationFilter;*/
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    private final CustomUserDetailsService userDetailsService;
+    /*private final CustomUserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService,
@@ -37,8 +37,17 @@ public class SecurityConfig {
             .userDetailsService(userDetailsService)
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
-    }
+    }*/
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll() // Permite todas las rutas
+            );
+        return http.build();
+}
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // Usado en el login y creación de usuarios
