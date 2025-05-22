@@ -1,0 +1,222 @@
+
+
+#container-item {
+  /* width: calc(30% - 15px); */
+  /* margin: 10px; */
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  background-color: #f9f9f9;
+  margin: 25px;
+  /* height: 70%; */
+}
+
+#container-item:hover {
+  background-color: white;
+  transform: translateY(-6px);
+  box-shadow: 2px 5px 10px rgba(24, 163, 39, 0.6);
+
+}
+
+#descripcion{
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+
+#container-item img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  align-items: left;
+}
+
+
+#container-item h3 {
+  margin-bottom: 5px;
+  font-family: 'Yeseva One', sans-serif;
+  font-size: clamp(1.8vw, 5vw, 1.5rem); 
+  font-weight: bold;
+  line-height: 1.1; 
+  color: #aa5629;
+  margin-bottom: 5px;
+  margin-top: 10px;
+  
+  text-align: center;
+}
+#git{
+  color:#181717;
+}
+#container-item a {
+  display: inline-block;
+  color: #323334;
+  font-size: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+}
+
+#boton-compras {
+  margin-top: 20px;
+  width: 30%;
+  padding: 15px 25px;
+  border: unset;
+  border-radius: 15px;
+  color: #212121;
+  z-index: 1;
+  background: #e8e8e8;
+  position: relative;
+  font-weight: 1000;
+  font-size: 14px;
+  -webkit-box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+  box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+  transition: all 250ms;
+  overflow: hidden;
+  margin: 15px;
+}
+
+#boton-compras ::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  border-radius: 15px;
+  background-color: #212121;
+  z-index: -1;
+  -webkit-box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+  box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+  transition: all 250ms;
+}
+
+#boton-compras:hover {
+  color: var(--registrarse-static);
+  background-color: var(--verde-3);
+}
+
+#descripcion {
+  text-align: center;
+}
+
+
+:root {
+--color-1: rgba(24, 163, 39, 0.6);
+--color-2: rgba(45 ,45 ,188, 0.6);
+--font-subtitle: 'Open Sans', sans-serif;
+--font-text: 'Lexend', sans-serif;
+}
+
+#container-producto {
+padding: 20px;
+border: 1px solid #ccc;
+border-radius: 5px;
+transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+background-color: #f9f9f9;
+margin: 25px;
+}
+
+#container-producto:hover {
+background-color: white;
+transform: translateY(-6px);
+box-shadow: -var(--color-1);
+}
+
+.item-content {
+display: flex;
+align-items: center;
+}
+
+.item-text {
+flex: 1;
+margin-left: 20px; /* Espacio entre imagen y texto */
+}
+
+#container-producto img {
+width: 80px;
+height: 80px;
+border-radius: 20%;
+}
+
+#container-producto h3 {
+margin-bottom: 5px;
+font-family: 'Yeseva One', sans-serif;
+font-size: clamp(1.8vw, 5vw, 1.5rem); 
+font-weight: bold;
+line-height: 1.1; 
+color: #3a8329;
+margin-top: 10px;
+text-align: center;
+}
+
+#descripcion {
+margin-top: 10px;
+margin-bottom: 10px;
+text-align: center;
+}
+
+.boton-compras {
+margin-top: 20px;
+width: 200px; /* Cambia el tamaño del botón en píxeles según tu preferencia */
+padding: 15px 25px;
+border: unset;
+border-radius: 15px;
+color: #212121;
+z-index: 1;
+background: #e8e8e8;
+position: relative;
+font-weight: 1000;
+font-size: 14px;
+-webkit-box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+transition: all 250ms;
+overflow: hidden;
+margin: 15px;
+}
+
+.boton-compras::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+height: 100%;
+width: 0;
+border-radius: 15px;
+background-color: #212121;
+z-index: -1;
+-webkit-box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.27);
+transition: all 250ms;
+}
+
+.boton-compras:hover {
+color: var(--registrarse-static);
+background-color: var(--verde-3);
+}
+
+#nombre-producto {
+font-weight: bold;
+font-size: 1.2rem; /* Puedes ajustar el tamaño según tus preferencias */
+color: #3a8329;
+text-align: left;
+margin-top: 10px; /* Ajusta el espaciado según sea necesario */
+size: 100px;
+margin-left: 50px;
+}
+
+#descripcion-producto {
+text-align: left;
+margin-top: 10px; /* Ajusta el espaciado según sea necesario */
+margin-bottom: 10px; /* Ajusta el espaciado según sea necesario */
+margin-left: 50px;
+}
+#estado {
+text-align: right;
+margin-top: 10px; /* Ajusta el margen superior según sea necesario */
+margin-right: 20px; /* Ajusta el margen derecho según sea necesario */
+color: var(--color-1); /* Cambiar al color verde definido en :root */
+font-weight: bold; 
+}

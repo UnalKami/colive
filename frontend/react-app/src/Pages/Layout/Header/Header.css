@@ -1,0 +1,23 @@
+nav  {
+    z-index: 100;
+}
+
+footer {
+    z-index: 90;
+}
+
+.custom-navbar {
+  background-color: #3d464e; /* morado oscuro */
+  color: white;
+}
+
+.custom-navbar .nav-link,
+.custom-navbar .navbar-brand,
+.custom-navbar .dropdown-item {
+  color: white !important;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .dropdown-item:hover {
+  color: #ccc !important;
+}

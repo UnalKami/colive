@@ -1,0 +1,81 @@
+.container-checkout {
+    max-width: 800px;
+    width: 90%;
+    margin: 15vh auto;
+    padding: 20px;
+    background-color: #fff; /* Color de fondo blanco */
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+@media (max-width: 768px) {
+    .container-checkout {
+        width: 100%; /* Cambiar a ancho completo en dispositivos móviles */
+        padding: 15px; /* Reducir el espacio interno en dispositivos móviles */
+    }
+}
+
+.container-checkout h2 {
+    margin-bottom: 30px;
+    color: #333; /* Color de texto oscuro */
+}
+
+.product-details {
+    display: flex;
+    flex-wrap: wrap; /* Permitir envoltura para dispositivos móviles */
+    align-items: flex-start;
+    border-bottom: 1px solid #ddd; /* Línea divisoria */
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+.product-details img {
+    max-width: 150px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 5px;
+}
+
+.product-info {
+    flex: 1;
+}
+
+.product-info h3 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #333; /* Color de texto oscuro */
+}
+
+.product-info p {
+    margin: 5px 0;
+    color: #666; /* Color de texto gris */
+}
+
+.price-details {
+    flex-shrink: 0;
+    text-align: right;
+    border-left: 1px solid #ddd; /* Línea divisoria */
+    padding-left: 20px;
+}
+
+.buyer-details {
+    border-bottom: 1px solid #ddd; /* Línea divisoria */
+    padding-bottom: 20px;
+}
+
+.buyer-details h3 {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+    color: #333; /* Color de texto oscuro */
+}
+
+.buyer-details p {
+    margin: 5px 0;
+    color: #666; /* Color de texto gris */
+}
+
+.payment-section {
+    text-align: center;
+    margin-top: 20px;
+    padding: 0 50px;
+}

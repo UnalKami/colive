@@ -1,0 +1,104 @@
+.fontHeader{
+  /* <uniquifier>: Use a unique and descriptive class name
+ <weight>: Use a value from 100 to 900 */
+
+  font-family: var(--font-text);
+  font-optical-sizing: auto;
+  font-weight: 520;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 100%;
+  overflow-x: hidden;
+  background-color: #f6f6f6;
+  font-family: var(--font-text);
+  height: 100%;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.fontFooter{
+  /* <uniquifier>: Use a unique and descriptive class name
+ <weight>: Use a value from 100 to 900 */
+
+  font-family: var(--font-text);
+  font-optical-sizing: auto;
+  font-weight: 520;
+  font-style: normal;
+}
+
+/* Estilos para el footer */
+
+.footer-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background-color: #333;
+  color: #fff;
+  position: static;
+}
+
+.footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.footer-section {
+  margin: 1rem;
+}
+
+.footer-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.footer-link {
+  color: #fff;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.footer-link:hover {
+  color: #ddd;
+}
+
+/* Estilo para el botón azul similar a btn-primary de Bootstrap */
+.btn-azul {
+    background-color: #007bff; /* Azul similar al btn-primary */
+    color: white; /* Color del texto blanco */
+    padding: 0.375rem 0.75rem; /* Espaciado interno */
+    font-size: 1rem; /* Tamaño de fuente */
+    font-weight: 400; /* Grosor de fuente */
+    border: 1px solid #007bff; /* Borde azul */
+    border-radius: 0.25rem; /* Bordes redondeados */
+    text-align: center; /* Alineación del texto */
+    text-decoration: none; /* Sin subrayado */
+    display: inline-block; /* Alineación en línea */
+    cursor: pointer; /* Cursor tipo puntero */
+    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out; /* Efecto de transición */
+}
+
+/* Efecto hover */
+.btn-azul:hover {
+    background-color: #0056b3; /* Azul más oscuro al pasar el mouse */
+    border-color: #0056b3; /* Borde azul más oscuro */
+}
+
+/* Efecto de enfoque (focus) */
+.btn-azul:focus, .btn-azul:active {
+    outline: none; /* Sin contorno */
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5); /* Sombra azul clara */
+}

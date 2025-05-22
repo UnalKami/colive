@@ -1,0 +1,100 @@
+.articulos-container {
+    display: flex;
+    max-width: 1200px;
+    width: 100%;
+    margin: 50px auto 150px;
+    padding: 15px;
+    border: 1px solid #cccccc;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(7, 176, 35, 0.308);
+    background-image: linear-gradient(to bottom, #f9f6f1, #d1dcd2);
+    animation: backgroundAnimation 5s linear infinite;
+}
+
+@keyframes backgroundAnimation {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 0%;
+    }
+}
+
+#articulos-contexto {
+    max-width: 900px;
+    text-align: justify;
+    margin: 0 auto;
+}
+
+#articulos-imagen-container {
+    text-align: center;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+#img-centrada-articulo {
+    width: auto;
+    height: 335px;
+    box-shadow: 0 2px 5px rgba(7, 176, 35, 0.308);
+}
+
+#articulos-titulo {
+    font-family: 'Yeseva One', sans-serif;
+    font-size: clamp(2.8vw, 5vw, 2.5rem);
+    line-height: 1.1;
+    color: #33784a;
+    margin-bottom: 2vw;
+    font-weight: bold;
+    text-align: center;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.articulos-descripcion {
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(1.2vw, 2.8vw, 1rem);
+    line-height: 1.5;
+    color: #666;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.articulos-boton {
+    display: flex;
+    padding: 1.1vw 2.5vw; /* Ajusta el relleno del botón en función del tamaño de la pantalla */
+    border-radius: 2rem; /* Redondea los bordes del botón */
+    font-size: clamp(0.9rem, 1.5vw, 1.3rem); /* Ajusta el tamaño de la fuente del botón según el ancho de la pantalla */
+    font-weight: 500;
+    color: white;
+    outline: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    align-items: center;
+    background: #EB6613;
+    margin: 0 auto;
+    margin-bottom: 2px;
+    max-width: 400px;
+    transition: background-color 0.3s ease; /* Transición suave del color de fondo */
+
+  /* Animación al pasar el cursor */
+     animation: pulse 1s infinite alternate; 
+}
+
+.articulos-boton:hover {
+    background-color: #d9540f;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    #articulos-contexto {
+        padding: 0 10px;
+    }
+
+    #img-centrada-articulo {
+        height: auto;
+        width: 100%;
+    }
+}

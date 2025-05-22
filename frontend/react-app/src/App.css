@@ -1,0 +1,57 @@
+.App {
+  position: relative;
+  font-family: var(--font-text);
+}
+
+.App::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://us.123rf.com/450wm/blankstock/blankstock1907/blankstock190704330/127211099-iconos-de-l%C3%ADnea-de-edificios-banco-hotel-palacio-de-justicia-ciudad-inmobiliaria-iconos-de.jpg?ver=6');
+  background-repeat: repeat; /* La imagen se repetirá tanto horizontal como verticalmente */
+  background-size: 300px; /* Cambia el tamaño de la imagen */
+  opacity: 0.2; /* Cambia la opacidad de la imagen */
+  z-index: -1; /* Coloca el pseudo-elemento detrás del contenido */
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+div {
+  font-family: var(--font-text);
+}
