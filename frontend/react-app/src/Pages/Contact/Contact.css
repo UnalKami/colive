@@ -1,3 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
+:root {
+  --light-blue: #c3dcfd;
+  --mid-blue: #bc5b0c;
+  --orange: #9a3a12;
+  --orange-2: #a77636;
+  --orange-3: #fd9c6f;
+  --white: #ffffff;
+  --letters: #333;
+  --letters-2: #7a7a7a;
+  --verde-1: #225f26;
+  --verde-2: #9fdf58;
+  --registrarse-static: #f0fff0;
+  --verde-3: #136c33;
+  --border1: #aaa;
+  --font-subtitle: 'Open Sans', sans-serif;
+  --font-text: 'Lexend', sans-serif;
+}
+
+.contact-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+#contact-register-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.13);
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(8, 7, 16, 0.39);
+  padding: 50px 35px;
+  margin-block: 50px;
+  width: 100%;
+  max-width: 700px;
+  font-family: var(--font-text);
+}
+
+@media (max-width: 768px) {
+  #contact-register-container {
+    max-width: 90%;
+  }
+}
+
+#contact-register-container img {
+  width: 180px;
+  margin-bottom: 20px;
+}
+
+#contact-register-form h3 {
+  color: var(--verde-1);
+  font-size: 1.5rem;
+  font-family: var(--font-text);
+  font-weight: 500;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
 
 
 

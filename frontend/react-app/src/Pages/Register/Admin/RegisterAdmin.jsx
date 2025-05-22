@@ -15,7 +15,7 @@ import TerminosCondiciones from '../TerminosCondiciones/TerminosCondiciones';
  * @desc This file contains the Register component, which is responsible for rendering and handling the registration form.
  */
 export default function RegisterAdmin() {
-    const api_url = process.env.REACT_APP_API_URL;
+    const   api_url = process.env.REACT_APP_API_URL;
 
     //--- Valores de los campos del formulario de registro ---//
 
