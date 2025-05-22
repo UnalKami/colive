@@ -60,11 +60,10 @@ export default function Routing() {
             <Route path="admin" element={<Admin />} />
             <Route path="cart" element={<Carrito />} />
             <Route path="checkout" element={<Checkout />} />
-
-            <Route path="user" element={<User />} />
+            <Route path="info" element={<User />} />
             <Route path="admins" element={<Admins />} />
-            <Route path="Preguntas" element={<Preguntas/>}/>
-           
+            <Route path="Preguntas" element={<Preguntas/>}/>          
+
             <Route path="campo" element={<Campo />} />
             <Route path="locales" element={<Locales />} />
             <Route path="saludables" element={<Saludables />} />
