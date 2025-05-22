@@ -1,27 +1,68 @@
 version: "3.9"
 services:
-  frontend:
-    build:
-      context: ./frontend
-    container_name: frontend
+  CL_ag:
+    image: nginx:1.28.0-alpine-perl
+    container_name: CL_ag
     ports:
-      - "3000:80"  # localhost:3000 servirá el frontend
-    networks:
-      - app-network
-
-  api_gateway:
-    image: nginx:latest
-    container_name: api_gateway
-    ports:
-      - "8080:80"
+        - "80:80"
+        - "443:443"
     volumes:
-      - ./Api_Gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./NetworkManager/nginx:/etc/nginx
+      -  ./frontend/react-app/build/html:/usr/share/nginx/html
     depends_on:
-      - frontend
-      # Aquí puedes agregar otros servicios si los tienes
-    networks:
-      - app-network
+      - CL_Auth_ms
+      - CL_residence_ms
 
-networks:
-  app-network:
-    driver: bridge
+  CL_Auth_ms:
+    image: openjdk:24-slim-bookworm
+    container_name: CL_Auth_ms
+    build:
+      context: ./auth-java-component  
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=cincopatodos
+    ports:
+      - "8080:8080"
+    depends_on:
+      - CL_auth_db
+    
+  CL_auth_db:
+    container_name: CL_auth_db
+    ports:
+      - 5432:5432
+    image: postgres:16.9-alpine3.21 
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=cincopatodos
+    volumes:
+      - ./dbPostgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  CL_residence_db:
+    image: mongo:8.0.9-noble
+    container_name: CL_residence_db
+    ports:
+      - "27017:27017" 
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
+      - MONGO_INITDB_DATABASE=residence_db
+
+  CL_residence_ms:
+    image: node:23.11.1-alpine3.21
+    container_name: CL_residence-ms
+    build:
+      context: ./ResidenceCreator-ms  
+    ports:
+      - "3001:3001"
+    depends_on:
+      - CL_residence_db
+    env_file:
+      - ./ResidenceCreator-ms/.env
