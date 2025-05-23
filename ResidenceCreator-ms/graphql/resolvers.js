@@ -13,11 +13,10 @@ module.exports = {
       // args incluye: nombre, direccion, ciudad, amenidades, configuraciones
       const conjunto = new Conjunto({
         nombre: args.nombre,
-        nombreAdministrador: args.nombreAdministrador,
         direccion: args.direccion,
         ciudad: args.ciudad,
         amenidades: args.amenidades,
-        divisiones: args.divisiones
+        configuraciones: args.configuraciones
       });
       await conjunto.save();
       return conjunto;

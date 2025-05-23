@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI =  process.env.MONGO_URI; 
+const MONGO_URI =  'mongodb://root:cincopatodos@mongo_db:27017/residence_db?authSource=admin';
 
 const connectDB = async () => {
   try {

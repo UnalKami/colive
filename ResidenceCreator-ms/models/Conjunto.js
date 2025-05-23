@@ -31,23 +31,22 @@ const AmenitySchema = new mongoose.Schema({
   }
 });
 
-const Divisiones = new mongoose.Schema({ 
-    tipo: { type: String, required: true }, // El nombre de la division, como torre, apartamento, bloque, manzana, etc.
-    cantidad: { type: Number, required: true } // Número de torres, apartamentos, bloques, etc.
-  });
+const ConfiguracionesSchema = new mongoose.Schema({
+  torresNumeradas: Boolean,
+  accesoControlado: Boolean,
+}, { _id: false });
+
 
 const ConjuntoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  nombreAdministrador: { type: String, required: true },
   direccion: { type: String, required: true },
   ciudad: { type: String, required: true },
   amenidades: [AmenitySchema],
-  divisiones: [Divisiones]
+  configuraciones: ConfiguracionesSchema
 });
 
 ConjuntoSchema.path('amenidades').validate(function(amenidades) {
-  const nombres = amenidades.map(a => a.nombre.toLowerCase());
-  return new Set(nombres).size === nombres.length;
+  return new Set(amenidades.map(a => a.toLowerCase())).size === amenidades.length;
 }, 'Cada amenidad debe tener un nombre único dentro del conjunto');
 
 module.exports = mongoose.model('Conjunto', ConjuntoSchema);

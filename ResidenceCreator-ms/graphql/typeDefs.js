@@ -27,24 +27,23 @@ module.exports = gql`
     horas: String!
   }
 
-  input DivisionesInput {
-    tipo: String!
-    cantidad: Int!
+  type Configuraciones {
+    torresNumeradas: Boolean
+    accesoControlado: Boolean
   }
 
-  type Divisiones {
-    tipo: String!
-    cantidad: Int!
+  input ConfiguracionesInput {
+    torresNumeradas: Boolean
+    accesoControlado: Boolean
   }
 
   type Conjunto {
     id: ID!
     nombre: String!
-    nombreAdministrador: String!
     direccion: String!
     ciudad: String!
     amenidades: [Amenidad]
-    divisiones: [Divisiones]
+    configuraciones: Configuraciones
   }
 
   type Pago {
@@ -120,11 +119,10 @@ module.exports = gql`
   type Mutation {
     createConjunto(
       nombre: String!
-      nombreAdministrador: String!
       direccion: String!
       ciudad: String!
       amenidades: [AmenidadInput]
-      divisiones: [DivisionesInput]
+      configuraciones: ConfiguracionesInput
     ): Conjunto
 
     createResidence(

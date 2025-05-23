@@ -74,7 +74,7 @@ export default function Login() {
                 <div id="background">
                     
                 </div>
-                <title>Login | Natu</title>
+                <title>Login | Colive</title>
                             <form id="login-form">
                                 <div id="logo">   
                                 </div>
