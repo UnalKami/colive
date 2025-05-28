@@ -27,23 +27,24 @@ module.exports = gql`
     horas: String!
   }
 
-  type Configuraciones {
-    torresNumeradas: Boolean
-    accesoControlado: Boolean
+  input DivisionesInput {
+    tipo: String!
+    cantidad: Int!
   }
 
-  input ConfiguracionesInput {
-    torresNumeradas: Boolean
-    accesoControlado: Boolean
+  type Divisiones {
+    tipo: String!
+    cantidad: Int!Controlado: Boolean
   }
 
   type Conjunto {
     id: ID!
     nombre: String!
+    nombreAdministrador: String!
     direccion: String!
     ciudad: String!
     amenidades: [Amenidad]
-    configuraciones: Configuraciones
+    divisiones: [Divisiones]
   }
 
   type Pago {
@@ -108,21 +109,51 @@ module.exports = gql`
     administracion: AdministracionInput!
     recibosServicios: [ReciboServicioInput]
   }
+
+  type Reserva {
+    id: ID!
+    conjuntoId: ID!
+    residenciaId: ID!
+    amenidad: String!
+    fecha: String!
+    horaInicio: String!
+    horaFin: String!
+    cantidadPersonas: Int!
+    motivo: String
+    estado: String!
+    observaciones: String
+    createdAt: String
+    updatedAt: String
+  }
+
+  input ReservaInput {
+    conjuntoId: ID!
+    residenciaId: ID!
+    amenidad: String!
+    fecha: String!
+    horaInicio: String!
+    horaFin: String!
+    cantidadPersonas: Int!
+    motivo: String
+    observaciones: String
+  }
     
   type Query {
     conjuntos: [Conjunto]
     conjunto(id: ID!): Conjunto
     residences: [Residence]
     residence(id: ID!): Residence
+    reservas(conjuntoId: ID, residenciaId: ID): [Reserva]
   }
 
   type Mutation {
     createConjunto(
       nombre: String!
+      nombreAdministrador: String!
       direccion: String!
       ciudad: String!
       amenidades: [AmenidadInput]
-      configuraciones: ConfiguracionesInput
+      divisiones: [DivisionesInput]
     ): Conjunto
 
     createResidence(
@@ -133,6 +164,8 @@ module.exports = gql`
       administracion: AdministracionInput!
       recibosServicios: [ReciboServicioInput]
     ): Residence
+
+    crearReserva(input: ReservaInput!): Reserva
   }
 `;
 

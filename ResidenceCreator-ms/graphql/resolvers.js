@@ -1,5 +1,6 @@
 const Conjunto = require('../models/Conjunto');
 const Residence = require('../models/Residence');
+const Reserva = require('../models/Reserva');
 
 module.exports = {
   Query: {
@@ -7,16 +8,25 @@ module.exports = {
     conjunto: async (_, { id }) => await Conjunto.findById(id),
     residences: async () => await Residence.find(),
     residence: async (_, { id }) => await Residence.findById(id),
+
+    reservas: async (_, { conjuntoId, residenciaId }) => {
+      const filter = {};
+      if (conjuntoId) filter.conjuntoId = conjuntoId;
+      if (residenciaId) filter.residenciaId = residenciaId;
+      return await Reserva.find(filter);
+    },
+    
   },
   Mutation: {
     createConjunto: async (_, args) => {
       // args incluye: nombre, direccion, ciudad, amenidades, configuraciones
       const conjunto = new Conjunto({
         nombre: args.nombre,
+        nombreAdministrador: args.nombreAdministrador,
         direccion: args.direccion,
         ciudad: args.ciudad,
         amenidades: args.amenidades,
-        configuraciones: args.configuraciones
+        divisiones: args.divisiones
       });
       await conjunto.save();
       return conjunto;
@@ -34,5 +44,12 @@ module.exports = {
       await residence.save();
       return residence;
     },
+
+    crearReserva: async (_, { input }) => {
+      const reserva = new Reserva(input);
+      await reserva.save();
+      return reserva;
+    },
+
   },
 };

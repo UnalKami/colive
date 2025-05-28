@@ -39,6 +39,15 @@ import Prevenir from "../Pages/Home/Beneficios/Prevenir.jsx";
 import Carrito from "../Pages/Carrito/Carrito.jsx";
 import Checkout from "../Pages/Carrito/Checkout/Checkout.jsx";
 
+
+
+
+
+
+
+import Propietario from "../Pages/Propietario/Propietario.jsx";
+import ReservarAmenidades from '../Pages/Propietario/ReservarAmenidades.jsx';
+
 export default function Routing() {
 
 
@@ -46,6 +55,15 @@ export default function Routing() {
       <BrowserRouter >
         <Routes>
           <Route path="/" element={<Layout />} >
+            
+            <Route path="propietario/reservar-amenidades" element={<ReservarAmenidades />} />
+            <Route path="propietario" element={<Propietario />} />
+
+
+
+
+
+
             <Route path="/" element={<About />} />
             <Route path="productDet/:id" element={<ProductDet />} />
             <Route path="register" element={<Register />} />
