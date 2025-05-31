@@ -26,13 +26,13 @@ public class RegistroService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void registrarAdmin(RegistroRequestDTO dto) {
+    public void registrar(RegistroRequestDTO dto, Long rolId) {
         if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new RuntimeException("El username ya está en uso");
+            throw new RuntimeException("El username: "+dto.getUsername()+" ya está en uso");
         }
 
-        Rol rol = rolRepository.findByNombreRol("AdminCR")
-                .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
+        Rol rol = rolRepository.findById(rolId)
+                .orElseThrow(() -> new RuntimeException("El rol con id: "+rolId+" no fue encontrado"));
 
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setUsername(dto.getUsername());
