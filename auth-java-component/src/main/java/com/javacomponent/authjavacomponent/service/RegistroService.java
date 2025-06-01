@@ -26,7 +26,7 @@ public class RegistroService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void registrar(RegistroRequestDTO dto, Long rolId) {
+    public void registrarUsuario(RegistroRequestDTO dto, Long rolId) {
         if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new RuntimeException("El username: "+dto.getUsername()+" ya está en uso");
         }

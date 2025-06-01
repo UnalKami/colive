@@ -17,7 +17,7 @@ public class RegistroController {
     @PostMapping("/admin")
     public ResponseEntity<String> registrarAdmin(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarAdmin(dto, Rol.ADMIN_CR);
+            registroService.registrarUsuario(dto, Rol.ADMIN_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -27,7 +27,7 @@ public class RegistroController {
     @PostMapping("/propietario")
     public ResponseEntity<String> registrarPropietario(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarAdmin(dto, Rol.PROPIEDAD_CR);
+            registroService.registrarUsuario(dto, Rol.PROPIEDAD_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -36,7 +36,7 @@ public class RegistroController {
     @PostMapping("/recidente")
     public ResponseEntity<String> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarAdmin(dto, Rol.RECIDENTE_CR);
+            registroService.registrarUsuario(dto, Rol.RECIDENTE_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -45,7 +45,7 @@ public class RegistroController {
     @PostMapping("/seguridad")
     public ResponseEntity<String> registrarSeguridad(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarAdmin(dto, Rol.SEGURIDAD_CR);
+            registroService.registrarUsuario(dto, Rol.SEGURIDAD_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -54,7 +54,7 @@ public class RegistroController {
     @PostMapping("/mantenimiento")
     public ResponseEntity<String> registrarMantenimiento(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarAdmin(dto, Rol.MANTENIMIENTO_CR);
+            registroService.registrarUsuario(dto, Rol.MANTENIMIENTO_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -63,7 +63,7 @@ public class RegistroController {
     @PostMapping("/aseo")
     public ResponseEntity<String> registrarAseo(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarAdmin(dto, Rol.ACEO_CR);
+            registroService.registrarUsuario(dto, Rol.ACEO_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
