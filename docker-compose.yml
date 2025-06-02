@@ -1,4 +1,4 @@
-version: "3.9"
+
 services:
   CL_ag:
     image: nginx:1.28.0-alpine-perl
@@ -37,8 +37,6 @@ services:
       - POSTGRES_DB=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=cincopatodos
-    volumes:
-      - ./dbPostgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
