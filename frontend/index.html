@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home</title>
+  <!-- Animate.css (opcional, si quieres las animaciones) -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    integrity="sha512-bYrGS5m6NnYcIFtEDNf3EkOOc5ljaR7C1TjeG3LfrHPyS4eY9/MbqmE0SlRvy9Eo76hG0DzW8XcRiKU2jKkq3g=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <!-- Tus estilos personalizados -->
+  <style>
+    /* Ejemplo mínimo de CSS para que se aprecien las clases mencionadas. */
+    .home-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .home-page-container-main {
+      max-width: 1200px;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .container-1 {
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .home-page-container {
+      flex: 1 1 50%;
+      padding: 40px;
+    }
+    .home-page-text-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .home-page-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #2c3e50;
+    }
+    .home-page-description {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      color: #4f5b66;
+    }
+    .home-page-button {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: #27ae60;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    .home-page-button:hover {
+      background-color: #219150;
+    }
+    .home-image-section {
+      flex: 1 1 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      background: #ecf0f1;
+    }
+    .home-banner-image {
+      max-width: 100%;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    @media (max-width: 768px) {
+      .home-page-container, .home-image-section {
+        flex: 1 1 100%;
+        padding: 20px;
+      }
+      .home-page-title {
+        font-size: 1.75rem;
+      }
+      .home-page-description {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="home-container">
+    <div class="home-page-container-main">
+      <div class="container-1">
+        
+        <div class="home-page-container">
+          <div class="home-page-text-container">
+            <h1 class="home-page-title animate__animated animate__fadeInUp">
+              ¿Quieres nutrir tu cuerpo con productos colombianos orgánicos?
+            </h1>
+            <p class="home-page-description animate__animated animate__fadeIn">
+              En Natu Tienda Orgánica encontrarás una gran variedad de productos de alta calidad, cultivados y fabricados por productores locales de pueblos de toda Colombia.
+            </p>
+            <a href="/products" class="home-page-button animate__animated animate__fadeIn animate__pulse">
+              Productos →
+            </a>
+          </div>
+        </div>
+
+        <div class="home-image-section">
+          <img
+            src="https://acortar.link/1sQiAb"
+            alt="Banner"
+            class="home-banner-image"
+          />
+        </div>
+
+      </div> <!-- /.container-1 -->
+    </div> <!-- /.home-page-container-main -->
+  </div> <!-- /.home-container -->
+
+  <!-- Si necesitas JavaScript para interacciones adicionales, agrégalo aquí -->
+</body>
+</html>

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registrar Usuario</title>
+
+  <!-- ===================== Bootstrap CSS v5 (CDN) ===================== -->
+  <!-- Nota: aquí quité `integrity` y `crossorigin` para que funcione localmente -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
+  <!-- ===================== Toastify CSS (opcional) ===================== -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/react-toastify@9.1.1/dist/ReactToastify.min.css"
+  />
+
+  <style>
+    /* ======================================================
+       Contenedor general y shapes animados
+       ====================================================== */
+    .register-container {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      background: #f2f2f2;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    #background1 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+    }
+    #background1 .shape1 {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(0, 123, 255, 0.15);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+    #background1 .shape1:nth-child(1) {
+      top: -50px;
+      left: -50px;
+    }
+    #background1 .shape1:nth-child(2) {
+      bottom: -50px;
+      right: -50px;
+    }
+    @keyframes float {
+      0%   { transform: translateY(0px); }
+      50%  { transform: translateY(20px); }
+      100% { transform: translateY(0px); }
+    }
+
+    /* ======================================================
+       Contenedor interno del formulario
+       ====================================================== */
+    #register-container {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    #register-container img {
+      display: block;
+      max-width: 150px;
+      margin: 0 auto 20px;
+    }
+
+    /* ======================================================
+       Estilos para el <dialog> de Términos y Condiciones
+       ====================================================== */
+    dialog#termsDialog {
+      width: 90%;
+      max-width: 600px;
+      border: none;
+      border-radius: 8px;
+      padding: 0;
+      overflow: hidden;
+    }
+    dialog#termsDialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    #termsDialogHeader {
+      background-color: #f7f7f7;
+      padding: 16px 24px;
+      font-weight: bold;
+      font-size: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+    }
+    #termsDialogHeader button {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    #termsDialogBody {
+      padding: 0;
+      margin: 0;
+      height: 400px;         /* Altura fija para que se pueda hacer scroll */
+      overflow: auto;
+    }
+    #termsDialogFooter {
+      padding: 16px 24px;
+      text-align: right;
+      background-color: #f7f7f7;
+      border-top: 1px solid #ddd;
+    }
+    #termsDialogFooter button {
+      padding: 0.5rem 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <!-- ToastContainer (si usas React-Toastify u otra librería de notificaciones) -->
+    <div id="toast-container"></div>
+
+    <!-- Fondos decorativos -->
+    <div id="background1">
+      <div class="shape1"></div>
+      <div class="shape1"></div>
+    </div>
+
+    <!-- Contenedor del formulario -->
+    <div id="register-container">
+      <!-- Logo -->
+      <img src="Colive_Logo_.png" alt="Colive Logo" />
+
+      <!-- ===================== INICIO DEL FORMULARIO ===================== -->
+      <form id="register-form" novalidate>
+        <!-- ----- Selector de Rol ----- -->
+        <h3 class="mb-3">Elige el tipo de usuario</h3>
+        <div class="mb-4">
+          <select class="form-select" id="rolSelect" required>
+            <option value="" disabled selected>Selecciona un rol</option>
+            <option value="admin">Administrador</option>
+            <option value="propietario">Propietario</option>
+            <option value="recidente">Residente</option>
+            <option value="seguridad">Seguridad</option>
+            <option value="mantenimiento">Mantenimiento</option>
+            <option value="aseo">Aseo</option>
+          </select>
+          <div class="invalid-feedback">
+            Por favor selecciona un rol.
+          </div>
+        </div>
+
+        <!-- ===== Sección: Datos Personales del Usuario ===== -->
+        <h3 class="mb-3">Datos personales</h3>
+        <div class="row mb-3">
+          <!-- Nombre completo -->
+          <div class="col-md-6 mb-3">
+            <label for="nombre" class="form-label">Nombre completo</label>
+            <input
+              type="text"
+              class="form-control"
+              id="nombre"
+              name="nombre"
+              maxlength="60"
+              placeholder="Juan Pérez"
+              required
+            />
+            <div class="invalid-feedback">
+              Por favor ingresa tu nombre completo.
+            </div>
+          </div>
+          <!-- Correo -->
+          <div class="col-md-6 mb-3">
+            <label for="correo" class="form-label">Correo electrónico</label>
+            <input
+              type="email"
+              class="form-control"
+              id="correo"
+              name="correo"
+              maxlength="60"
+              placeholder="ejemplo@dominio.com"
+              required
+            />
+            <div class="invalid-feedback">
+              Por favor ingresa un correo válido.
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <!-- Celular -->
+          <div class="col-md-6 mb-3">
+            <label for="celular" class="form-label">Celular</label>
+            <input
+              type="tel"
+              class="form-control"
+              id="celular"
+              name="celular"
+              maxlength="15"
+              placeholder="3001234567"
+              pattern="[0-9]{7,15}"
+              required
+            />
+            <div class="invalid-feedback">
+              Por favor ingresa un número de celular válido (7–15 dígitos).
+            </div>
+          </div>
+          <!-- Nombre de usuario -->
+          <div class="col-md-6 mb-3">
+            <label for="username" class="form-label">Nombre de usuario</label>
+            <input
+              type="text"
+              class="form-control"
+              id="username"
+              name="username"
+              maxlength="30"
+              placeholder="usuario123"
+              required
+            />
+            <div class="invalid-feedback">
+              Por favor ingresa un nombre de usuario.
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Sección: Datos de la Cuenta (Contraseña) ===== -->
+        <h3 class="mb-3">Datos de la cuenta</h3>
+        <div class="row mb-3">
+          <!-- Contraseña -->
+          <div class="col-md-6 mb-3">
+            <label for="password" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              name="password"
+              maxlength="100"
+              placeholder="********"
+              required
+              minlength="8"
+            />
+            <div class="invalid-feedback">
+              La contraseña debe tener al menos 8 caracteres.
+            </div>
+          </div>
+          <!-- Confirmar Contraseña -->
+          <div class="col-md-6 mb-3">
+            <label for="confirmPassword" class="form-label">
+              Confirmar contraseña
+            </label>
+            <input
+              type="password"
+              class="form-control"
+              id="confirmPassword"
+              name="confirmPassword"
+              maxlength="100"
+              placeholder="********"
+              required
+            />
+            <div class="invalid-feedback">
+              La confirmación de contraseña no coincide.
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Aceptar Términos y Botón de Envío ===== -->
+        <div class="d-flex flex-column align-items-center mt-4">
+          <div class="form-check mb-3">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="termsCheck"
+              name="termsCheck"
+              required
+            />
+            <label class="form-check-label" for="termsCheck">
+              Acepto los
+              <a href="#" id="openTermsLink">términos y condiciones</a>
+            </label>
+            <div class="invalid-feedback">
+              Debes aceptar los términos y condiciones para continuar.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-outline-success btn-lg">
+            Registrarse
+          </button>
+        </div>
+      </form>
+      <!-- ===================== FIN DEL FORMULARIO ===================== -->
+    </div> <!-- /#register-container -->
+  </div> <!-- /.register-container -->
+
+  <!-- ===================== DIALOG NATIVO PARA “TÉRMINOS Y CONDICIONES” ===================== -->
+  <dialog id="termsDialog">
+    <div id="termsDialogHeader">
+      <span>Términos y Condiciones</span>
+      <button data-action="close" aria-label="Cerrar">&times;</button>
+    </div>
+    <div id="termsDialogBody">
+      <iframe
+        src="components/terminos-condiciones.html"
+        style="width: 100%; height: 100%; border: none;"
+      >
+        <p>No se pudo cargar los términos y condiciones.</p>
+      </iframe>
+    </div>
+    <div id="termsDialogFooter">
+      <button data-action="close" class="btn btn-secondary">Cerrar</button>
+    </div>
+  </dialog>
+
+  <!-- ===================== Bootstrap Bundle JS v5 (CDN) ===================== -->
+  <!-- Sin integrity ni crossorigin, para que funcione localmente -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+  </script>
+
+  <!-- ===================== Toastify JS (opcional) ===================== -->
+  <script src="https://cdn.jsdelivr.net/npm/react-toastify@9.1.1/dist/ReactToastify.min.js"></script>
+
+  <!-- ===================== SCRIPT PRINCIPAL ===================== -->
+  <script>
+    // ————————————————————————————————————————————————————————————
+    // 1) Lógica para abrir / cerrar el dialog de Términos y Condiciones
+    // ————————————————————————————————————————————————————————————
+    const openLink       = document.getElementById('openTermsLink');
+    const termsDialog    = document.getElementById('termsDialog');
+    const closeButtons   = termsDialog.querySelectorAll('[data-action="close"]');
+
+    openLink.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (typeof termsDialog.showModal === 'function') {
+        termsDialog.showModal();
+      } else {
+        alert('Tu navegador no soporta <dialog>. Actualiza tu navegador.');
+      }
+    });
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', () => termsDialog.close());
+    });
+
+    // ————————————————————————————————————————————————————————————
+    // 2) Función auxiliar: convierte un formulario en un objeto JS
+    // ————————————————————————————————————————————————————————————
+    function formToObject(formElement) {
+      const formData = new FormData(formElement);
+      const obj = {};
+      for (let [key, value] of formData.entries()) {
+        obj[key] = value;
+      }
+      return obj;
+    }
+
+    // ————————————————————————————————————————————————————————————
+    // 3) Validación y envío con fetch al endpoint según el rol
+    // ————————————————————————————————————————————————————————————
+    (function () {
+      'use strict';
+
+      const form      = document.getElementById('register-form');
+      const rolSelect = document.getElementById('rolSelect');
+
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // 1) Validación nativa de HTML5 + contraseñas coincidentes
+        if (!form.checkValidity()) {
+          form.classList.add('was-validated');
+          return;
+        }
+        // Verificar que contraseña y confirmPassword coincidan
+        const pwd  = document.getElementById('password').value;
+        const pwd2 = document.getElementById('confirmPassword').value;
+        if (pwd !== pwd2) {
+          document.getElementById('confirmPassword').classList.add('is-invalid');
+          return;
+        }
+
+        // 2) Determinar endpoint según el rol seleccionado
+        const rolValue = rolSelect.value; 
+        if (!rolValue) {
+          rolSelect.classList.add('is-invalid');
+          return;
+        }
+        // Mapeo de valor del <select> a ruta de tu servicio
+        const rutaMap = {
+          admin:        '/admin',
+          propietario:  '/propietario',
+          residente:    '/recidente',
+          seguridad:    '/seguridad',
+          mantenimiento:'/mantenimiento',
+          aseo:         '/aseo'
+        };
+        const endpoint = "auth/api/registro/"+rutaMap[rolValue];
+        if (!endpoint) {
+          alert('Rol no válido');
+          return;
+        }
+
+        // 3) Armar el JSON con los campos requeridos por RegistroRequestDTO
+        //    Asumo que RegistroRequestDTO tiene: nombre, correo, celular, username, password
+        const payload = {
+          nombre:    document.getElementById('nombre').value.trim(),
+          correo:    document.getElementById('correo').value.trim(),
+          celular:   document.getElementById('celular').value.trim(),
+          username:  document.getElementById('username').value.trim(),
+          password:  pwd
+        };
+
+        // 4) Realizar fetch POST con JSON
+        try {
+          const response = await fetch(endpoint, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            // Éxito: mostrar alerta o toast, luego reiniciar formulario
+            alert('Registro exitoso');
+            form.reset();
+            form.classList.remove('was-validated');
+            // También puedes recargar la página o redirigir, según tu necesidad:
+            // window.location.href = '/otra-página';
+          } else {
+            // Error de validación / excepción del backend
+            const errorText = await response.text();
+            alert('Error en el registro: ' + errorText);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ocurrió un error al comunicarse con el servidor');
+        }
+      }, false);
+    })();
+  </script>
+</body>
+</html>
