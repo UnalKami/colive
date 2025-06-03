@@ -5,6 +5,7 @@ const connectDB = require('./config/db');
 const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
+const Reserva = require('./models/Reserva'); //modelo de Reserva
 
 const app = express();
 // app.use(bodyParser.json());
@@ -12,7 +13,12 @@ const app = express();
 connectDB();
 
 const startApolloServer = async () => {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({ typeDefs, resolvers,
+    context: ({ req }) => ({
+      Reserva, // exponer el modelo a los resolvers
+      req
+    })
+  });
   await server.start();
   server.applyMiddleware({ app, path: '/graphql' });
 

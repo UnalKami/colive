@@ -3,12 +3,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const residenciaSel = document.getElementById('residenciaId');
   const amenidadSel = document.getElementById('amenidad');
   const mensajeDiv = document.getElementById('mensaje');
+  const precioTexto = document.getElementById('precioAmenidadTexto');
+  const costoDiv = document.getElementById('costoAmenidad');
+
   let conjuntos = [];
   let residencias = [];
 
-  // Cargar conjuntos y residencias usando GraphQL
   async function cargarDatos() {
-    // Consulta GraphQL para conjuntos y residencias
     const query = `
       query {
         conjuntos {
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
           nombre
           amenidades {
             nombre
+            costo
           }
         }
         residences {
@@ -41,13 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
   cargarDatos();
 
-  // Cuando cambia el conjunto, actualiza amenidades y residencias
   conjuntoSel.addEventListener('change', function() {
     const conjunto = conjuntos.find(c => c.id === conjuntoSel.value);
-    // Amenidades
     if (conjunto) {
       amenidadSel.innerHTML = '<option value="">Seleccione una amenidad</option>' +
-        (conjunto.amenidades || []).map(a => `<option value="${a.nombre}">${a.nombre}</option>`).join('');
+        (conjunto.amenidades || []).map(a => `<option value="${a.nombre}" data-precio="${a.precio}">${a.nombre}</option>`).join('');
     } else {
       amenidadSel.innerHTML = '<option value="">Seleccione una amenidad</option>';
     }
@@ -57,10 +57,21 @@ document.addEventListener('DOMContentLoaded', function() {
       resFiltradas.map(r => `<option value="${r.id}">${r.code}</option>`).join('');
   });
 
-  // Enviar reserva
+amenidadSel.addEventListener('change', function() {
+  const conjunto = conjuntos.find(c => c.id === conjuntoSel.value);
+  let costo = "";
+  if (conjunto) {
+    const amenidad = (conjunto.amenidades || []).find(a => a.nombre === amenidadSel.value);
+    if (amenidad) {
+      costo = amenidad.costo;
+    }
+  }
+  precioTexto.textContent = costo !== "" ? `$${costo}` : "Seleccione una amenidad";
+});
+
   document.getElementById('reservaForm').addEventListener('submit', async function(e) {
     e.preventDefault();
-    mensajeDiv.textContent = 'Enviando reserva...';
+    mensajeDiv.textContent = '';
 
     const form = e.target;
     const input = {
@@ -75,6 +86,61 @@ document.addEventListener('DOMContentLoaded', function() {
       observaciones: form.observaciones.value
     };
 
+    const inicio = new Date(`${input.fecha}T${input.horaInicio}`);
+    const fin = new Date(`${input.fecha}T${input.horaFin}`);
+    const ahora = new Date();
+
+    if (inicio >= fin) {
+      mensajeDiv.textContent = "La hora de inicio debe ser anterior a la hora de fin.";
+      return;
+    }
+
+    const duracionMinutos = (fin - inicio) / (1000 * 60);
+    if (duracionMinutos < 30 || duracionMinutos > 360) {
+      mensajeDiv.textContent = "La duración debe ser entre 30 minutos y 6 horas.";
+      return;
+    }
+
+    if (inicio < ahora) {
+      mensajeDiv.textContent = "No se puede reservar en el pasado.";
+      return;
+    }
+
+    // Validación de solapamiento y doble reserva
+    const validacionQuery = `
+      query ValidarDisponibilidad($amenidad: String!, $fecha: String!, $horaInicio: String!, $horaFin: String!, $residenciaId: ID!) {
+        validarReservaDisponible(amenidad: $amenidad, fecha: $fecha, horaInicio: $horaInicio, horaFin: $horaFin, residenciaId: $residenciaId) {
+          disponible
+          motivo
+        }
+      }
+    `;
+
+    const validacionRes = await fetch('http://localhost:3001/graphql', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query: validacionQuery,
+        variables: {
+          amenidad: input.amenidad,
+          fecha: input.fecha,
+          horaInicio: input.horaInicio,
+          horaFin: input.horaFin,
+          residenciaId: input.residenciaId
+        }
+      })
+    });
+
+    const validacionData = await validacionRes.json();
+    const validacion = validacionData.data && validacionData.data.validarReservaDisponible;
+    if (!validacion || !validacion.disponible) {
+      mensajeDiv.textContent = validacion && validacion.motivo
+        ? validacion.motivo
+        : "La amenidad ya está reservada para ese horario o ya tienes una reserva activa.";
+      return;
+    }
+
+    // Enviar reserva
     const mutation = `
       mutation CrearReserva($input: ReservaInput!) {
         crearReserva(input: $input) {
@@ -89,10 +155,13 @@ document.addEventListener('DOMContentLoaded', function() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: mutation, variables: { input } })
     });
+
     const result = await res.json();
     if (result.data && result.data.crearReserva) {
       mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
       form.reset();
+      precioTexto.textContent = "Seleccione una amenidad";
+      costoDiv.style.display = "none";
     } else {
       mensajeDiv.textContent = 'Error al reservar.';
     }

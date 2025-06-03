@@ -144,6 +144,18 @@ module.exports = gql`
     residences: [Residence]
     residence(id: ID!): Residence
     reservas(conjuntoId: ID, residenciaId: ID): [Reserva]
+    validarReservaDisponible(
+      amenidad: String!
+      fecha: String!
+      horaInicio: String!
+      horaFin: String!
+      residenciaId: ID!
+    ): ValidacionReservaResult!
+  }
+
+  type ValidacionReservaResult {
+    disponible: Boolean!
+    motivo: String
   }
 
   type Mutation {
