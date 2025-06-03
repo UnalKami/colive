@@ -4,15 +4,10 @@
     --background-color: #f8f9fa;
     --text-color: #333;
     --error-color: #dc3545;
-    --success-color: #28a745;
-    --border-color: #dee2e6;
-    --Verde_azulado_oscuro2:  #276f65;
-    --Verde_azulado: #4caf83;
-    --Verde: #7ad9b0;
-    --Verde_claro: #BBEBD6;
-    --Verde_2: #90d082;
-    --Blanco: #f7f9fc;
-    --Azul_grisaceo: #131A29;
+    --base-color: #c8ae89;
+    --second-color: #968979;
+    --border-color: #646460;
+    --input-color: #edededf0;
 }
 
 input[type="text"] {
@@ -20,12 +15,23 @@ input[type="text"] {
 }
     
 body {
-    background: white;
+    position: relative;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-color);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('../img/loginBckg.jpg') no-repeat center center;
+    background-size:cover;
+    opacity: 0.3; /* Adjust opacity as needed */
+    z-index: 0;
+    pointer-events: none;
 }
     
 .header {
@@ -51,6 +57,12 @@ body {
     position: relative;
     overflow: visible;
 }
+
+.complexRegister img {
+    max-width: 20%;
+    display: block;
+    margin: 0 auto 1rem auto;   
+}
     
 .complexRegister h2 {
     text-align: center;
@@ -73,11 +85,13 @@ body {
     border: 1px solid var(--border-color);
     transition: border-color 0.3s ease;
     width: 100%;
+    background-color: var(--input-color);
+    color:var(--text-color);
 }    
 
 .form-control:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(68, 0, 255, 0.25);
+    box-shadow: 0 0 0 0.1rem var(--primary-hover);
     outline: none;
 }
 
@@ -107,8 +121,8 @@ body {
 }
 
 .btn-primary {
-    background: var(--Verde_azulado);
-    color: #fff;
+    background: var(--base-color);
+    color: var(--text-color);
     border: none;
     border-radius: 25px;
     padding: 0.75rem 2.5rem;
@@ -121,9 +135,9 @@ body {
 }
 
 .btn-primary:hover, .btn-primary:focus {
-    background: var(--Verde_azulado_oscuro2);
+    background: var(--second-color);
+    color: var(--background-color);
     transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 8px 24px rgba(68, 0, 255, 0.18);
     outline: none;
 }
 
