@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrar Usuario</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .container img {
+      display: block;
+      margin: 0 auto 20px;
+      max-width: 120px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .checkbox {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox input {
+      margin-right: 8px;
+    }
+
+    .button {
+      margin-top: 20px;
+      width: 100%;
+      background-color: #00b894;
+      border: none;
+      color: white;
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background-color: #019875;
+    }
+
+    #mensaje {
+      margin-top: 20px;
+      padding: 15px;
+      text-align: center;
+      border-radius: 8px;
+    }
+
+    #mensaje.exito {
+      background-color: #dff0d8;
+      color: #3c763d;
+    }
+
+    #mensaje.error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    #cargando {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #00b894;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="../../Colive_Logo_.png" alt="Colive Logo">
+    <h2>Registrar Usuario</h2>
+
+    <label for="rol">Tipo de usuario</label>
+    <select id="rol" required>
+      <option value="">Cargando roles...</option>
+    </select>
+
+    <div id="datos-propiedad" class="hidden">
+      <label for="descripcionApartamento">Descripción del apartamento</label>
+      <input type="text" id="descripcionApartamento" placeholder="Ej: Torre 1 Apto 303">
+
+      <label for="numeroParqueadero">Número de parqueadero (opcional)</label>
+      <input type="text" id="numeroParqueadero" placeholder="Ej: P12">
+
+      <label for="numeroBodega">Número de bodega (opcional)</label>
+      <input type="text" id="numeroBodega" placeholder="Ej: B7">
+    </div>
+
+
+    <!-- <div class="checkbox">
+      <input type="checkbox" id="terminos">
+      <label for="terminos">Acepto los <a href="#">términos y condiciones</a></label>
+    </div> -->
+
+    <button class="button" onclick="registrarUsuario()">Registrar</button>
+
+    <div id="cargando"><div class="spinner"></div><p>Procesando...</p></div>
+    <div id="mensaje" class="hidden"></div>
+  </div>
+
+  <script>
+    const rolSelect = document.getElementById('rol');
+    const datosPropiedad = document.getElementById('datos-propiedad');
+    const mensaje = document.getElementById('mensaje');
+    const cargando = document.getElementById('cargando');
+
+    // Cargar roles desde backend
+    async function cargarRoles() {
+      try {
+        //const res = await fetch('https://tuservidor/api/roles');
+        //const roles = await res.json();
+
+         const roles = [
+            { id: 1, nombre: 'ADMIN_CR' },
+            { id: 2, nombre: 'PROPIEDAD_CR' },
+            { id: 3, nombre: 'RESIDENTE_CR' },
+            { id: 4, nombre: 'SEGURIDAD_CR' },
+            { id: 5, nombre: 'MANTENIMIENTO_CR' },
+            { id: 6, nombre: 'ASEO_CR' }
+        ];
+        const opciones = roles.filter(rol =>
+          rol.id !== 1 && rol.id !== 3
+        );
+
+        rolSelect.innerHTML = '<option value="">Selecciona un rol</option>';
+        for (let rol of opciones) {
+          const option = document.createElement('option');
+          option.value = rol.nombre;
+          option.textContent = rol.nombre.replace('_CR', '').toLowerCase().replace(/^./, s => s.toUpperCase());
+          rolSelect.appendChild(option);
+        }
+      } catch (err) {
+        rolSelect.innerHTML = '<option value="">Error al cargar roles</option>';
+        console.error('Error cargando roles:', err);
+      }
+    }
+
+    rolSelect.addEventListener('change', () => {
+      datosPropiedad.classList.toggle('hidden', rolSelect.value !== 'PROPIEDAD_CR');
+    });
+
+    async function registrarUsuario() {
+      const rol = rolSelect.value;
+      //const terminos = document.getElementById('terminos').checked;
+      const descripcionApartamento = document.getElementById('descripcionApartamento').value;
+      const numeroParqueadero = document.getElementById('numeroParqueadero').value;
+      const numeroBodega = document.getElementById('numeroBodega').value;
+
+      if (!rol/* || !terminos*/) {
+        mostrarMensaje('Por favor completa todos los campos requeridos.', false);
+        return;
+      }
+
+      const data = {
+        rol        
+      };
+
+      if (rol === 'PROPIEDAD_CR') {
+        if(!descripcionApartamento || !numeroParqueadero || !numeroBodega) {
+          mostrarMensaje('Por favor completa todos los campos de propiedad.', false);
+          return;
+        }
+        data.descripcionApartamento = descripcionApartamento;
+        data.numeroParqueadero = numeroParqueadero;
+        data.numeroBodega = numeroBodega;
+      }
+
+      mostrarCargando(true);
+      mensaje.classList.add('hidden');
+
+      try {
+        const res = await fetch('https://tuservidor/api/crear-usuario', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (!res.ok) throw new Error('Error en la creación');
+
+        const result = await res.json();
+        mostrarMensaje(`Usuario creado. <br><a href="${result.link}" target="_blank">Haz clic aquí para continuar</a>`, true);
+      } catch (err) {
+        mostrarMensaje('Hubo un error al registrar el usuario.', false);
+      } finally {
+        mostrarCargando(false);
+      }
+    }
+
+    function mostrarMensaje(msg, exito) {
+      mensaje.classList.remove('hidden', 'exito', 'error');
+      mensaje.classList.add(exito ? 'exito' : 'error');
+      mensaje.innerHTML = msg;
+    }
+
+    function mostrarCargando(estado) {
+      cargando.style.display = estado ? 'block' : 'none';
+    }
+
+    cargarRoles();
+  </script>
+</body>
+</html>

@@ -36,7 +36,7 @@ public class RegistroController {
     @PostMapping("/recidente")
     public ResponseEntity<String> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.RECIDENTE_CR);
+            registroService.registrarUsuario(dto, Rol.RESIDENTE_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -63,7 +63,7 @@ public class RegistroController {
     @PostMapping("/aseo")
     public ResponseEntity<String> registrarAseo(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.ACEO_CR);
+            registroService.registrarUsuario(dto, Rol.ASEO_CR);
             return ResponseEntity.ok("Registro exitoso");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
