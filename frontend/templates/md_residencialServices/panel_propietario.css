@@ -1,0 +1,54 @@
+body {
+  background-color: #f2f5f7;
+}
+.navbar {
+  height: 60px;
+}
+.logo {
+  height: 40px;
+}
+.hero-section {
+  background-color: #343a40; 
+  min-height: 250px;
+}
+
+.hero-section img {
+  max-height: 120px;
+  width: auto;
+  object-fit: contain;
+}
+
+.hero-section h1 {
+  font-size: 2.2rem;
+}
+
+.hero-section img {
+  max-height: 200px;
+  object-fit: cover;
+}
+
+.info-card {
+  border: none;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.info-card .card-title {
+  font-weight: 500;
+  color: #333;
+}
+.info-card p.display-6 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #0d6efd;
+}
+.list-group-item {
+  background: transparent;
+  border: none;
+  padding-left: 0;
+}
+.list-unstyled li {
+  margin-bottom: 0.5rem;
+}
+.btn-lg {
+  margin: 0 0.5rem;
+}
