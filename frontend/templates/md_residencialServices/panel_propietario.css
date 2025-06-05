@@ -1,8 +1,29 @@
 body {
   background-color: #f2f5f7;
 }
-.navbar {
-  height: 60px;
+nav {
+    z-index: 100;
+}
+
+.custom-navbar {
+    background-color: #3d464e; /* morado oscuro */
+    color: white;
+}
+
+.custom-navbar .nav-link,
+.custom-navbar .navbar-brand,
+.custom-navbar .dropdown-item {
+    color: white !important;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .dropdown-item:hover {
+    color: #ccc !important;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
 }
 .logo {
   height: 40px;

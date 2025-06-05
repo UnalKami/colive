@@ -61,5 +61,5 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   }
 
-  await cargarPanelPropietario();
+  //await cargarPanelPropietario();
 });
