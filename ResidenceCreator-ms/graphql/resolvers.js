@@ -17,16 +17,17 @@ module.exports = {
     },
     
   },
+  
   Mutation: {
     createConjunto: async (_, args) => {
       // args incluye: nombre, direccion, ciudad, amenidades, configuraciones
       const conjunto = new Conjunto({
-        nombre: args.nombre,
-        nombreAdministrador: args.nombreAdministrador,
+        nombreConjunto: args.nombreConjunto,
         direccion: args.direccion,
+        departamento: args.departamento,
         ciudad: args.ciudad,
         amenidades: args.amenidades,
-        divisiones: args.divisiones
+        configuraciones: args.configuraciones
       });
       await conjunto.save();
       return conjunto;
@@ -53,3 +54,5 @@ module.exports = {
 
   },
 };
+
+module.exports = resolvers;

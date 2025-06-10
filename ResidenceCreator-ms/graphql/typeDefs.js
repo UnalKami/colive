@@ -1,12 +1,10 @@
 const { gql } = require('apollo-server-express');
 
-module.exports = gql`
+const typeDefs = gql`
   type Amenidad {
     nombre: String!
     horario: Horario!
-    estado: String!
     costo: Float!
-    capacidad: Int!
   }
 
   type Horario {
@@ -17,9 +15,7 @@ module.exports = gql`
   input AmenidadInput {
     nombre: String!
     horario: HorarioInput!
-    estado: String!
     costo: Float!
-    capacidad: Int!
   }
 
   input HorarioInput {
@@ -27,24 +23,28 @@ module.exports = gql`
     horas: String!
   }
 
-  input DivisionesInput {
-    tipo: String!
-    cantidad: Int!
+  input ConfigInput {
+    tipoParqueadero: String!
+    numeroParqueadero: Int!
+    tieneAlmacen: Boolean!
+    numeroAlmacen: Int!
   }
 
-  type Divisiones {
-    tipo: String!
-    cantidad: Int!Controlado: Boolean
+  type Config {
+    tipoParqueadero: String!
+    numeroParqueadero: Int!
+    tieneAlmacen: Boolean!
+    numeroAlmacen: Int!
   }
 
   type Conjunto {
     id: ID!
-    nombre: String!
-    nombreAdministrador: String!
+    nombreConjunto: String!
     direccion: String!
+    departamento: String!
     ciudad: String!
     amenidades: [Amenidad]
-    divisiones: [Divisiones]
+    configuraciones: [Config]
   }
 
   type Pago {
@@ -153,7 +153,7 @@ module.exports = gql`
       direccion: String!
       ciudad: String!
       amenidades: [AmenidadInput]
-      divisiones: [DivisionesInput]
+      configuraciones: [ConfigInput]
     ): Conjunto
 
     createResidence(
@@ -169,3 +169,4 @@ module.exports = gql`
   }
 `;
 
+module.exports = typeDefs;

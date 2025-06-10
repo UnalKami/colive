@@ -8,24 +8,20 @@ const resolvers = require('./graphql/resolvers');
 const conjuntoRoutes = require('./routes/conjuntoRoutes');
 const residenceRoutes = require('./routes/residenceRoutes');
 
+const mongoose = require("mongoose")
+
 const app = express();
-// app.use(bodyParser.json());
 
 connectDB();
 
-const startApolloServer = async () => {
-  const server = new ApolloServer({ typeDefs, resolvers });
+async function startServer() {
+  const server = new ApolloServer({typeDefs, resolvers});
   await server.start();
-  server.applyMiddleware({ app, path: '/graphql' });
+  server.applyMiddleware({app});
 
-  // Optionally keep REST routes for now
-  app.use('/api', conjuntoRoutes);
-  app.use('/api', residenceRoutes);
-
-  const PORT = process.env.PORT || 3001;
-  app.listen(PORT, () =>
-    console.log(`🚀 ResidenceCreator-ms corriendo en puerto ${PORT}\n🚀 GraphQL en /graphql`)
+  app.listen({port:3001}, () =>
+    console.log(`Conexión exitosa a http://localhost:3001${server.graphqlPath}`)
   );
-};
+}
 
-startApolloServer();
+startServer();

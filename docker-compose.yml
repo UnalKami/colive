@@ -67,7 +67,7 @@ services:
   CL_messaging-ms:
     image: cl_messaging_ms:latest
     build:
-      context: ./MensajeriaYNotificaciones
+      context: ./MensajeriaYnotificaciones
       dockerfile: Dockerfile.sbt-alpine
     container_name: CL_messaging-ms
     ports:
