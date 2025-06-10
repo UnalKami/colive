@@ -63,3 +63,20 @@ services:
       - CL_residence_db
     env_file:
       - ./ResidenceCreator-ms/.env
+
+  CL_messaging-ms:
+    image: cl_messaging_ms:latest
+    build:
+      context: ./MensajeriaYNotificaciones
+      dockerfile: Dockerfile.sbt-alpine
+    container_name: CL_messaging-ms
+    ports:
+      - "9000:9000"
+    environment:
+      SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
+      MONGO_URI: "mongodb://root:cincopatodos@CL_residence_db:27017/correos?authSource=admin"
+    command: ["sbt", "run"]
+    depends_on:
+      - CL_residence_db
+      - CL_auth_db
+    restart: unless-stopped

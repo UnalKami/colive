@@ -15,5 +15,5 @@ RUN curl -L -o /tmp/sbt.tgz https://github.com/sbt/sbt/releases/download/v${SBT_
 WORKDIR /app
 # Copia la applicación
 COPY ./app /app
-EXPOSE 	8080
+EXPOSE 	9000
 RUN sbt clean compile
