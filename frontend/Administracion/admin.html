@@ -1,248 +1,223 @@
-/* About.css */
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colive – Administración de Personal</title>
 
-/* ====== 1) Fondo general con "papel tapiz" (pattern) ====== */
-body {
-  margin: 0;
-  padding: 0;
-  background: url('wallpaper-pattern.png') repeat center top;
-  background-size: auto; /* El PNG se repetirá a su tamaño real */
-  font-family: 'Montserrat', sans-serif;
-  color: #111;
-}
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Yeseva+One&display=swap" rel="stylesheet" />
 
-/* ====== 2) Contenedor principal "Acerca de nosotros" ====== */
-.nosotros-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 1200px;
-  width: 100%;
-  margin: 50px auto 150px;
-  padding: 15px;
-  border: 1px solid #cccccc;
-  border-radius: 15px;
-  box-shadow: 0 2px 5px rgba(18, 7, 176, 0.3);
+  <style>
+    html, body { height: 100%; margin: 0; background-color: #f2f2f2; font-family: 'Montserrat', sans-serif; }
+    .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
 
-  /* Fondo blanco semitransparente para que se vea el pattern detrás */
-  background-color: rgba(255, 255, 255, 0.90);
+    /* Navbar */
+    nav { z-index: 100; }
+    .custom-navbar { background-color: #3d464e; }
+    .custom-navbar .navbar-brand,
+    .custom-navbar .nav-link { color: #fff !important; }
+    .custom-navbar .nav-link:hover { color: #ccc !important; }
+    .btn-logout { background-color: #dc3545; color: #fff !important; border: none; padding: 0.375rem 1rem; font-weight: bold; transition: background-color 0.3s ease; }
+    .btn-logout:hover { background-color: #bb2d3b; }
 
-  /* Animación de entrada */
-  animation: fadeInLeft 0.8s ease-in-out 0.2s forwards;
-  opacity: 0; /* se mostrará tras fadeInLeft */
-}
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      bottom: 0;
+      left: 0;
+      width: 200px;
+      background-color: #3d464e;
+      padding: 1rem;
+      transform: translateX(-100%);
+      transition: transform 0.5s cubic-bezier(0.25,0.8,0.25,1);
+      z-index: 50;
+    }
+    .sidebar.show { transform: translateX(0); }
+    .sidebar a { display: block; color: #fff; text-decoration: none; margin: 0.5rem 0; }
+    .sidebar a:hover { color: #ccc; }
 
-/* ====== 3) Animación de entrada (fadeIn desde la izquierda) ====== */
-@keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
+    /* Content */
+    .page-title { font-weight: 600; margin-bottom: 1.5rem; color: #3d464e; }
+    .card-admin { background-color: #fff; border: none; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 2rem; }
+    .btn-nuevo { background-color: #4A90E2; color: #fff; font-weight: 600; border: none; transition: background-color 0.3s ease; }
+    .btn-nuevo:hover { background-color: #357ABD; }
 
-/* ====== 4) Sección de texto (Acerca, Visión, Misión) ====== */
-.text-section {
-  width: 100%;
-  max-width: 900px;
-  text-align: justify;
-  margin-bottom: 40px;
-}
+    table#tablaPersonal { width: 100%; border-collapse: collapse; }
+    table#tablaPersonal thead { background-color: #3d464e; }
+    table#tablaPersonal thead th { color: #fff; font-weight: 600; padding: 0.75rem 1rem; text-align: center; }
+    table#tablaPersonal tbody tr:nth-child(even) { background-color: #f9f9f9; }
+    table#tablaPersonal tbody tr:hover { background-color: #e6f2ff; }
+    table#tablaPersonal tbody td { padding: 0.75rem 1rem; text-align: center; vertical-align: middle; }
+    .btn-accion { padding: 0.25rem 0.5rem; font-size: 0.9rem; }
 
-/* Logo centrado */
-.logo-container {
-  text-align: center;
-  margin-bottom: 20px;
-}
+    /* Footer */
+    .fontFooter { font-family: 'Montserrat', sans-serif; }
+    .footer-section { font-family: 'Yeseva One', sans-serif; font-size: 1rem; }
+    footer { position: relative; z-index: 100; background-color: #3d464e; }
+    footer a, footer p, footer span, footer li { color: #fff !important; }
+    footer img.footer-logo { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
 
-#img-centrada2 {
-  width: auto;
-  height: 150px; /* Ajusta alto según convenga */
-  object-fit: contain;
-}
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg custom-navbar shadow">
+      <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand" href="../index.html">
+          <img src="../img/colive_logo.png" width="200" alt="Logo Colive" />
+        </a>
+        <!-- Categories Button next to logo -->
+        <button class="btn p-0 ms-2" onclick="toggleSidebar()" title="Categorías">
+          <img src="../icon/options.png" width="24" height="24" alt="Categorías" />
+        </button>
+        <!-- Spacer and Logout on right -->
+        <div class="ms-auto">
+          <a class="btn btn-logout" href="../index.html">Cerrar Sesión</a>
+        </div>
+      </div>
+    </nav>
 
-/* Títulos secciones (Acerca, Visión, Misión, Nuestro Equipo) */
-#titulo2 {
-  font-family: 'Yeseva One', sans-serif;
-  font-size: clamp(1.8rem, 2.2vw, 2.4rem);
-  font-weight: bold;
-  color: #111b7b;
-  margin: 20px 0 10px;
-  text-align: left;
-}
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebarCategorias">
+      <a href="/products/category/food">Alimentos</a>
+      <a href="/products/category/personal-care">Cuidado personal</a>
+      <a href="/products/category/home">Productos para el hogar</a>
+      <a href="/products/category/supplements">Suplementos dietéticos</a>
+      <a href="/products/category/garden">Cuidado del jardín</a>
+    </div>
 
-/* Texto de visión y acerca */
-.vision,
-.mision,
-.acerca {
-  font-size: clamp(1rem, 1.4vw, 1.1rem);
-  line-height: 1.6;
-  color: #333;
-  margin-bottom: 20px;
-}
+    <!-- MAIN CONTENT -->
+    <main class="container my-5">
+      <h1 class="text-center page-title">Administración de Personal</h1>
+      <div class="card-admin">
+        <div class="d-flex justify-content-end mb-3">
+          <button class="btn btn-nuevo" data-bs-toggle="modal" data-bs-target="#modalCrear">
+            <i class="bi bi-plus-lg"></i> Nuevo Personal
+          </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped" id="tablaPersonal">
+            <thead><tr>
+              <th>ID</th><th>Nombre</th><th>Apellido</th><th>Rol</th>
+              <th>Teléfono</th><th>Email</th><th>Estado</th><th>Acciones</th>
+            </tr></thead>
+            <tbody><!-- dinámico --></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
 
-/* ====== 5) "Nuestro Equipo" ====== */
-#about-us-container2 {
-  width: 100%;
-  max-width: 900px;
-  margin-bottom: 30px;
-}
+    <!-- MODAL -->
+    <div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog"><form id="formPersonal" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear Nuevo Personal</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="inputId" />
+          <div class="mb-3"><label class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="inputNombre" required />
+          </div>
+          <div class="mb-3"><label class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="inputApellido" required />
+          </div>
+          <div class="mb-3"><label class="form-label">Rol</label>
+            <select class="form-select" id="selectRol" required>
+              <option value="vigilante">Vigilante</option>
+              <option value="mantenimiento">Mantenimiento</option>
+              <option value="aseo">Aseo</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <div class="mb-3"><label class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="inputTelefono" />
+          </div>
+          <div class="mb-3"><label class="form-label">Email</label>
+            <input type="email" class="form-control" id="inputEmail" />
+          </div>
+          <div class="mb-3"><label class="form-label">Estado</label>
+            <select class="form-select" id="selectEstado">
+              <option value="activo" selected>Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form></div>
+    </div>
 
-/* Contenedor grid de miembros */
-#team-container2 {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
-}
+  <!-- FOOTER -->
+  <footer class="footer py-3 shadow-lg border-top" style="background-color: #3d464e;">
+    <div class="container fontFooter">
+      <nav class="row justify-content-between">
+        <div class="col-12 col-md-3 d-flex align-items-center justify-content-center mb-3 mb-md-0">
+          <img src="../img/Colive_Logo_.png" alt="Logo" class="img-fluid" width="250" height="50" />
+        </div>
 
-/* Tarjeta de cada miembro */
-.team-member2 {
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  position: relative;
-  overflow: hidden;
-}
+        <ul class="col-12 col-md-2 list-unstyled px-3 mb-3 mb-md-0">
+          <li class="footer-section fw-bold mb-2">COLIVE co-ownership</li>
+        </ul>
 
-/* Hover en tarjeta */
-.team-member2:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 4px 12px rgba(39, 73, 224, 0.4);
-}
+        <ul class="col-12 col-md-3 list-unstyled px-4 mb-3 mb-md-0">
+          <li class="footer-section fw-bold mb-2">Enlaces</li>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/products">Productos</a></li>
+          <li><a href="/about">Nosotros</a></li>
+          <li><a href="/contact">Contáctanos</a></li>
+          <li><a href="/encuesta">Califícanos</a></li>
+          <li><a href="/terms-and-conditions">Términos y Condiciones</a></li>
+          <li><a href="https://heyzine.com/flip-book/c951be1b87.html">Manual de Usuario</a></li>
+          <li><a href="/preguntas">Preguntas Frecuentes</a></li>
+        </ul>
 
-/* Imagen del integrante */
-.team-member2 img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-  margin-bottom: 12px;
-}
+        <ul class="col-12 col-md-3 list-unstyled px-4 text-center mb-3 mb-md-0">
+          <li class="footer-section fw-bold mb-2">Síguenos</li>
+          <li class="d-flex justify-content-center gap-3">
+            <a href="https://www.facebook.com/profile.php?id=61557990925535" target="_blank">
+              <i class="bi bi-facebook fs-2"></i>
+            </a>
+            <a href="https://www.instagram.com/_natu_tienda/" target="_blank">
+              <i class="bi bi-instagram fs-2"></i>
+            </a>
+            <a href="mailto:Colive@gmail.com" target="_blank">
+              <i class="bi bi-envelope fs-2"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="container mt-2">
+        <p class="text-center mb-0 fw-bold">Colive@gmail.com</p>
+        <p class="text-center mb-0 fw-bold">Realizado por el equipo Colive</p>
+      </div>
+    </div>
+  </footer>
 
-/* Nombre del integrante */
-.team-member2 h3 {
-  margin: 10px 0 5px;
-  font-size: clamp(1.2rem, 1.6vw, 1.4rem);
-  color: #3c3d75a8;
-}
+  </div>
 
-/* Rol del integrante */
-.team-member2 p {
-  margin: 0;
-  font-size: clamp(0.9rem, 1.2vw, 1rem);
-  color: #555;
-}
-
-/* Contenedor de íconos sociales */
-.social-links {
-  margin-top: 12px;
-}
-
-/* Iconos de GitHub/LinkedIn */
-.social-links a {
-  margin: 0 8px;
-  color: #323334;
-  font-size: 1.6rem;
-  transition: transform 0.8s linear;
-}
-
-/* Hover en los íconos: rotación */
-.social-links a:hover {
-  transform: rotate(360deg);
-}
-
-/* ====== 6) Media queries para pantallas pequeñas ====== */
-
-/* Para pantallas menores a 768px */
-@media (max-width: 768px) {
-  .nosotros-container {
-    margin: 20px auto 60px;
-    padding: 10px;
-  }
-
-  .text-section {
-    margin-bottom: 25px;
-  }
-
-  #img-centrada2 {
-    height: 120px;
-  }
-
-  #titulo2 {
-    font-size: clamp(1.6rem, 2.5vw, 2rem);
-    margin: 15px 0 8px;
-  }
-
-  .vision,
-  .mision,
-  .acerca {
-    font-size: clamp(0.95rem, 1.6vw, 1rem);
-    margin-bottom: 15px;
-  }
-
-  /* Grid pasa a 1 o 2 columnas según ancho */
-  #team-container2 {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
-  }
-
-  .team-member2 {
-    padding: 16px;
-  }
-
-  .team-member2 img {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
-  }
-
-  .team-member2 h3 {
-    font-size: clamp(1.1rem, 1.8vw, 1.3rem);
-  }
-
-  .team-member2 p {
-    font-size: clamp(0.85rem, 1.4vw, 0.95rem);
-  }
-
-  .social-links a {
-    font-size: 1.4rem;
-    margin: 0 6px;
-  }
-}
-
-/* Para pantallas muy pequeñas menores a 480px */
-@media (max-width: 480px) {
-  #team-container2 {
-    grid-template-columns: 1fr; /* Una sola columna */
-    gap: 12px;
-  }
-
-  .team-member2 {
-    padding: 12px;
-  }
-
-  .team-member2 img {
-    width: 70px;
-    height: 70px;
-    margin-bottom: 8px;
-  }
-
-  .team-member2 h3 {
-    font-size: clamp(1rem, 2.2vw, 1.2rem);
-  }
-
-  .team-member2 p {
-    font-size: clamp(0.8rem, 1.2vw, 0.9rem);
-  }
-
-  .social-links a {
-    font-size: 1.2rem;
-    margin: 0 5px;
-  }
-}
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebarCategorias').classList.toggle('show');
+    }
+    document.addEventListener('click', e => {
+      const sb = document.getElementById('sidebarCategorias');
+      if (!sb.contains(e.target) && !e.target.closest('[onclick="toggleSidebar()"]')) sb.classList.remove('show');
+    });
+  </script>
+  <script src="admin.js"></script>
+</body>
+</html>
