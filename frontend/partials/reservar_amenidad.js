@@ -177,11 +177,12 @@ document.addEventListener('DOMContentLoaded', function() {
         mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
         form.reset();
         precioTexto.textContent = "Seleccione una amenidad";
-        // Cierra el modal automáticamente
+        // Cierra el modal automáticamente SOLO si fue exitoso
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) modal.hide();
       } else {
         mensajeDiv.textContent = 'Error al reservar.';
+        // NO cerrar el modal aquí
       }
     });
   }

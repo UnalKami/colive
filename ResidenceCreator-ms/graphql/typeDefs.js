@@ -137,6 +137,16 @@ module.exports = gql`
     motivo: String
     observaciones: String
   }
+
+  input EditarReservaInput {
+    fecha: String!
+    horaInicio: String!
+    horaFin: String!
+    cantidadPersonas: Int!
+    motivo: String
+    observaciones: String
+  }
+
     
   type Query {
     conjuntos: [Conjunto]
@@ -178,6 +188,12 @@ module.exports = gql`
     ): Residence
 
     crearReserva(input: ReservaInput!): Reserva
+
+    editarReserva(
+      id: ID!
+      input: EditarReservaInput!
+    ): Reserva
+
   }
 `;
 

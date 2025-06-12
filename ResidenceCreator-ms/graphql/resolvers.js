@@ -92,5 +92,10 @@ module.exports = {
       return reserva;
     },
 
+    editarReserva: async (_, { id, input }) => {
+      const reserva = await Reserva.findByIdAndUpdate(id, input, { new: true });
+      return reserva;
+    },
+
   },
 };
