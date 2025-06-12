@@ -1,0 +1,153 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>COLive - Registro</title>
+    <link rel="stylesheet" href="../../css/create_complex.css">
+    <link rel="icon" href="../../img/colive.png">
+</head>
+
+<body>
+    <div class="complexRegister">
+        <img src="../../img/colive.png" >
+        <h2>Registar conjunto</h2>
+        <form id="complexForm">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" id="complex_name" name="complex_name" class="form-control" placeholder="Nombre del conjunto" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" id="address" name="address" class="form-control" placeholder="Dirección del conjunto" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <select id="department" name="department" class="form-control" required>
+                        <option value="">SELECIONA UN DEPARTAMENTO</option>
+                        <option value="AMAZONAS">AMAZONAS</option>
+                        <option value="ANTIOQUIA">ANTIOQUIA</option>
+                        <option value="ARAUCA">ARAUCA</option>
+                        <option value="ATLÁNTICO">ATLÁNTICO</option>
+                        <option value="BOLÍVAR">BOLIVAR</option>
+                        <option value="BOYACÁ">BOYACÁ</option>
+                        <option value="CALDAS">CALDAS</option>
+                        <option value="CAQUETÁ">CAQUETÁ</option>
+                        <option value="CASANARE">CASANARE</option>
+                        <option value=-CAUCA">CAUCA</option>
+                        <option value="CESAR">CESAR</option>
+                        <option value="CHOCÓ">CHOCÓ</option>
+                        <option value="CÓRDOBA">CÓRDOBA</option>
+                        <option value="CUNDINAMARCA">CUNDINAMARCA</option>
+                        <option value="GUAINÍA">GUAINÍA</option>
+                        <option value="GUAVIARE">GUAVIARE</option>
+                        <option value="HUILA">HUILA</option>
+                        <option value="LA GUAJIRA">LA GUAJIRA</option>
+                        <option value="MAGDALENA">MAGDALENA</option>
+                        <option value="META">META</option>
+                        <option value="NARIÑO">NARIÑO</option>
+                        <option value="NORTE DE SANTANDER">NORTE DE SANTANDER</option>
+                        <option value="PUTUMAYO">PUTUMAYO</option>
+                        <option value="QUINDÍO">QUINDÍO</option>
+                        <option value="RISARALDA">RISARALDA</option>
+                        <option value="SAN ANDRÉS Y PROVIDENCIA">SAN ANDRÉS Y PROVIDENCIA</option>
+                        <option value="SANTANDER">SANTANDER</option>
+                        <option value="SUCRE">SUCRE</option>
+                        <option value="TOLIMA">TOLIMA</option>
+                        <option value="VALLE DEL CAUCA">VALLE DEL CAUCA</option>
+                        <option value="VAUPÉS">VAUPÉS</option>
+                        <option value="VICHADA">VICHADA</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" id="city" name="city" class="form-control" placeholder="Ciudad" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <h3>Amenidades</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="PISCINA" id="amenityPiscina" name="amenities">
+                            <label class="form-check-label" for="amenityPiscina">PISCINA</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="GIMNASIO" id="amenityGimnasio" name="amenities">
+                            <label class="form-check-label" for="amenityGimnasio">GIMNASIO</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="PARQUE INFANTIL" id="amenityParque" name="amenities">
+                            <label class="form-check-label" for="amenityParque">PARQUE INFANTIL</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="BBQ" id="amenityBBQ" name="amenities">
+                            <label class="form-check-label" for="amenityBBQ">BBQ</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SALON COMUNAL" id="amenityComunal" name="amenities">
+                            <label class="form-check-label" for="amenityComunal">SALON COMUNAL</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="SALON DE JUEGOS" id="amenityJuegos" name="amenities">
+                            <label class="form-check-label" for="amenityJuegos">SALON DE JUEGOS</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="ZONAS HUMEDAS" id="amenityHumedas" name="amenities">
+                            <label class="form-check-label" for="amenityHumedas">ZONAS HUMEDAS</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="CANCHA MULTIPROPOSITO" id="amenityCancha" name="amenities">
+                            <label class="form-check-label" for="amenityCancha">CANCHA MULTIPROPOSITO</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <h3>Configuraciones</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <select id="parking" name="parking" class="form-control" required>
+                            <option value="">TIPOS DE PARQUEADEROS</option>
+                            <option value="1">1 A 1</option>
+                            <option value="2">SORTEO</option>
+                            <option value="0">NO DISPONIBLES</option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="parkingNumberGroup" style="display:none;">
+                        <input type="number" min="1" class="form-control" id="parkingNumber" name="parkingNumber" placeholder="Número de parqueaderos">
+                    </div>
+                    <div class="form-group">
+                        <select id="storage" name="storage" class="form-control" required>
+                            <option value="">BODEGAS</option>
+                            <option value="1">SI APLICA</option>
+                            <option value="0">NO APLICA</A></option>
+                        </select>
+                    </div>
+                    <div class="form-group" id="storageNumberGroup" style="display:none;">
+                        <input type="number" min="1" class="form-control" id="storageNumber" name="storageNumber" placeholder="Número de bodegas">
+                    </div>
+                </div>                       
+            </div>
+            <div class="btn-center">
+                <button type="button" id="submitBtn" class="btn btn-primary">Registrar conjunto</button>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="frontend/templates/md_authModule/create_complex.js"></script>
+</body>
+</html>
