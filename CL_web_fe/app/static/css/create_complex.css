@@ -1,0 +1,149 @@
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --error-color: #dc3545;
+    --base-color: #c8ae89;
+    --second-color: #968979;
+    --border-color: #646460;
+    --input-color: #edededf0;
+}
+
+input[type="text"] {
+    text-transform: uppercase;
+}
+    
+body {
+    position: relative;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: url('../img/loginBckg.jpg') no-repeat center center;
+    background-size:cover;
+    opacity: 0.3; /* Adjust opacity as needed */
+    z-index: 0;
+    pointer-events: none;
+}
+    
+.header {
+    padding: 1rem;
+    text-align: center;
+}
+    
+.title {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: bold;
+}
+    
+.complexRegister {
+    min-width: 1000px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 30px 25px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: visible;
+}
+
+.complexRegister img {
+    max-width: 20%;
+    display: block;
+    margin: 0 auto 1rem auto;   
+}
+    
+.complexRegister h2 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+.complexRegister h3{
+    margin-left: 2%;
+}
+    
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-control {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+    width: 100%;
+    background-color: var(--input-color);
+    color:var(--text-color);
+}    
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.1rem var(--primary-hover);
+    outline: none;
+}
+
+.form-row .form-group {
+    max-width: 100%;
+    flex: 1 1 350px;
+    margin-right: 20px;
+}
+.form-row .form-group:last-child {
+    margin-right: 0;
+}
+.form-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+.col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.btn-primary {
+    background: var(--base-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 25px;
+    padding: 0.75rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    box-shadow: 0 4px 16px rgba(68, 0, 255, 0.10);
+    transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: var(--second-color);
+    color: var(--background-color);
+    transform: translateY(-2px) scale(1.03);
+    outline: none;
+}
+
+.btn-center {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 1.5rem;
+}
