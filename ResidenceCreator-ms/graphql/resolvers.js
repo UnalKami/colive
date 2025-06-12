@@ -5,8 +5,11 @@ const Reserva = require('../models/Reserva');
 module.exports = {
   Query: {
     conjuntos: async () => await Conjunto.find(),
+
     conjunto: async (_, { id }) => await Conjunto.findById(id),
+
     residences: async () => await Residence.find(),
+
     residence: async (_, { id }) => await Residence.findById(id),
 
     reservas: async (_, { conjuntoId, residenciaId }) => {
@@ -58,6 +61,8 @@ module.exports = {
     },
     
   },
+
+
   Mutation: {
     createConjunto: async (_, args) => {
       // args incluye: nombre, direccion, ciudad, amenidades, configuraciones
@@ -67,11 +72,11 @@ module.exports = {
         direccion: args.direccion,
         ciudad: args.ciudad,
         amenidades: args.amenidades,
-        divisiones: args.divisiones
       });
       await conjunto.save();
       return conjunto;
     },
+
     createResidence: async (_, args) => {
       // args incluye: code, conjuntoId
       const residence = new Residence({
@@ -79,23 +84,30 @@ module.exports = {
         conjuntoId: args.conjuntoId,
         parqueaderos: args.parqueaderos,
         bodegas: args.bodegas,
-        administracion: args.administracion,
-        recibosServicios: args.recibosServicios
       });
       await residence.save();
       return residence;
     },
 
-    crearReserva: async (_, { input }) => {
-      const reserva = new Reserva(input);
+    crearReserva: async (_, args) => {
+      const reserva = new Reserva({
+        conjuntoId: args.conjuntoId,
+        residenciaId: args.residenciaId,
+        amenidad: args.amenidad,
+        fecha: args.fecha,
+        horaInicio: args.horaInicio,
+        horaFin: args.horaFin,
+        cantidadPersonas: args.cantidadPersonas,
+        motivo: args.motivo,
+        estado: args.estado,
+        observaciones: args.observaciones,
+      });
       await reserva.save();
       return reserva;
     },
 
-    editarReserva: async (_, { id, input }) => {
-      const reserva = await Reserva.findByIdAndUpdate(id, input, { new: true });
-      return reserva;
-    },
-
+    editarReserva: async (_, args) => {
+      
+    }
   },
 };

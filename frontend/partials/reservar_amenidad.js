@@ -90,7 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
       mensajeDiv.textContent = '';
 
       const form = e.target;
-      const input = {
+
+      // Crear objeto con los valores del formulario (incluyendo estado)
+      const reservaData = {
         conjuntoId: form.conjuntoId.value,
         residenciaId: form.residenciaId.value,
         amenidad: form.amenidad.value,
@@ -99,11 +101,13 @@ document.addEventListener('DOMContentLoaded', function() {
         horaFin: form.horaFin.value,
         cantidadPersonas: parseInt(form.cantidadPersonas.value, 10),
         motivo: form.motivo.value,
-        observaciones: form.observaciones.value
+        estado: "pendiente", // Valor por defecto requerido
+        observaciones: form.observaciones.value,
       };
+      console.log('Datos de reserva:', reservaData);
 
-      const inicio = new Date(`${input.fecha}T${input.horaInicio}`);
-      const fin = new Date(`${input.fecha}T${input.horaFin}`);
+      const inicio = new Date(`${reservaData.fecha}T${reservaData.horaInicio}`);
+      const fin = new Date(`${reservaData.fecha}T${reservaData.horaFin}`);
       const ahora = new Date();
 
       if (inicio >= fin) {
@@ -138,11 +142,11 @@ document.addEventListener('DOMContentLoaded', function() {
         body: JSON.stringify({
           query: validacionQuery,
           variables: {
-            amenidad: input.amenidad,
-            fecha: input.fecha,
-            horaInicio: input.horaInicio,
-            horaFin: input.horaFin,
-            residenciaId: input.residenciaId
+            amenidad: reservaData.amenidad,
+            fecha: reservaData.fecha,
+            horaInicio: reservaData.horaInicio,
+            horaFin: reservaData.horaFin,
+            residenciaId: reservaData.residenciaId
           }
         })
       });
@@ -158,21 +162,60 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Enviar reserva
       const mutation = `
-        mutation CrearReserva($input: ReservaInput!) {
-          crearReserva(input: $input) {
+        mutation CrearReserva(
+          $conjuntoId: ID!,
+          $residenciaId: ID!,
+          $amenidad: String!,
+          $fecha: String!,
+          $horaInicio: String!,
+          $horaFin: String!,
+          $cantidadPersonas: Int!,
+          $motivo: String,
+          $estado: String!,
+          $observaciones: String,
+        ) {
+          crearReserva(
+            conjuntoId: $conjuntoId,
+            residenciaId: $residenciaId,
+            amenidad: $amenidad,
+            fecha: $fecha,
+            horaInicio: $horaInicio,
+            horaFin: $horaFin,
+            cantidadPersonas: $cantidadPersonas,
+            motivo: $motivo,
+            estado: $estado,
+            observaciones: $observaciones,
+          ) {
             id
             estado
           }
         }
       `;
 
+    const variables = {
+      conjuntoId: reservaData.conjuntoId,
+      residenciaId: reservaData.residenciaId,
+      amenidad: reservaData.amenidad,
+      fecha: reservaData.fecha,
+      horaInicio: reservaData.horaInicio,
+      horaFin: reservaData.horaFin,
+      cantidadPersonas: reservaData.cantidadPersonas,
+      motivo: reservaData.motivo,
+      estado: reservaData.estado,
+      observaciones: reservaData.observaciones
+    };
+
       const res = await fetch('http://localhost:3001/graphql', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: mutation, variables: { input } })
+        body: JSON.stringify({ 
+          query: mutation, 
+          variables : variables,
+        })
       });
 
       const result = await res.json();
+      console.log('Resultado de la reserva:', result);
       if (result.data && result.data.crearReserva) {
         mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
         form.reset();
