@@ -80,3 +80,14 @@ services:
       - CL_residence_db
       - CL_auth_db
     restart: unless-stopped
+
+  CL_web_fe:
+    image: cl_web_fe:latest
+    build: 
+      context: ./CL_web_fe      
+    container_name: CL_web_fe
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+    restart: unless-stopped
