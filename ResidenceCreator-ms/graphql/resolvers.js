@@ -128,5 +128,11 @@ module.exports = {
       );
       return reservaActualizada;
     },
+
+  eliminarReserva: async (_, { id }) => {
+    const result = await Reserva.findByIdAndDelete(id);
+    return !!result;
+  },
+    
   },
 };

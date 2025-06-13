@@ -126,6 +126,10 @@ module.exports = gql`
       reserva: ReservaInput!
     ): Reserva
 
+    eliminarReserva(
+      id: ID!
+    ): Boolean
+
   }
 `;
 

@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <td>${r.horaInicio}</td>
             <td>${r.horaFin}</td>
             <td>
-            <button class="btn btn-warning btn-sm">Editar</button>
+                <button class="btn btn-warning btn-sm me-2">Editar</button>
+                <button class="btn btn-danger btn-sm btn-eliminar">Eliminar</button>
             </td>
         </tr>
         `).join('');
@@ -102,17 +103,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Delegación de eventos para el botón Editar
-    reservasTbody.addEventListener('click', function(e) {
+reservasTbody.addEventListener('click', async function(e) {
+    const row = e.target.closest('tr');
+    if (!row) return;
+    const reservaId = row.dataset.reservaId;
+    const reserva = reservasCache.find(r => r.id === reservaId);
+
     if (e.target.classList.contains('btn-warning')) {
-        const row = e.target.closest('tr');
-        const reservaId = row.dataset.reservaId;
-        const reserva = reservasCache.find(r => r.id === reservaId);
         if (reserva) {
-        abrirModalEditarReserva(reserva);
+            abrirModalEditarReserva(reserva);
         }
     }
-    });
+
+    if (e.target.classList.contains('btn-eliminar')) {
+        if (reserva) {
+            if (confirm('¿Está seguro de que desea eliminar esta reserva?')) {
+                // Mutation para eliminar
+                const mutation = `
+                  mutation EliminarReserva($id: ID!) {
+                    eliminarReserva(id: $id)
+                  }
+                `;
+                const variables = { id: reservaId };
+                const res = await fetch('http://localhost:3001/graphql', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: mutation, variables })
+                });
+                const data = await res.json();
+                if (data.data && data.data.eliminarReserva) {
+                    // Recargar la lista de reservas
+                    buscarBtn.click();
+                } else {
+                    alert('Error al eliminar la reserva.');
+                }
+            }
+        }
+    }
+});
 
 // Guarda las reservas cargadas para fácil acceso
 let reservasCache = [];
