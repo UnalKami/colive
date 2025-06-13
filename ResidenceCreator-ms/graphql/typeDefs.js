@@ -58,8 +58,19 @@ module.exports = gql`
     motivo: String
     estado: String
     observaciones: String
-    createdAt: String
-    updatedAt: String
+  }
+
+  input ReservaInput {
+    conjuntoId: ID!
+    residenciaId: ID!
+    amenidad: String!
+    fecha: String!
+    horaInicio: String!
+    horaFin: String!
+    cantidadPersonas: Int!
+    motivo: String
+    estado: String
+    observaciones: String
   }
 
   type ValidacionReservaResult {
@@ -107,18 +118,12 @@ module.exports = gql`
     ): Residence
 
     crearReserva(
-      conjuntoId: ID!
-      residenciaId: ID!
-      amenidad: String!
-      fecha: String!
-      horaInicio: String!
-      horaFin: String!
-      cantidadPersonas: Int!
-      motivo: String
-      estado: String
-      observaciones: String
-      createdAt: String
-      updatedAt: String
+      reserva: ReservaInput!
+    ): Reserva
+
+    editarReserva(
+      id: ID!
+      reserva: ReservaInput!
     ): Reserva
 
   }

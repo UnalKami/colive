@@ -91,23 +91,42 @@ module.exports = {
 
     crearReserva: async (_, args) => {
       const reserva = new Reserva({
-        conjuntoId: args.conjuntoId,
-        residenciaId: args.residenciaId,
-        amenidad: args.amenidad,
-        fecha: args.fecha,
-        horaInicio: args.horaInicio,
-        horaFin: args.horaFin,
-        cantidadPersonas: args.cantidadPersonas,
-        motivo: args.motivo,
-        estado: args.estado,
-        observaciones: args.observaciones,
+        conjuntoId: args.reserva.conjuntoId,
+        residenciaId: args.reserva.residenciaId,
+        amenidad: args.reserva.amenidad,
+        fecha: args.reserva.fecha,
+        horaInicio: args.reserva.horaInicio,
+        horaFin: args.reserva.horaFin,
+        cantidadPersonas: args.reserva.cantidadPersonas,
+        motivo: args.reserva.motivo,
+        estado: args.reserva.estado,
+        observaciones: args.reserva.observaciones,
       });
       await reserva.save();
       return reserva;
     },
 
-    editarReserva: async (_, args) => {
-      
-    }
+    editarReserva: async (_, { id, reserva }) => {
+      // Busca y actualiza la reserva por ID usando los datos del input
+      const reservaActualizada = await Reserva.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            conjuntoId: reserva.conjuntoId,
+            residenciaId: reserva.residenciaId,
+            amenidad: reserva.amenidad,
+            fecha: reserva.fecha,
+            horaInicio: reserva.horaInicio,
+            horaFin: reserva.horaFin,
+            cantidadPersonas: reserva.cantidadPersonas,
+            motivo: reserva.motivo,
+            estado: reserva.estado,
+            observaciones: reserva.observaciones
+          }
+        },
+        { new: true }
+      );
+      return reservaActualizada;
+    },
   },
 };

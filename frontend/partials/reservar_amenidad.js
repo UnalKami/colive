@@ -104,7 +104,9 @@ document.addEventListener('DOMContentLoaded', function() {
         estado: "pendiente", // Valor por defecto requerido
         observaciones: form.observaciones.value,
       };
-      console.log('Datos de reserva:', reservaData);
+      //console.log('Datos de reserva:', reservaData);
+
+      console.log("fecha de reserva:", reservaData.fecha);
 
       const inicio = new Date(`${reservaData.fecha}T${reservaData.horaInicio}`);
       const fin = new Date(`${reservaData.fecha}T${reservaData.horaFin}`);
@@ -162,37 +164,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // Enviar reserva
       const mutation = `
-        mutation CrearReserva(
-          $conjuntoId: ID!,
-          $residenciaId: ID!,
-          $amenidad: String!,
-          $fecha: String!,
-          $horaInicio: String!,
-          $horaFin: String!,
-          $cantidadPersonas: Int!,
-          $motivo: String,
-          $estado: String!,
-          $observaciones: String,
-        ) {
-          crearReserva(
-            conjuntoId: $conjuntoId,
-            residenciaId: $residenciaId,
-            amenidad: $amenidad,
-            fecha: $fecha,
-            horaInicio: $horaInicio,
-            horaFin: $horaFin,
-            cantidadPersonas: $cantidadPersonas,
-            motivo: $motivo,
-            estado: $estado,
-            observaciones: $observaciones,
-          ) {
+        mutation CrearReserva($reserva: ReservaInput!) {
+          crearReserva(reserva: $reserva) {
             id
+            conjuntoId
+            residenciaId
+            amenidad
+            fecha
+            horaInicio
+            horaFin
+            cantidadPersonas
+            motivo
             estado
+            observaciones
           }
-        }
+}
       `;
 
     const variables = {
+    reserva: {
       conjuntoId: reservaData.conjuntoId,
       residenciaId: reservaData.residenciaId,
       amenidad: reservaData.amenidad,
@@ -203,6 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
       motivo: reservaData.motivo,
       estado: reservaData.estado,
       observaciones: reservaData.observaciones
+  }
     };
 
       const res = await fetch('http://localhost:3001/graphql', {
@@ -214,8 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
       });
 
+      console.log("fecha enviada:", variables.reserva.fecha);
+
       const result = await res.json();
-      console.log('Resultado de la reserva:', result);
+      //console.log('Resultado de la reserva:', result);
       if (result.data && result.data.crearReserva) {
         mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
         form.reset();
