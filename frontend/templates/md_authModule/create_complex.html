@@ -9,19 +9,96 @@
 </head>
 
 <body>
-    <div class="complexRegister">
+    <div class="administratorRegister form-fade active">
+        <img src="../../img/colive.png" >
+        <h2>Registrar administrador</h2>
+        <form id="administradorForm">
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" id="administratorFullname" name="administrator_name" class="form-control uppercase"
+                    placeholder="Nombre del administrador" required>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="text" id="administratorEmail" name="administrator_email" class="form-control uppercase"
+                    placeholder="Dirección de correo" required>
+                </div>
+            </div> 
+
+            <div class="form-group">
+                <div class="input-group">
+                    <input type="password" id="administratorPassword" name="administrator_password" class="form-control-password" placeholder="CONTRASEÑA" required>
+                    <button type="button" class="btn btn-outline-secondary toggle-password" tabindex="-1" data-target="administratorPassword">
+                    <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="validate-message" class="text-muted small mt-2">
+                <ul>
+                    <li id="lengthPassword">La contraseña debe tener al menos 8 caracteres.</li>
+                    <li id="uppercasePassword">La contraseña debe tener al menos una letra mayúscula.</li>
+                    <li id="numberPassword">La contraseña debe tener al menos un número.</li>
+                </ul>
+            </div>
+
+             <div class="form-group">
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" name="confirm_password" class="form-control-password"
+                    placeholder="CONFIRMAR CONTRASEÑA" required>
+                    <button type="button" class="btn btn-outline-secondary toggle-password" tabindex="-1" data-target="confirmPassword">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+
+            <div class="terms-and-conditions">
+                <div class="checkbox-form">
+                    <input class="form-check-input" type="checkbox" id="termsCheck" name="termsCheck" required />
+                    <label class="form-check-label" for="termsCheck">Acepto los <a href="#" id="openTermsLink">términos y condiciones</a></label>
+                </div>
+          </div>
+
+            <dialog id="termsDialog">
+                <div id="termsDialogHeader">
+                    <span>Términos y Condiciones</span>
+                    <button data-action="close" aria-label="Cerrar">&times;</button>
+                </div>
+                <div id="termsDialogBody">
+                    <iframe src="components/terminos-condiciones.html" style="width:100%;height:100%;border:none;"></iframe>
+                </div>
+                <div id="termsDialogFooter">
+                    <button data-action="close" class="btn btn-secondary">Cerrar</button>
+                </div>
+            </dialog>
+
+            <button type="button" id="nextForm" class="btn btn-primary btn-center">
+                Continuar registro
+            </button>
+        </form>
+    </div>
+
+    <div class="complexRegister form-fade">
+        <button type="button" id="backBtn" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Volver
+        </button>
+
         <img src="../../img/colive.png" >
         <h2>Registar conjunto</h2>
         <form id="complexForm">
             <div class="form-group">
                 <div class="input-group">
-                    <input type="text" id="complex_name" name="complex_name" class="form-control" placeholder="Nombre del conjunto" required>
+                    <input type="text" id="complex_name" name="complex_name" class="form-control uppercase" placeholder="Nombre del conjunto" required>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="input-group">
-                    <input type="text" id="address" name="address" class="form-control" placeholder="Dirección del conjunto" required>
+                    <input type="text" id="address" name="address" class="form-control uppercase" placeholder="Dirección del conjunto" required>
                 </div>
             </div>
 
@@ -65,7 +142,7 @@
                 </div>
                 <div class="form-group">
                     <div class="input-group">
-                        <input type="text" id="city" name="city" class="form-control" placeholder="Ciudad" required>
+                        <input type="text" id="city" name="city" class="form-control uppercase" placeholder="Ciudad" required>
                     </div>
                 </div>
             </div>
@@ -139,6 +216,7 @@
                     </div>
                 </div>                       
             </div>
+
             <div class="btn-center">
                 <button type="button" id="submitBtn" class="btn btn-primary">Registrar conjunto</button>
             </div>
@@ -148,6 +226,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="frontend/templates/md_authModule/create_complex.js"></script>
+    <script src="create_complex.js"></script>
 </body>
 </html>
