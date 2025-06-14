@@ -29,6 +29,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - cl_auth_db_data:/var/lib/postgresql/data
 
   CL_residence_db:
     image: mongo:8.0.9-noble
@@ -87,6 +89,9 @@ services:
     container_name: CL_ag
     ports:
       - "8000:8000"
+
+volumes:
+  cl_auth_db_data:
     
   #CL_inverse_proxy:
   #  image: nginx:1.28.0-alpine-perl
