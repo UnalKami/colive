@@ -1,20 +1,8 @@
 services:
-  CL_ag:
-    image: nginx:1.28.0-alpine-perl
-    container_name: CL_ag
-    ports:
-        - "80:80"
-        - "443:443"
-    volumes:
-      - ./NetworkManager/nginx:/etc/nginx
-      -  ./frontend:/usr/share/nginx/html
-    depends_on:
-      - CL_Auth_ms
-      - CL_residence_ms
-
   CL_Auth_ms:
     image: openjdk:24-slim-bookworm
     container_name: CL_Auth_ms
+    hostname: cl-auth-ms
     build:
       context: ./auth-java-component  
     environment:
@@ -91,3 +79,24 @@ services:
     environment:
       - FLASK_ENV=development
     restart: unless-stopped
+
+  CL_ag:
+    image: cl_ag:latest
+    build:
+      context: ./CL_ag
+    container_name: CL_ag
+    ports:
+      - "8000:8000"
+    
+  #CL_inverse_proxy:
+  #  image: nginx:1.28.0-alpine-perl
+  #  container_name: CL_ag0
+  #  ports:
+  #      - "80:80"
+  #      - "443:443"
+  #  volumes:
+  #    - ./NetworkManager/nginx:/etc/nginx
+  #    -  ./frontend:/usr/share/nginx/html
+  #  depends_on:
+  #    - CL_Auth_ms
+  #    - CL_residence_ms
