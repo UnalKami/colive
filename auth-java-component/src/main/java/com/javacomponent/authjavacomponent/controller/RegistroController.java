@@ -33,7 +33,7 @@ public class RegistroController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-    @PostMapping("/recidente")
+    @PostMapping("/residente")
     public ResponseEntity<String> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
         try {
             registroService.registrarUsuario(dto, Rol.RESIDENTE_CR);
