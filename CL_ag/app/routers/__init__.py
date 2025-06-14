@@ -1,0 +1,1 @@
+#En la carpeta de routers se definen los endpoints que expone el Gateway, son los que consume el Frontend
