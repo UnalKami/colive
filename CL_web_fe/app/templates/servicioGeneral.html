@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Colive – Administración de Personal</title>
+  <title>Colive – Servicios Generales </title>
 
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
@@ -11,9 +11,9 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Yeseva+One&display=swap" rel="stylesheet" />
-
+  <link rel="stylesheet" href="../static/css/servicio.css" />
   <style>
-    html, body { height: 100%; margin: 0; background-color: #f2f2f2; font-family: 'Montserrat', sans-serif; }
+    html, body { height: 100%; margin: 0; background-color:  #f2f2f2; font-family: 'Montserrat', sans-serif; }
     .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
     main { flex: 1; }
 
@@ -88,76 +88,106 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebarCategorias">
-      <a href="/products/category/food">Alimentos</a>
-      <a href="/products/category/personal-care">Cuidado personal</a>
-      <a href="/products/category/home">Productos para el hogar</a>
-      <a href="/products/category/supplements">Suplementos dietéticos</a>
-      <a href="/products/category/garden">Cuidado del jardín</a>
+      <a href="/products/category/food">Generar Incidencia</a>
+      <a href="/products/category/personal-care">Visualizacion Horario</a>
+      
     </div>
 
     <!-- MAIN CONTENT -->
     <main class="container my-5">
-      <h1 class="text-center page-title">Administración de Personal</h1>
-      <div class="card-admin">
-        <div class="d-flex justify-content-end mb-3">
-          <button class="btn btn-nuevo" data-bs-toggle="modal" data-bs-target="#modalCrear">
-            <i class="bi bi-plus-lg"></i> Nuevo Personal
-          </button>
+      <h1 class="text-center page-title mb-4">Panel de Servicios Generales – Aseo</h1>
+      <p class="lead text-center mb-5">
+        ¡Bienvenido(a)! Aquí puedes consultar tus tareas diarias, reportar incidencias y ver tu horario de trabajo en el conjunto residencial.
+      </p>
+
+      <!-- Tarjetas de acceso rápido -->
+      <div class="row g-4 mb-5">
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100 text-center border-0">
+            <div class="card-body">
+              <i class="bi bi-list-check fs-1 text-success"></i>
+              <h5 class="card-title mt-3">Mis Tareas de Hoy</h5>
+              <p class="card-text">Consulta y marca las tareas de limpieza y mantenimiento asignadas para hoy.</p>
+              <a href="#" class="btn btn-primary w-100">Ver Tareas</a>
+            </div>
+          </div>
         </div>
-        <div class="table-responsive">
-          <table class="table table-striped" id="tablaPersonal">
-            <thead><tr>
-              <th>ID</th><th>Nombre</th><th>Apellido</th><th>Rol</th>
-              <th>Teléfono</th><th>Email</th><th>Estado</th><th>Acciones</th>
-            </tr></thead>
-            <tbody><!-- dinámico --></tbody>
-          </table>
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100 text-center border-0">
+            <div class="card-body">
+              <i class="bi bi-exclamation-circle-fill fs-1 text-warning"></i>
+              <h5 class="card-title mt-3">Reportar Incidencia</h5>
+              <p class="card-text">Informa sobre cualquier problema o situación especial detectada durante tu jornada.</p>
+              <a href="#" class="btn btn-primary w-100">Reportar</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm h-100 text-center border-0">
+            <div class="card-body">
+              <i class="bi bi-calendar-event fs-1 text-info"></i>
+              <h5 class="card-title mt-3">Mi Horario</h5>
+              <p class="card-text">Consulta tus turnos, horarios y días asignados de trabajo.</p>
+              <a href="#" class="btn btn-primary w-100">Ver Horario</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen rápido -->
+      <div class="row mb-5">
+        <div class="col-md-4">
+          <div class="bg-white rounded shadow-sm p-4 text-center">
+            <h2 class="mb-1 text-primary">7</h2>
+            <p class="mb-0">Tareas pendientes hoy</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="bg-white rounded shadow-sm p-4 text-center">
+            <h2 class="mb-1 text-warning">1</h2>
+            <p class="mb-0">Incidencia reportada</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="bg-white rounded shadow-sm p-4 text-center">
+            <h2 class="mb-1 text-info">Turno: Mañana</h2>
+            <p class="mb-0">Horario de hoy</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendario de actividades -->
+      <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-primary text-white">
+          <i class="bi bi-calendar3"></i> Calendario de Turnos y Actividades
+        </div>
+        <div class="card-body">
+          <div class="text-center text-muted">
+            <em>Aquí puedes ver tus turnos y actividades programadas del mes.</em>
+          </div>
+          <!-- Aquí puedes integrar un calendario real con JS si lo deseas -->
+        </div>
+      </div>
+
+      <!-- Recursos útiles -->
+      <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-success text-white">
+          <i class="bi bi-journal-text"></i> Recursos y Manuales
+        </div>
+        <div class="card-body">
+          <ul>
+            <li><a href="/manual-aseo.pdf" target="_blank">Manual de procedimientos de aseo</a></li>
+            <li><a href="/contacto-supervisor" target="_blank">Contactar a mi supervisor</a></li>
+            <li><a href="/preguntas-frecuentes" target="_blank">Preguntas frecuentes</a></li>
+          </ul>
         </div>
       </div>
     </main>
+    <link href='https://fonts.googleapis.com/css?family=Ubuntu:400,500,700' rel='stylesheet' type='text/css'>
 
-    <!-- MODAL -->
-    <div class="modal fade" id="modalCrear" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog"><form id="formPersonal" class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Crear Nuevo Personal</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="inputId" />
-          <div class="mb-3"><label class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="inputNombre" required />
-          </div>
-          <div class="mb-3"><label class="form-label">Apellido</label>
-            <input type="text" class="form-control" id="inputApellido" required />
-          </div>
-          <div class="mb-3"><label class="form-label">Rol</label>
-            <select class="form-select" id="selectRol" required>
-              <option value="vigilante">Vigilante</option>
-              <option value="mantenimiento">Mantenimiento</option>
-              <option value="aseo">Aseo</option>
-              <option value="admin">Admin</option>
-            </select>
-          </div>
-          <div class="mb-3"><label class="form-label">Teléfono</label>
-            <input type="text" class="form-control" id="inputTelefono" />
-          </div>
-          <div class="mb-3"><label class="form-label">Email</label>
-            <input type="email" class="form-control" id="inputEmail" />
-          </div>
-          <div class="mb-3"><label class="form-label">Estado</label>
-            <select class="form-select" id="selectEstado">
-              <option value="activo" selected>Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-      </form></div>
-    </div>
+    
+
+    
 
   <!-- FOOTER -->
   <footer class="footer py-3 shadow-lg border-top" style="background-color: #3d464e;">
@@ -217,7 +247,8 @@
       const sb = document.getElementById('sidebarCategorias');
       if (!sb.contains(e.target) && !e.target.closest('[onclick="toggleSidebar()"]')) sb.classList.remove('show');
     });
-  </script>
-  <script src="admin.js"></script>
+
+</script>  
+  <script src="../static/js/vigilante.js"></script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Test de conexión con el Gateway</title>
+</head>
+<body>
+  <h1>Test de conexión al Gateway</h1>
+  <button onclick="enviarPeticion()">Enviar petición</button>
+  <p id="respuesta"></p>
+
+  <script>
+    async function enviarPeticion() {
+      try {
+        const res = await fetch('http://localhost:5000/fe-api/testAuth');
+        if (!res.ok) throw new Error("Error en la respuesta del servidor");
+        const data = await res.json();
+        document.getElementById('respuesta').innerText = data.mensaje || JSON.stringify(data);
+      } catch (err) {
+        document.getElementById('respuesta').innerText = "Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colive – Mantenimiento</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Yeseva+One&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/vigilante.css" />
+  <style>
+    html, body { height: 100%; margin: 0; background-color:  #f2f2f2; font-family: 'Montserrat', sans-serif; }
+    .wrapper { display: flex; flex-direction: column; min-height: 100vh; }
+    main { flex: 1; }
+    nav { z-index: 100; }
+    .custom-navbar { background-color: #3d464e; }
+    .custom-navbar .navbar-brand,
+    .custom-navbar .nav-link { color: #fff !important; }
+    .custom-navbar .nav-link:hover { color: #ccc !important; }
+    .btn-logout { background-color: #dc3545; color: #fff !important; border: none; padding: 0.375rem 1rem; font-weight: bold; transition: background-color 0.3s ease; }
+    .btn-logout:hover { background-color: #bb2d3b; }
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      bottom: 0;
+      left: 0;
+      width: 200px;
+      background-color: #3d464e;
+      padding: 1rem;
+      transform: translateX(-100%);
+      transition: transform 0.5s cubic-bezier(0.25,0.8,0.25,1);
+      z-index: 50;
+    }
+    .sidebar.show { transform: translateX(0); }
+    .sidebar a { display: block; color: #fff; text-decoration: none; margin: 0.5rem 0; }
+    .sidebar a:hover { color: #ccc; }
+    .page-title { font-weight: 600; margin-bottom: 1.5rem; color: #3d464e; }
+    .card-admin { background-color: #fff; border: none; border-radius: 0.75rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 2rem; }
+    .btn-nuevo { background-color: #4A90E2; color: #fff; font-weight: 600; border: none; transition: background-color 0.3s ease; }
+    .btn-nuevo:hover { background-color: #357ABD; }
+    /* Footer */
+    .fontFooter { font-family: 'Montserrat', sans-serif; }
+    .footer-section { font-family: 'Yeseva One', sans-serif; font-size: 1rem; }
+    footer { position: relative; z-index: 100; background-color: #3d464e; }
+    footer a, footer p, footer span, footer li { color: #fff !important; }
+    footer img.footer-logo { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg custom-navbar shadow">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="../index.html">
+          <img src="../static/img/colive_logo.png" width="200" alt="Logo Colive" />
+        </a>
+        <button class="btn p-0 ms-2" onclick="toggleSidebar()" title="Categorías">
+          <img src="../static/img/options.png" width="24" height="24" alt="Categorías" />
+        </button>
+        <div class="ms-auto">
+          <a class="btn btn-logout" href="../index.html">Cerrar Sesión</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebarCategorias">
+      <a href="#">Crear Incidencia</a>
+      <a href="#">Ver Horario</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="container my-5">
+      <h1 class="text-center page-title mb-4">Panel de Mantenimiento</h1>
+      <p class="lead text-center mb-5">
+        ¡Bienvenido(a)! Aquí puedes crear incidencias de mantenimiento y consultar tu horario de trabajo en el conjunto residencial.
+      </p>
+
+      <!-- Tarjetas de acceso rápido -->
+      <div class="row g-4 mb-5 justify-content-center">
+        <div class="col-md-5">
+          <div class="card shadow-sm h-100 text-center border-0">
+            <div class="card-body">
+              <i class="bi bi-tools fs-1 text-warning"></i>
+              <h5 class="card-title mt-3">Crear Incidencia</h5>
+              <p class="card-text">Reporta cualquier problema o necesidad de mantenimiento detectada.</p>
+              <a href="#" class="btn btn-primary w-100">Crear Incidencia</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="card shadow-sm h-100 text-center border-0">
+            <div class="card-body">
+              <i class="bi bi-calendar-event fs-1 text-info"></i>
+              <h5 class="card-title mt-3">Mi Horario</h5>
+              <p class="card-text">Consulta tus turnos y horarios de trabajo.</p>
+              <a href="#" class="btn btn-primary w-100">Ver Horario</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calendario de actividades -->
+      <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-primary text-white">
+          <i class="bi bi-calendar3"></i> Calendario de Turnos y Actividades
+        </div>
+        <div class="card-body">
+          <div class="text-center text-muted">
+            <em>Aquí puedes ver tus turnos y actividades programadas del mes.</em>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer py-3 shadow-lg border-top" style="background-color: #3d464e;">
+      <div class="container fontFooter">
+        <nav class="row justify-content-between">
+          <div class="col-12 col-md-3 d-flex align-items-center justify-content-center mb-3 mb-md-0">
+            <img src="../static/img/Colive_Logo_.png" alt="Logo" class="img-fluid" width="250" height="50" />
+          </div>
+          <ul class="col-12 col-md-2 list-unstyled px-3 mb-3 mb-md-0">
+            <li class="footer-section fw-bold mb-2">COLIVE co-ownership</li>
+          </ul>
+          <ul class="col-12 col-md-3 list-unstyled px-4 mb-3 mb-md-0">
+            <li class="footer-section fw-bold mb-2">Enlaces</li>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/products">Productos</a></li>
+            <li><a href="/about">Nosotros</a></li>
+            <li><a href="/contact">Contáctanos</a></li>
+            <li><a href="/encuesta">Califícanos</a></li>
+            <li><a href="/terms-and-conditions">Términos y Condiciones</a></li>
+            <li><a href="https://heyzine.com/flip-book/c951be1b87.html">Manual de Usuario</a></li>
+            <li><a href="/preguntas">Preguntas Frecuentes</a></li>
+          </ul>
+          <ul class="col-12 col-md-3 list-unstyled px-4 text-center mb-3 mb-md-0">
+            <li class="footer-section fw-bold mb-2">Síguenos</li>
+            <li class="d-flex justify-content-center gap-3">
+              <a href="https://www.facebook.com/profile.php?id=61557990925535" target="_blank">
+                <i class="bi bi-facebook fs-2"></i>
+              </a>
+              <a href="https://www.instagram.com/_natu_tienda/" target="_blank">
+                <i class="bi bi-instagram fs-2"></i>
+              </a>
+              <a href="mailto:Colive@gmail.com" target="_blank">
+                <i class="bi bi-envelope fs-2"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="container mt-2">
+          <p class="text-center mb-0 fw-bold">Colive@gmail.com</p>
+          <p class="text-center mb-0 fw-bold">Realizado por el equipo Colive</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebarCategorias').classList.toggle('show');
+    }
+    document.addEventListener('click', e => {
+      const sb = document.getElementById('sidebarCategorias');
+      if (!sb.contains(e.target) && !e.target.closest('[onclick="toggleSidebar()"]')) sb.classList.remove('show');
+    });
+  </script>
+  <script src=

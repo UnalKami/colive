@@ -13,3 +13,7 @@ def about():
 @frontend_bp.route('/login')
 def login():
     return render_template('login.html')
+
+@frontend_bp.route('/testAuth')
+def pruebaConexionAuth():
+    return render_template('pruebaSaludo.html')

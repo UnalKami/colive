@@ -1,4 +1,4 @@
-<script>
+
 // URL base de tu microservicio
 const API_BASE = "http://localhost:8000/personal";
 
@@ -89,4 +89,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // actualizarPersonal(1);
   // eliminarPersonal(1);
 });
-</script>
+

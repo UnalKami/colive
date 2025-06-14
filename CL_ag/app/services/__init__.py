@@ -1,0 +1,1 @@
+#En la carpeta de services se definen las consultas a los endpoints de los microservicios, son los que consume el Gateway
