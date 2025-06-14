@@ -24,10 +24,10 @@ function togglePasswordVisibility() {
 
   if (passwordField.type === "password") {
     passwordField.type = "text";
-    eyeIcon.src = "../img/eye-open.png";
+    eyeIcon.src = "../static/img/eye-open.png";
   } else {
     passwordField.type = "password";
-    eyeIcon.src = "../img/eye-closed.png";
+    eyeIcon.src = "../static/img/eye-closed.png";
   }
 }
 
