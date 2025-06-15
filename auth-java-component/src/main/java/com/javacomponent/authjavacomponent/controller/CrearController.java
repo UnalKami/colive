@@ -7,6 +7,7 @@ import com.javacomponent.authjavacomponent.service.ConjuntoResidencialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/crear")
@@ -19,12 +20,14 @@ public class CrearController {
     private ApartamentoService apartamentoService;
 
     @PostMapping("/conjunto")
-    public ResponseEntity<String> crearConjunto(@RequestBody ConjuntoResidencialRequestDTO dto) {
+    public ResponseEntity<Map<String,Object>> crearConjunto(@RequestBody ConjuntoResidencialRequestDTO dto) {
+        System.out.println("Recibido DTO: " + dto);
         try {
             conjuntoService.crearConjunto(dto);
-            return ResponseEntity.ok("Creación exitosa");
+            System.out.println("Conjunto creado exitosamente");
+            return ResponseEntity.ok(Map.of("success", true, "message", "Creación exitosa"));
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("success", false, "error", e.getMessage()));
         }
     }
 
