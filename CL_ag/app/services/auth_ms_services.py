@@ -15,6 +15,7 @@ async def register_admin(admin_data):
     Register an admin user in the authentication microservice.
     """
     async with httpx.AsyncClient() as client:
+        print(f"Registering admin in auth with data: {admin_data}")
         response = await client.post(f"{AUTH_MS_URL}/api/registro/admin", json=admin_data)        
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice
