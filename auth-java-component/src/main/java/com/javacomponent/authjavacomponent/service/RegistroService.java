@@ -53,4 +53,18 @@ public class RegistroService {
         response.put("usuarioId", nuevoUsuario.getIdUsuario());
         return response;
     }
+    public void eliminarUsuario(Long idUsuario) {
+    // Buscar el usuario por ID
+    Usuario usuario = usuarioRepository.findById(idUsuario)
+            .orElseThrow(() -> new RuntimeException("Usuario con id " + idUsuario + " no encontrado"));
+
+    // Eliminar la persona asociada, si existe
+    Persona persona = personaRepository.findByUsuario(usuario);
+    if (persona != null) {
+        personaRepository.delete(persona);
+    }
+
+    // Eliminar el usuario
+    usuarioRepository.delete(usuario);
+}
 }

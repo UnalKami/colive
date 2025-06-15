@@ -74,4 +74,13 @@ public class RegistroController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+    @DeleteMapping("/usuario/{id}")
+    public ResponseEntity<Map<String, Object>> eliminarUsuario(@PathVariable Long id) {
+        try {
+            registroService.eliminarUsuario(id);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
 }
