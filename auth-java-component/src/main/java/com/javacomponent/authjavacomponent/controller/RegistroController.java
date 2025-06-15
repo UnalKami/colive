@@ -6,6 +6,7 @@ import com.javacomponent.authjavacomponent.service.RegistroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/registro")
@@ -15,58 +16,62 @@ public class RegistroController {
     private RegistroService registroService;
 
     @PostMapping("/admin")
-    public ResponseEntity<String> registrarAdmin(@RequestBody RegistroRequestDTO dto) {
+    public ResponseEntity<Map<String, Object>> registrarAdmin(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.ADMIN_CR);
-            return ResponseEntity.ok("Registro exitoso");
+            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.ADMIN_CR);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
     @PostMapping("/propietario")
-    public ResponseEntity<String> registrarPropietario(@RequestBody RegistroRequestDTO dto) {
+    public ResponseEntity<Map<String, Object>> registrarPropietario(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.PROPIEDAD_CR);
-            return ResponseEntity.ok("Registro exitoso");
+            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.PROPIEDAD_CR);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
     @PostMapping("/residente")
-    public ResponseEntity<String> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
+    public ResponseEntity<Map<String, Object>> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.RESIDENTE_CR);
-            return ResponseEntity.ok("Registro exitoso");
+            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.RESIDENTE_CR);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
     @PostMapping("/seguridad")
-    public ResponseEntity<String> registrarSeguridad(@RequestBody RegistroRequestDTO dto) {
+    public ResponseEntity<Map<String, Object>> registrarSeguridad(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.SEGURIDAD_CR);
-            return ResponseEntity.ok("Registro exitoso");
+            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.SEGURIDAD_CR);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
     @PostMapping("/mantenimiento")
-    public ResponseEntity<String> registrarMantenimiento(@RequestBody RegistroRequestDTO dto) {
+    public ResponseEntity<Map<String, Object>> registrarMantenimiento(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.MANTENIMIENTO_CR);
-            return ResponseEntity.ok("Registro exitoso");
+            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.MANTENIMIENTO_CR);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
     @PostMapping("/aseo")
-    public ResponseEntity<String> registrarAseo(@RequestBody RegistroRequestDTO dto) {
+    public ResponseEntity<Map<String, Object>> registrarAseo(@RequestBody RegistroRequestDTO dto) {
         try {
-            registroService.registrarUsuario(dto, Rol.ASEO_CR);
-            return ResponseEntity.ok("Registro exitoso");
+            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.ASEO_CR);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 }

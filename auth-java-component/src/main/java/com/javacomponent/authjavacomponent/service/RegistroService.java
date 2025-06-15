@@ -10,6 +10,8 @@ import com.javacomponent.authjavacomponent.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class RegistroService {
@@ -26,7 +28,7 @@ public class RegistroService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void registrarUsuario(RegistroRequestDTO dto, Long rolId) {
+    public Map<String, Object> registrarUsuario(RegistroRequestDTO dto, Long rolId) {
         if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new RuntimeException("El username: "+dto.getUsername()+" ya está en uso");
         }
@@ -46,5 +48,9 @@ public class RegistroService {
         persona.setCelular(dto.getCelular());
         persona.setUsuario(nuevoUsuario);
         personaRepository.save(persona);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("usuarioId", nuevoUsuario.getIdUsuario());
+        return response;
     }
 }
