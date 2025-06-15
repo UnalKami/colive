@@ -25,10 +25,6 @@ const conjuntosData = [
         capacidad: 20
       }
     ],
-    divisiones: [
-      { tipo: "Torre", cantidad: 3 },
-      { tipo: "Apartamento", cantidad: 60 }
-    ]
   },
   {
     nombre: "Residencial Los Robles",
@@ -51,10 +47,6 @@ const conjuntosData = [
         capacidad: 15
       }
     ],
-    divisiones: [
-      { tipo: "Bloque", cantidad: 2 },
-      { tipo: "Casa", cantidad: 40 }
-    ]
   }
 ];
 

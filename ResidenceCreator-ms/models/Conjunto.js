@@ -31,11 +31,6 @@ const AmenitySchema = new mongoose.Schema({
   }
 });
 
-const Divisiones = new mongoose.Schema({ 
-    tipo: { type: String, required: true }, // El nombre de la division, como torre, apartamento, bloque, manzana, etc.
-    cantidad: { type: Number, required: true } // Número de torres, apartamentos, bloques, etc.
-  });
-
 
 const ConjuntoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
@@ -43,7 +38,6 @@ const ConjuntoSchema = new mongoose.Schema({
   direccion: { type: String, required: true },
   ciudad: { type: String, required: true },
   amenidades: [AmenitySchema],
-  divisiones: [Divisiones]
 });
 
 ConjuntoSchema.path('amenidades').validate(function(amenidades) {
