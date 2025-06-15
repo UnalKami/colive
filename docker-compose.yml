@@ -1,8 +1,21 @@
+
 services:
+  CL_ag:
+    image: nginx:1.28.0-alpine-perl
+    container_name: CL_ag
+    ports:
+        - "80:80"
+        - "443:443"
+    volumes:
+      - ./NetworkManager/nginx:/etc/nginx
+      -  ./frontend:/usr/share/nginx/html
+    depends_on:
+      - CL_Auth_ms
+      - CL_residence_ms
+
   CL_Auth_ms:
     image: openjdk:24-slim-bookworm
     container_name: CL_Auth_ms
-    hostname: cl-auth-ms
     build:
       context: ./auth-java-component  
     environment:
@@ -29,8 +42,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-    volumes:
-      - cl_auth_db_data:/var/lib/postgresql/data
 
   CL_residence_db:
     image: mongo:8.0.9-noble
@@ -53,55 +64,3 @@ services:
       - CL_residence_db
     env_file:
       - ./ResidenceCreator-ms/.env
-
-  CL_messaging-ms:
-    image: cl_messaging_ms:latest
-    build:
-      context: ./MensajeriaYnotificaciones
-      dockerfile: Dockerfile.sbt-alpine
-    container_name: CL_messaging-ms
-    ports:
-      - "9000:9000"
-    environment:
-      SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
-      MONGO_URI: "mongodb://root:cincopatodos@CL_residence_db:27017/correos?authSource=admin"
-    command: ["sbt", "run"]
-    depends_on:
-      - CL_residence_db
-      - CL_auth_db
-    restart: unless-stopped
-
-  CL_web_fe:
-    image: cl_web_fe:latest
-    build: 
-      context: ./CL_web_fe      
-    container_name: CL_web_fe
-    ports:
-      - "5000:5000"
-    environment:
-      - FLASK_ENV=development
-    restart: unless-stopped
-
-  CL_ag:
-    image: cl_ag:latest
-    build:
-      context: ./CL_ag
-    container_name: CL_ag
-    ports:
-      - "8000:8000"
-
-volumes:
-  cl_auth_db_data:
-    
-  #CL_inverse_proxy:
-  #  image: nginx:1.28.0-alpine-perl
-  #  container_name: CL_ag0
-  #  ports:
-  #      - "80:80"
-  #      - "443:443"
-  #  volumes:
-  #    - ./NetworkManager/nginx:/etc/nginx
-  #    -  ./frontend:/usr/share/nginx/html
-  #  depends_on:
-  #    - CL_Auth_ms
-  #    - CL_residence_ms

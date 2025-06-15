@@ -5,23 +5,28 @@ const connectDB = require('./config/db');
 const { ApolloServer } = require('apollo-server-express');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
-const conjuntoRoutes = require('./routes/conjuntoRoutes');
-const residenceRoutes = require('./routes/residenceRoutes');
-
-const mongoose = require("mongoose")
+const Reserva = require('./models/Reserva'); //modelo de Reserva
 
 const app = express();
+// app.use(bodyParser.json());
 
 connectDB();
 
-async function startServer() {
-  const server = new ApolloServer({typeDefs, resolvers});
+const startApolloServer = async () => {
+  const server = new ApolloServer({ typeDefs, resolvers,
+    context: ({ req }) => ({
+      Reserva, // exponer el modelo a los resolvers
+      req
+    })
+  });
   await server.start();
-  server.applyMiddleware({app});
+  server.applyMiddleware({ app, path: '/graphql' });
 
-  app.listen({port:3001}, () =>
-    console.log(`Conexión exitosa a http://localhost:3001${server.graphqlPath}`)
+
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () =>
+    console.log(`🚀 ResidenceCreator-ms corriendo en puerto ${PORT}\n🚀 GraphQL en /graphql`)
   );
-}
+};
 
-startServer();
+startApolloServer();
