@@ -10,16 +10,15 @@
     --input-color: #edededf0;
 }
 
-input[type="text"] {
+.uppercase {
     text-transform: uppercase;
 }
-    
+
 body {
     position: relative;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-color);
     min-height: 100vh;
-    display: flex;
     flex-direction: column;
 }
 
@@ -46,9 +45,21 @@ body::before {
     font-weight: bold;
 }
     
+.administratorRegister {
+    min-width: 500px;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px 25px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: visible;
+}
+
 .complexRegister {
-    min-width: 1000px;
-    max-width: 1200px;
+    min-width: 800px;
+    max-width: 1000px;
     margin: 40px auto;
     padding: 30px 25px;
     background-color: white;
@@ -64,7 +75,20 @@ body::before {
     margin: 0 auto 1rem auto;   
 }
     
+.administratorRegister img {
+    max-width: 40%;
+    display: block;
+    margin: 0 auto 1rem auto;   
+}
+    
 .complexRegister h2 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+}
+
+.administratorRegister h2 {
     text-align: center;
     color: var(--text-color);
     margin-bottom: 2rem;
@@ -87,7 +111,67 @@ body::before {
     width: 100%;
     background-color: var(--input-color);
     color:var(--text-color);
+} 
+
+.administratorRegister .form-control {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+    width: 80%;
+    background-color: var(--input-color);
+    color:var(--text-color);
+}
+
+.administratorRegister .form-control {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
+    width: 70%;
+    background-color: var(--input-color);
+    color:var(--text-color);
+    ;
 }    
+
+.administratorRegister .form-control-password{
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+    padding: 0.75rem 1rem;
+    border-left: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-right:none ;
+    transition: border-color 0.3s ease;
+    width: 65%;
+    background-color: var(--input-color);
+    color:var(--text-color);
+    ;
+}    
+
+.administratorRegister .input-group {
+    display: flex;
+    justify-content: center;
+}  
+.input-group .toggle-password {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left: none; /* Quita el borde izquierdo */
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);;
+    background-color: var(--input-color); /* Igual que el input */
+}
+.input-group .toggle-password:focus {
+    box-shadow: none;
+}
+
+#validate-message, .validate-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
 .form-control:focus {
     border-color: var(--primary-color);
@@ -146,4 +230,110 @@ body::before {
     justify-content: center;
     width: 100%;
     margin-top: 1.5rem;
+}
+
+.btn-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    color: var(--second-color);
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.btn-back i {
+    font-size: 1.3rem;
+}
+
+.btn-back:hover {
+    color: var(--border-color);
+}
+
+.complexRegister {
+    position: relative; /* Asegura que el botón se posicione respecto a este contenedor */
+}
+
+.terms-and-conditions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+    width: 100%;
+    text-align: center;
+}
+
+.terms-and-conditions .checkbox-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+dialog#termsDialog {
+    width: 90%;
+    max-width: 600px;
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+}
+dialog#termsDialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+#termsDialogHeader {
+    background-color: #f7f7f7;
+    padding: 16px 24px;
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+#termsDialogHeader button {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+#termsDialogBody {
+    padding: 0;
+    margin: 0;
+    height: 400px;         /* Altura fija para que se pueda hacer scroll */
+    overflow: auto;
+}
+#termsDialogFooter {
+    padding: 16px 24px;
+    text-align: right;
+    background-color: #f7f7f7;
+    border-top: 1px solid #ddd;
+}
+#termsDialogFooter button {
+    padding: 0.5rem 1rem;
+}
+
+.form-fade {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+}
+
+.form-fade.active {
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    z-index: 1;
 }
