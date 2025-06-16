@@ -6,6 +6,7 @@ async def register_conjunto(conjunto_data):
     Register a conjunto in the residence microservice.
     """
     async with httpx.AsyncClient() as client:
+        print(f"Registering conjunto with data: {conjunto_data}")
         response = await client.post(f"{RESIDENCE_MS_URL}/graphql", json=conjunto_data)        
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice

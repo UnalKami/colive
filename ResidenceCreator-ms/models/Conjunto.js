@@ -9,24 +9,21 @@ const AmenitySchema = new mongoose.Schema({
     trim: true
   },
   horario: {
-    dias: { type: String, required: true }, // Ej: "Lunes-Viernes"
-    horas: { type: String, required: true } // Ej: "8:00-20:00"
+    dias: { type: String }, // Ej: "Lunes-Viernes"
+    horas: { type: String } // Ej: "8:00-20:00"
   },
   estado: {
     type: String,
-    required: true,
     enum: ['disponible', 'en_mantenimiento', 'cerrado', 'reservado'],
     default: 'disponible'
   },
   costo: {
     type: Number,
-    required: true,
     min: 0,
     default: 0
   },
   capacidad: {
     type: Number,
-    required: true,
     min: 1
   }
 });

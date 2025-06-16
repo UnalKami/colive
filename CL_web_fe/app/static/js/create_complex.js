@@ -1,4 +1,4 @@
-const Conjunto = require("../../../../ResidenceCreator-ms/models/Conjunto");
+//const Conjunto = require("../../../../ResidenceCreator-ms/models/Conjunto");
 
 document.addEventListener('DOMContentLoaded', function() {
     //-- Validacion visul de la contraseña --//
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Las contraseñas no coinciden');
                 return;
             }
-            if (pw1.length <= 8) {
+            if (pw1.length < 8) {
                 alert('La contraseña no cumple con los requisitos');
                 return;
             }
@@ -163,9 +163,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const variablesUsuario = {
             username: username,
-            nombre: document.getElementById('administratorFullname'),
+            nombre: document.getElementById('administratorFullname').value,
             correo: correo,
-            contraseña: document.getElementById('administratorPassword').value
+            password: document.getElementById('administratorPassword').value,
+            celular:0
         }
         
         const queryConjunto = `
@@ -203,19 +204,23 @@ document.addEventListener('DOMContentLoaded', function() {
             user: variablesUsuario
         };
 
-        fetch('registrarUsuarioConjunto', {
+        fetch('fe-api/registrarUsuarioConjunto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            alert('¡Registro enviado!');
+       .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en el registro');
+            }
+            return response.json();
         })
-        .catch(err => {
-            alert('Error al enviar el registro');
-            console.error(err);
+        .then(data => {
+            alert('¡Registro exitoso!');
+            window.location.href = "http://localhost:5000/login";
+        })
+        .catch(error => {
+            alert('El registro falló: ' + error.message);
         });
     });
 });
