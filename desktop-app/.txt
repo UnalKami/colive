@@ -1,0 +1,2 @@
+pytest -q
+pyinstaller --onefile --windowed --icon=Colive_Logo.ico main.py

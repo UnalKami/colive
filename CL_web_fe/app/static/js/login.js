@@ -1,5 +1,5 @@
 // URL base de la API backend
-const api_url = "http://localhost:8080";
+const api_url = "http://localhost:8000";
 
 // Referencias al formulario y elementos
 const form = document.getElementById("login-form");
@@ -69,7 +69,7 @@ form.addEventListener("submit", async function(event) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        Correo_usuario: emailInput.value,
+        username: emailInput.value,
         password: passwordInput.value
       })
     });
@@ -85,13 +85,8 @@ form.addEventListener("submit", async function(event) {
       localStorage.setItem("rol", data.body.rol);
       localStorage.setItem("id", data.body.user[0].USUARIO_ID_Usuario);
 
-      const nombre = data.body.rol === "Vendedor"
-        ? data.body.user[0].Nombre_vendedor
-        : data.body.user[0].Nombres_comprador;
-      localStorage.setItem("user", nombre);
-
       showAlert("¡Bienvenido!", "success");
-      setTimeout(() => window.location.href = "/", 1000);
+      setTimeout(() => window.location.href = "../templates/adminhome.html", 1000);
     }
   } catch (err) {
     showAlert("Error del servidor. Intenta más tarde.");
