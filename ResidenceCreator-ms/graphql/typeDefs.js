@@ -112,6 +112,8 @@ module.exports = gql`
       horaInicio: String!
       horaFin: String!
       residenciaId: ID!
+      conjuntoId: ID!
+      excluirId: ID
     ): ValidacionReservaResult!
     
   }

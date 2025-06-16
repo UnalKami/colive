@@ -19,45 +19,33 @@ module.exports = {
       return await Reserva.find(filter);
     },
 
-    validarReservaDisponible: async (_, { amenidad, fecha, horaInicio, horaFin, residenciaId }) => {
+    validarReservaDisponible: async (_, { amenidad, fecha, horaInicio, horaFin, residenciaId, conjuntoId, excluirId }) => {
       // Busca reservas solapadas para la amenidad
-      const solapada = await Reserva.findOne({
+      const filtro = {
         amenidad,
         fecha,
+        conjuntoId,
         $or: [
           {
             horaInicio: { $lt: horaFin },
             horaFin: { $gt: horaInicio }
           }
         ]
-      });
+      };
+      if (excluirId) {
+        filtro._id = { $ne: excluirId };
+      }
+      const solapada = await Reserva.findOne(filtro);
+
       if (solapada) {
         return {
           disponible: false,
-          motivo: "Ya existe una reserva para esta amenidad en ese horario."
-        };
-      }
-
-      // Busca doble reserva del mismo usuario (residencia) en la misma franja
-      const doble = await Reserva.findOne({
-        residenciaId,
-        amenidad,
-        fecha,
-        $or: [
-          {
-            horaInicio: { $lt: horaFin },
-            horaFin: { $gt: horaInicio }
-          }
-        ]
-      });
-      if (doble) {
-        return {
-          disponible: false,
-          motivo: "Ya tienes una reserva activa para esta amenidad en ese horario."
+          motivo: "Ya existe una reserva para esta amenidad en ese horario en este conjunto."
         };
       }
 
       return { disponible: true, motivo: null };
+
     },
     
   },
