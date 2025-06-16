@@ -60,9 +60,31 @@ def login():
 def crear_reserva():
     datos = request.json
     try:
-        response = requests.post('http://CL_ag:8000/residence/residence/reservas', json=datos)
+        response = requests.post('http://CL_ag:8000/residence/crearReserva', json=datos)
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
         print("Error al llamar al gateway:", e)
         return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/editarReserva', methods=['POST'])
+def editar_reserva():
+    datos = request.json
+    try:
+        response = requests.post('http://CL_ag:8000/residence/editarReserva', json=datos)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"success": False, "motivo": str(e)}), 500
+
+@api_bp.route('/eliminarReserva', methods=['POST'])
+def eliminar_reserva():
+    datos = request.json
+    try:
+        response = requests.post('http://CL_ag:8000/residence/eliminarReserva', json=datos)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"success": False, "motivo": str(e)}), 500

@@ -181,40 +181,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
       }
 
-      // Validación de solapamiento y doble reserva, esto no deberia estar en el frontend, toca cambiarlo
-      const validacionQuery = `
-        query ValidarDisponibilidad($amenidad: String!, $fecha: String!, $horaInicio: String!, $horaFin: String!, $residenciaId: ID!) {
-          validarReservaDisponible(amenidad: $amenidad, fecha: $fecha, horaInicio: $horaInicio, horaFin: $horaFin, residenciaId: $residenciaId) {
-            disponible
-            motivo
-          }
-        }
-      `;
-
-      const validacionRes = await fetch('http://localhost:3001/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: validacionQuery,
-          variables: {
-            amenidad: reservaData.amenidad,
-            fecha: reservaData.fecha,
-            horaInicio: reservaData.horaInicio,
-            horaFin: reservaData.horaFin,
-            residenciaId: reservaData.residenciaId
-          }
-        })
-      });
-
-      const validacionData = await validacionRes.json();
-      const validacion = validacionData.data && validacionData.data.validarReservaDisponible;
-      if (!validacion || !validacion.disponible) {
-        mensajeDiv.textContent = validacion && validacion.motivo
-          ? validacion.motivo
-          : "La amenidad ya está reservada para ese horario o ya tienes una reserva activa.";
-        return;
-      }
-
   const res = await fetch('/fe-api/crearReserva', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -222,8 +188,15 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   const result = await res.json();
-  if (result.data && result.data.crearReserva) {
-    mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
+
+  // Revisa si la amenidad ya esta reservada o si el usuario ya tiene una reserva activa
+  if (result.disponible === false) {
+    mensajeDiv.textContent = result.motivo || "La amenidad ya está reservada para ese horario o ya tienes una reserva activa.";
+    return;
+  }
+
+  if (result.disponible === true && result.reserva) {
+    mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.reserva.estado;
     form.reset();
     precioTexto.textContent = "Seleccione una amenidad";
     const modal = bootstrap.Modal.getInstance(modalEl);
