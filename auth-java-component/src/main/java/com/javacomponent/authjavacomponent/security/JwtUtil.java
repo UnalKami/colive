@@ -14,7 +14,7 @@ public class JwtUtil {
     private final long EXPIRATION_TIME = 10 * 60 * 1000; // 10 minutos
     //private final long EXPIRATION_TIME = 86400000; // 1 día
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, Long role) {
         return Jwts.builder()
             .setSubject(username)
             .claim("role", role)
