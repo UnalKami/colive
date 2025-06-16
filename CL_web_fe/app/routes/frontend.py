@@ -14,6 +14,10 @@ def about():
 def login():
     return render_template('login.html')
 
+@frontend_bp.route('/registerCR')
+def registerCR():
+    return render_template('create_complex.html')
+
 @frontend_bp.route('/testAuth')
 def pruebaConexionAuth():
     return render_template('pruebaSaludo.html')
