@@ -111,6 +111,23 @@ services:
       - CL_residence-ms
       - CL_auth_db
       - CL_residence_db
+  CL_guest_db:
+    container_name: CL_guest_db
+    ports:
+      - 5433:5433
+    image: postgres:16.9-alpine3.21 
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=db2
+      - POSTGRES_USER=postgres2
+      - POSTGRES_PASSWORD=cincopatodos
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - cl_auth_db_data:/var/lib/postgresql/data
 
 volumes:
   cl_auth_db_data:
