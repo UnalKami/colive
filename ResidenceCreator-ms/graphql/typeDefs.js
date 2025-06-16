@@ -43,7 +43,7 @@ module.exports = gql`
 
   type Conjunto {
     id: ID!
-    nombreConjunto: String!
+    nombre: String!
     nombreAdministrador: String!
     direccion: String!
     departamento: String!

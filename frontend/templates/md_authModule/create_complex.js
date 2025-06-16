@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 configuraciones: $configuraciones
             ) {
                 id
-                nombreConjunto
+                nombre
                 direccion
                 ciudad
             }

@@ -18,3 +18,21 @@ async def delete_conjunto(hash_conjunto):
         response = await client.post(f"{RESIDENCE_MS_URL}/graphql/{hash_conjunto}")        
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice
+
+async def crear_reserva(reserva_data):
+    mutation = '''
+    mutation CrearReserva($reserva: ReservaInput!) {
+      crearReserva(reserva: $reserva) {
+        id
+        estado
+      }
+    }
+    '''
+    variables = {"reserva": reserva_data}
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/graphql",
+            json={"query": mutation, "variables": variables}
+        )
+        response.raise_for_status()
+        return response.json()

@@ -112,6 +112,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         conjuntoSel.innerHTML = '<option value="">Seleccione un conjunto</option>' +
           conjuntos.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
       }
+      console.log('datos cargados:', conjuntos, residencias);
     }
 
     cargarDatos();
@@ -180,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
       }
 
-      // Validación de solapamiento y doble reserva
+      // Validación de solapamiento y doble reserva, esto no deberia estar en el frontend, toca cambiarlo
       const validacionQuery = `
         query ValidarDisponibilidad($amenidad: String!, $fecha: String!, $horaInicio: String!, $horaFin: String!, $residenciaId: ID!) {
           validarReservaDisponible(amenidad: $amenidad, fecha: $fecha, horaInicio: $horaInicio, horaFin: $horaFin, residenciaId: $residenciaId) {
@@ -214,63 +215,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
       }
 
-      // Enviar reserva
-      const mutation = `
-        mutation CrearReserva($reserva: ReservaInput!) {
-          crearReserva(reserva: $reserva) {
-            id
-            conjuntoId
-            residenciaId
-            amenidad
-            fecha
-            horaInicio
-            horaFin
-            cantidadPersonas
-            motivo
-            estado
-            observaciones
-          }
-}
-      `;
+  const res = await fetch('/fe-api/crearReserva', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(reservaData)
+  });
 
-    const variables = {
-    reserva: {
-      conjuntoId: reservaData.conjuntoId,
-      residenciaId: reservaData.residenciaId,
-      amenidad: reservaData.amenidad,
-      fecha: reservaData.fecha,
-      horaInicio: reservaData.horaInicio,
-      horaFin: reservaData.horaFin,
-      cantidadPersonas: reservaData.cantidadPersonas,
-      motivo: reservaData.motivo,
-      estado: reservaData.estado,
-      observaciones: reservaData.observaciones
+  const result = await res.json();
+  if (result.data && result.data.crearReserva) {
+    mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
+    form.reset();
+    precioTexto.textContent = "Seleccione una amenidad";
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+  } else {
+    mensajeDiv.textContent = 'Error al reservar.';
   }
-    };
 
-      const res = await fetch('http://localhost:3001/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          query: mutation, 
-          variables : variables,
-        })
-      });
-
-      console.log("fecha enviada:", variables.reserva.fecha);
-
-      const result = await res.json();
-      //console.log('Resultado de la reserva:', result);
-      if (result.data && result.data.crearReserva) {
-        mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
-        form.reset();
-        precioTexto.textContent = "Seleccione una amenidad";
-        // Cierra el modal automáticamente SOLO si fue exitoso
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        if (modal) modal.hide();
-      } else {
-        mensajeDiv.textContent = 'Error al reservar.';
-        // NO cerrar el modal aquí
-      }
     });
 });
