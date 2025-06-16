@@ -10,3 +10,12 @@ async def get_saludo():
         print(f"Response from auth microservice: {response}")  # Debugging output
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice
+
+async def post_login(username: str, password: str):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{AUTH_MS_URL}/auth/login",
+            json={"username": username, "password": password}
+        )
+        response.raise_for_status()
+        return response.json()

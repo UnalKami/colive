@@ -23,6 +23,15 @@ public class Rol {
 
     private String nombreRol;
 
+    public String getNombreRol() {
+        return nombreRol;
+    }
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
+
     @OneToMany(mappedBy = "rol")
     private List<Usuario> usuarios;
 }
