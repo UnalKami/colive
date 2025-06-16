@@ -14,6 +14,13 @@ module.exports = gql`
     horas: String!
   }
 
+  type Config {
+    tipoParqueadero: Boolean!
+    numParqueadero: Int
+    tipoAlmacen: Boolean!
+    numAlmacen: Int
+  }
+
   input AmenidadInput {
     nombre: String!
     horario: HorarioInput!
@@ -27,13 +34,22 @@ module.exports = gql`
     horas: String!
   }
 
+  input ConfigInput {
+    tipoParqueadero: Boolean!
+    numParqueadero: Int
+    tipoAlmacen: Boolean!
+    numAlmacen: Int
+  }
+
   type Conjunto {
     id: ID!
-    nombre: String!
+    nombreConjunto: String!
     nombreAdministrador: String!
     direccion: String!
+    departamento: String!
     ciudad: String!
     amenidades: [Amenidad]
+    configuraciones: [Config]
   }
 
   type Residence {
@@ -107,7 +123,9 @@ module.exports = gql`
       nombreAdministrador: String!
       direccion: String!
       ciudad: String!
+      departamentos: String!
       amenidades: [AmenidadInput]
+      configuraciones: [ConfigInput]
     ): Conjunto
 
     createResidence(

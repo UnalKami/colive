@@ -136,4 +136,67 @@ document.addEventListener('DOMContentLoaded', function() {
             storageNumberGroup.style.display = "none";
         }
     });
+
+    document.getElementById('submitBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const variables = {
+            nombre: document.getElementById('complex_name').value,
+            nombreAdministrador: document.getElementById('administratorFullname').value,
+            direccion: document.getElementById('address').value,
+            ciudad: document.getElementById('city').value,
+            departamentos: document.getElementById('department').value,
+            amenidades: Array.from(document.querySelectorAll('input[name="amenities"]:checked')).map(cb => ({
+                nombre: cb.value,
+            })),
+            configuraciones: [{
+                tipoParqueadero: document.getElementById('parking').value === "1",
+                numParqueadero: parseInt(document.getElementById('parkingNumber').value) || 0,
+                tipoAlmacen: document.getElementById('storage').value === "1",
+                numAlmacen: parseInt(document.getElementById('storageNumber').value) || 0
+            }]
+        };
+        
+        const query = `
+        mutation CrearConjunto(
+            $nombre: String!,
+            $nombreAdministrador: String!,
+            $direccion: String!,
+            $ciudad: String!,
+            $departamentos: String!,
+            $amenidades: [AmenidadInput],
+            $configuraciones: [ConfigInput]
+        ) {
+            createConjunto(
+                nombre: $nombre,
+                nombreAdministrador: $nombreAdministrador,
+                direccion: $direccion,
+                ciudad: $ciudad,
+                departamentos: $departamentos,
+                amenidades: $amenidades,
+                configuraciones: $configuraciones
+            ) {
+                id
+                nombreConjunto
+                direccion
+                ciudad
+            }
+        }
+        `;
+
+        fetch('/graphql', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            alert('¡Registro enviado!');
+        })
+        .catch(err => {
+            alert('Error al enviar el registro');
+            console.error(err);
+        });
+    });
 });
