@@ -278,3 +278,59 @@ span.event-ghost { background-color:transparent; }
 .calendar {
   margin: 50px auto;
 }
+
+/* Estilos para el dialog de registro de visitante */
+dialog#registroDialog {
+    width: 90%;
+    max-width: 500px;
+    border: none;
+    border-radius: 8px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+dialog#registroDialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#registroDialogHeader {
+    background-color: #f7f7f7;
+    padding: 16px 24px;
+    font-weight: bold;
+    font-size: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+#registroDialogHeader button {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+#registroDialogBody {
+    padding: 24px;
+    background: #fff;
+}
+#registroDialogFooter {
+    padding: 16px 24px;
+    text-align: right;
+    background-color: #f7f7f7;
+    border-top: 1px solid #ddd;
+}
+#registroDialogFooter button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    background: var(--base-color, #c8ae89);
+    color: var(--text-color, #333);
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#registroDialogFooter button:hover {
+    background: var(--second-color, #968979);
+    color: #fff;
+}
