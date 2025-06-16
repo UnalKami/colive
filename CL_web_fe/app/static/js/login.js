@@ -47,10 +47,10 @@ form.addEventListener("submit", async function(event) {
 
   let valid = true;
 
-  if (!emailInput.value || !emailInput.checkValidity()) {
-    emailInput.classList.add("is-invalid");
-    valid = false;
-  }
+  //if (!emailInput.value || !emailInput.checkValidity()) {
+  //  emailInput.classList.add("is-invalid");
+  //  valid = false;
+  //}
 
   if (!passwordInput.value) {
     passwordInput.classList.add("is-invalid");

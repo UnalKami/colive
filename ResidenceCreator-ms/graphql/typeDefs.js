@@ -23,10 +23,10 @@ module.exports = gql`
 
   input AmenidadInput {
     nombre: String!
-    horario: HorarioInput!
-    estado: String!
-    costo: Float!
-    capacidad: Int!
+    horario: HorarioInput
+    estado: String
+    costo: Float
+    capacidad: Int
   }
 
   input HorarioInput {
