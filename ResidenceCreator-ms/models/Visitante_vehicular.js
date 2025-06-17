@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db');
+const sequelize = require('../app/db2');
 
 const VisitanteV = sequelize.define('VisitanteV', {
     diaIngreso: {type: DataTypes.DATE, allowNull: false},

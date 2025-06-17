@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const VisitanteP = require('../models/VisitanteP');
+const VisitanteP = require('../models/Visitante_peaton');
 const VisitanteV = require('../models/Visitante_vehicular');
 const { Op } = require('sequelize')
 
