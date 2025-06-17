@@ -24,7 +24,7 @@ object Main {
     val allRoutes = SesionAgentRoutes.route(sesionActor) ~ SMTPAgentRoutes.route(smtpActor)
 
     // Bind del servidor HTTP en puerto 9000
-    val bindingFuture = Http().newServerAt("0.0.0.0", 9000).bind(allRoutes)
+    val bindingFuture = Http().newServerAt("0.0.0.0", 7000).bind(allRoutes)
 
     bindingFuture.onComplete {
       case Success(binding) =>
@@ -40,11 +40,11 @@ object Main {
       system.log.info("🔴 Shutdown hook iniciado: desbindear servidor y terminar ActorSystem")
       // Desbindear y luego terminar actor system
       bindingFuture
-        .flatMap(_.unbind())(system.executionContext)
+        .flatMap(_.unbind())(using system.executionContext)
         .onComplete { _ =>
           system.terminate()
           system.log.info("ActorSystem terminado")
-        }(system.executionContext)
+        }(using system.executionContext)
       // Esperamos a que el sistema realmente termine (opcionalmente)
       Await.result(system.whenTerminated, Duration.Inf)
     }

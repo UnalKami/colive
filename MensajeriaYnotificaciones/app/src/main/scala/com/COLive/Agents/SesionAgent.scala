@@ -1,27 +1,20 @@
 package com.COLive.Agents
 
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import akka.actor.typed.scaladsl.Behaviors
-import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.model.StatusCodes
 import akka.actor.typed.scaladsl.AskPattern._
+import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
+import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.model.RemoteAddress
 import akka.util.Timeout
-import spray.json._
-import spray.json.DefaultJsonProtocol._
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
+
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-/** Modelos y JsonSupport compartido para sesiones */
-final case class Token(token: String)
-final case class OperationResult(success: Boolean, message: String)
-
-trait JsonSupport {
-  import spray.json.RootJsonFormat
-  implicit val tokenFormat: RootJsonFormat[Token]                     = jsonFormat1(Token.apply)
-  implicit val operationResultFormat: RootJsonFormat[OperationResult] = jsonFormat2(OperationResult.apply)
-}
+import com.COLive.Models.{Token, TokenRequest, OperationResult}
+import com.COLive.JsonSupport._ 
+import java.net.InetAddress
 
 /**
  * Actor que gestiona tokens de sesión: crear, verificar, refrescar, eliminar.
@@ -30,10 +23,10 @@ trait JsonSupport {
 object SesionAgent {
   // Comandos
   sealed trait Command
-  final case class SetSesionToken(token: String, replyTo: ActorRef[OperationResult])    extends Command
-  final case class ActiveSesionToken(token: String, replyTo: ActorRef[OperationResult]) extends Command
-  final case class DeleteSesionToken(token: String, replyTo: ActorRef[OperationResult]) extends Command
-  final case class RefreshSesionToken(token: String, replyTo: ActorRef[OperationResult]) extends Command
+  final case class SetSesionToken(token: Token, replyTo: ActorRef[OperationResult])    extends Command
+  final case class ActiveSesionToken(token: Token, replyTo: ActorRef[OperationResult]) extends Command
+  final case class DeleteSesionToken(token: Token, replyTo: ActorRef[OperationResult]) extends Command
+  final case class RefreshSesionToken(token: Token, replyTo: ActorRef[OperationResult]) extends Command
 
   private case object Cleanup extends Command
 
@@ -45,23 +38,23 @@ object SesionAgent {
       active(Map.empty)
     }
 
-  private def active(tokens: Map[String, Long]): Behavior[Command] =
+  private def active(tokens: Map[Token, Long]): Behavior[Command] =
     Behaviors.receive { (context, message) =>
       message match {
-        case SetSesionToken(token, replyTo) =>
+        case SetSesionToken(tokenObj, replyTo) =>
           val expiry = System.currentTimeMillis() + TTL_MILLIS
           replyTo ! OperationResult(success = true, message = s"Token registrado; expira en $expiry")
-          active(tokens + (token -> expiry))
+          active(tokens + (tokenObj -> expiry))
 
-        case ActiveSesionToken(token, replyTo) =>
+        case ActiveSesionToken(tokenObj, replyTo) =>
           val now = System.currentTimeMillis()
-          tokens.get(token) match {
+          tokens.get(tokenObj) match {
             case Some(expiry) if expiry > now =>
               replyTo ! OperationResult(success = true, message = "Acceso concedido")
               Behaviors.same
             case Some(_) =>
               replyTo ! OperationResult(success = false, message = "Token expirado")
-              active(tokens - token)
+              active(tokens - tokenObj)
             case None =>
               replyTo ! OperationResult(success = false, message = "Token no encontrado")
               Behaviors.same
@@ -101,8 +94,8 @@ object SesionAgent {
 /**
  * Rutas HTTP para SesionAgent, bajo /msg/sesion.
  */
-object SesionAgentRoutes extends JsonSupport {
-  def route(actor: ActorRef[SesionAgent.Command])(implicit system: ActorSystem[_]): Route = {
+object SesionAgentRoutes {
+  def route(actor: ActorRef[SesionAgent.Command])(implicit system: ActorSystem[?]): Route = {
     implicit val timeout: Timeout = Timeout(3.seconds)
     implicit val ec: ExecutionContext = system.executionContext
     implicit val scheduler = system.scheduler
@@ -112,54 +105,79 @@ object SesionAgentRoutes extends JsonSupport {
         // POST /msg/sesion/crear  JSON {"token":"..."}
         path("crear") {
           post {
-            entity(as[Token]) { (dto: Token) =>
-              val resultF: Future[OperationResult] =
-                actor.ask(ref => SesionAgent.SetSesionToken(dto.token, ref))
-              onSuccess(resultF) { result =>
-                if result.success then
-                  complete(StatusCodes.Created, result.message)
-                else
-                  complete(StatusCodes.InternalServerError, result.message)
-              }
+            extractClientIP {
+              case RemoteAddress.IP(ip, _) =>
+                val ipStr = ip.getHostAddress
+                entity(as[TokenRequest]) { dto =>
+                  val tokenObj = Token(dto.token, ipStr)
+                  val resultF: Future[OperationResult] =
+                    actor.ask(ref => SesionAgent.SetSesionToken(tokenObj, ref))
+                  onSuccess(resultF) { result =>
+                    if result.success then
+                      complete(StatusCodes.Created, result.message)
+                    else
+                      complete(StatusCodes.InternalServerError, result.message)
+                  }
+                }
+
+              case _ =>
+                complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
             }
           }
         },
-        // GET /msg/sesion/activo/{token}
+         // GET /msg/sesion/activo/{token}
         path("activo" / Segment) { token =>
-          get {
-            val resultF: Future[OperationResult] =
-              actor.ask(ref => SesionAgent.ActiveSesionToken(token, ref))
-            onSuccess(resultF) { result =>
-              if result.success then
-                complete(StatusCodes.OK, result.message)
-              else
-                complete(StatusCodes.Unauthorized, result.message)
-            }
+          extractClientIP {
+           case RemoteAddress.IP(ip, _) =>
+              val ipStr = ip.getHostAddress
+              val resultF: Future[OperationResult] =
+                actor.ask(ref => SesionAgent.ActiveSesionToken(Token(token, ipStr), ref))
+              onSuccess(resultF) { result =>
+                if result.success then
+                  complete(StatusCodes.OK, result.message)
+                else
+                  complete(StatusCodes.Unauthorized, result.message)
+              }
+
+            case _ =>
+              complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
           }
         },
         // PUT /msg/sesion/refrescar/{token}
         path("refrescar" / Segment) { token =>
-          put {
-            val resultF: Future[OperationResult] =
-              actor.ask(ref => SesionAgent.RefreshSesionToken(token, ref))
-            onSuccess(resultF) { result =>
-              if result.success then
-                complete(StatusCodes.OK, result.message)
-              else
-                complete(StatusCodes.Unauthorized, result.message)
-            }
+          extractClientIP {
+            case RemoteAddress.IP(ip, _) =>
+              val ipStr = ip.getHostAddress
+              val resultF: Future[OperationResult] =
+                actor.ask(ref => SesionAgent.RefreshSesionToken(Token(token, ipStr), ref))
+              onSuccess(resultF) { result =>
+                if result.success then
+                  complete(StatusCodes.OK, result.message)
+                else
+                  complete(StatusCodes.Unauthorized, result.message)
+              }
+
+            case _ =>
+              complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
           }
         },
         // DELETE /msg/sesion/{token}
         path(Segment) { token =>
           delete {
-            val resultF: Future[OperationResult] =
-              actor.ask(ref => SesionAgent.DeleteSesionToken(token, ref))
-            onSuccess(resultF) { result =>
-              if result.success then
-                complete(StatusCodes.OK, result.message)
-              else
-                complete(StatusCodes.NotFound, result.message)
+            extractClientIP {
+              case RemoteAddress.IP(ip, _)  =>
+                val ipStr = ip.getHostAddress
+                val resultF: Future[OperationResult] =
+                  actor.ask(ref => SesionAgent.DeleteSesionToken(Token(token, ipStr), ref))
+                onSuccess(resultF) { result =>
+                  if result.success then
+                    complete(StatusCodes.OK, result.message)
+                  else
+                    complete(StatusCodes.NotFound, result.message)
+                }
+
+              case _ =>
+                complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
             }
           }
         }

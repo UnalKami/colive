@@ -15,7 +15,10 @@ libraryDependencies ++= Seq(
   // MongoDB Reactive Streams Java Driver
   "org.mongodb"       %  "mongodb-driver-reactivestreams" % "5.5.1",
   // JavaMail
-  "com.sun.mail"      %  "javax.mail"           % "1.6.2"
+  "com.sun.mail"      %  "javax.mail"           % "1.6.2",
+  // Akka SLF4J for logging
+   "com.typesafe.akka" %% "akka-slf4j"            % "2.8.5",
+  "ch.qos.logback"    %  "logback-classic"       % "1.4.11"
 )
 
 Compile / run / mainClass := Some("com.COLive.Main")
