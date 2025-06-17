@@ -125,7 +125,7 @@ module.exports = gql`
       nombreAdministrador: String!
       direccion: String!
       ciudad: String!
-      departamentos: String!
+      departamento: String!
       amenidades: [AmenidadInput]
       configuraciones: [ConfigInput]
     ): Conjunto

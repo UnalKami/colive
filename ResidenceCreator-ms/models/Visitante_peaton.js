@@ -7,7 +7,7 @@ const VisitanteP = sequelize.define('VisitanteP', {
     visitanteDocumento: {type: DataTypes.STRING, allowNull:false},
     Destino: {type: DataTypes.STRING, allowNull: false},
     nombreAutoriza: {type: DataTypes.STRING, allowNull: false},
-    idConjunto: {type: DataTypes.UUID, allowNull: false}
+    idConjunto: {type: DataTypes.UUID}
 })
 
 
