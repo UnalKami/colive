@@ -2,12 +2,17 @@ package com.COLive.Agents
 
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
+import akka.stream.scaladsl.Sink
+import akka.stream.SystemMaterializer
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Failure}
 
 import com.COLive.Services.MongoService
 import com.COLive.Models.SalidaCorreoConfig
-import com.COLive.Agents.OperationResult
+import com.COLive.Models.OperationResult
+import com.COLive.Models.SMTPConfigInfo
+import com.COLive.Models.SMTPConfigs
 
 // Import JavaMail con alias para evitar ambigüedades con Akka HTTP
 import javax.mail.{Session => MailSession, Message => MailMessage, Transport => MailTransport, Authenticator => MailAuthenticator, PasswordAuthentication}
@@ -33,6 +38,8 @@ object SMTPAgent {
     replyTo: ActorRef[OperationResult]
   ) extends Command
 
+  final case class ListarSMTP(replyTo: ActorRef[SMTPConfigs]) extends Command
+
   def apply(): Behavior[Command] =
     Behaviors.setup { context =>
       implicit val ec: ExecutionContext = context.executionContext
@@ -43,7 +50,7 @@ object SMTPAgent {
             case Success(_) =>
               replyTo ! OperationResult(success = true, message = s"SMTP registrado para '$email'.")
             case Failure(ex) =>
-              context.log.error("Error guardando SMTP para {}: {}", email, ex.getMessage)
+              context.log.error("Error guardando SMTP para {}: {}", email, ex)
               replyTo ! OperationResult(success = false, message = s"Error registrando SMTP: ${ex.getMessage}")
           }
           Behaviors.same
@@ -79,7 +86,7 @@ object SMTPAgent {
                     message.setText(cuerpo)
 
                     MailTransport.send(message)
-                  }(ec).onComplete {
+                  }(using ec).onComplete {
                     case Success(_) =>
                       replyTo ! OperationResult(success = true, message = s"Correo enviado de '$de' a '$para'.")
                     case Failure(exSend) =>
@@ -89,10 +96,28 @@ object SMTPAgent {
               }
 
             case Failure(ex) =>
-              context.log.error("Error obteniendo configuración SMTP para {}: {}", de, ex.getMessage)
+              context.log.error("Error obteniendo configuración SMTP para {}: {}", de, ex)
               replyTo ! OperationResult(success = false, message = s"Error interno al obtener configuración: ${ex.getMessage}")
-          }(ec)
+          }(using ec)
 
+          Behaviors.same
+
+        case ListarSMTP(replyTo) =>
+          context.log.info("SMTPAgent: ListarSMTP recibido")
+          implicit val system: akka.actor.typed.ActorSystem[?] = context.system
+          implicit val ec: ExecutionContext = context.executionContext
+          val source = MongoService.listarTodos()
+          implicit val mat = SystemMaterializer(context.system).materializer
+          source.runWith(Sink.seq).onComplete {
+            case Success(listSalidaCorreo) =>
+              val infos = listSalidaCorreo.map(e =>
+                SMTPConfigInfo(e.email, e.smtpHost, e.smtpPort, e.username)
+              )
+              replyTo ! SMTPConfigs(infos.toList)
+            case Failure(ex) =>
+              context.log.error("SMTPAgent: Error al listar configuraciones SMTP", ex)
+              replyTo ! SMTPConfigs(Nil)
+          }
           Behaviors.same
       }
     }

@@ -9,6 +9,7 @@ import com.mongodb.client.model.Filters
 import com.mongodb.client.model.ReplaceOptions
 import com.mongodb.client.result.UpdateResult
 import com.mongodb.reactivestreams.client.{MongoClients, MongoClient, MongoDatabase, MongoCollection}
+import org.bson.codecs.configuration.{CodecRegistry, CodecRegistries}
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.bson.codecs.pojo.PojoCodecProvider
 
@@ -16,32 +17,36 @@ import scala.concurrent.{Future, Promise}
 import scala.concurrent.ExecutionContext
 import org.reactivestreams.Publisher
 
+import akka.actor.typed.ActorSystem
+import akka.stream.scaladsl.Source
+import akka.stream.{Materializer, SystemMaterializer}
+
 object MongoService {
   // Leer variables de entorno
-  private val mongoUri  = sys.env.getOrElse("MONGO_URI", "mongodb://localhost:27017")
+  private val mongoUri  = sys.env.getOrElse("MONGO_URI", 
+    throw new RuntimeException("Falta MONGO_URI en variables de entorno"))
   private val secretKey = sys.env.getOrElse("SMTP_SECRET_KEY",
     throw new RuntimeException("Falta SMTP_SECRET_KEY en variables de entorno"))
 
   // Configurar codec registry para POJO
-  private val pojoCodecProvider = PojoCodecProvider.builder().automatic(true).build()
+  private val pojoCodecProvider = PojoCodecProvider.builder()
+    .register(classOf[SalidaCorreo]) 
+    .automatic(true)
+    .build()
+
   private val codecRegistry = fromRegistries(
-    fromProviders(pojoCodecProvider),
-    MongoClientSettings.getDefaultCodecRegistry
+    MongoClientSettings.getDefaultCodecRegistry,
+    fromProviders(pojoCodecProvider)
   )
 
-  // Crear MongoClient Reactive Streams
-  private val connectionString = new ConnectionString(mongoUri)
-  // Si la URI incluye /dbname, getDatabase devuelve ese nombre; si no, usamos "correos" por defecto.
-  private val dbName = Option(connectionString.getDatabase).filter(_.nonEmpty).getOrElse("correos")
   private val settings = MongoClientSettings.builder()
-    .applyConnectionString(connectionString)
+    .applyConnectionString(new ConnectionString(mongoUri))
     .codecRegistry(codecRegistry)
     .build()
-  private val client: MongoClient = MongoClients.create(settings)
-  private val database: MongoDatabase = client.getDatabase(dbName)
+  private val client = MongoClients.create(settings)
+  private val database = client.getDatabase("correos").withCodecRegistry(codecRegistry)
+  private val collection = database.getCollection("salida_correos", classOf[SalidaCorreo])
 
-  private val collection: MongoCollection[SalidaCorreo] =
-    database.getCollection("salida_correos", classOf[SalidaCorreo])
 
   /** Guarda o actualiza la configuración SMTP en Mongo.
     * Retorna Future[UpdateResult] del replaceOne(upsert=true).
@@ -50,7 +55,15 @@ object MongoService {
                    (implicit ec: ExecutionContext): Future[UpdateResult] = {
     val encrypted = CryptoUtil.encrypt(secretKey, password)
     val doc = SalidaCorreo(email, smtpHost, smtpPort, username, encrypted)
+    println(s"...................................... [MongoService] Documento a guardar: $doc")
 
+    println(s"[MongoService] Base de datos usada: ${database.getName}")
+    println(s"[MongoService] Colección usada: ${collection.getNamespace.getCollectionName}")
+    println(s"[MongoService] URI de conexión: $mongoUri")
+    println(s"[MongoService] Encriptando password: $encrypted")
+    println(s"[MongoService] Email: $email, SMTP Host: $smtpHost, SMTP Port: $smtpPort, Username: $username")
+    println(s"[MongoService] Encriptando password: $encrypted")
+    println(s"..................................[MongoService] Guardando documento: $doc")
     val publisher: Publisher[UpdateResult] =
       collection.replaceOne(
         Filters.eq("email", email),
@@ -103,10 +116,11 @@ object MongoService {
     }
   }
 
-  /** Lista todos los documentos SalidaCorreo como Source, usando Akka Streams. */
-  def listarTodos()(implicit system: akka.actor.ActorSystem, ec: ExecutionContext): akka.stream.scaladsl.Source[SalidaCorreo, _] = {
-    import akka.stream.scaladsl.Source
-    // collection.find() ya es un Publisher[SalidaCorreo]
+  /** Lista todos los documentos SalidaCorreo como Source, usando Akka Typed. */
+  def listarTodos()(using system: ActorSystem[?]): Source[SalidaCorreo, ?] = {
+    implicit val mat: Materializer = SystemMaterializer(system).materializer
+    implicit val ec: ExecutionContext = system.executionContext
+
     Source.fromPublisher(collection.find())
-  }
+}
 }
