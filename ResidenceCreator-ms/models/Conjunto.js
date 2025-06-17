@@ -28,18 +28,21 @@ const AmenitySchema = new mongoose.Schema({
   }
 });
 
+const ConfigSchema = new mongoose.Schema({
+  tipoParqueadero: { type: Number, required: true},
+  numParqueadero: { type: Number, default: null},
+  tipoAlmacen: { type: Boolean, required: true},
+  numAlmancen: { type: Number, default: null}
+});
 
 const ConjuntoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
   nombreAdministrador: { type: String, required: true },
   direccion: { type: String, required: true },
   ciudad: { type: String, required: true },
+  departamento: {type: String, required: true},
   amenidades: [AmenitySchema],
+  configuraciones: [ConfigSchema]
 });
-
-ConjuntoSchema.path('amenidades').validate(function(amenidades) {
-  const nombres = amenidades.map(a => a.nombre.toLowerCase());
-  return new Set(nombres).size === nombres.length;
-}, 'Cada amenidad debe tener un nombre único dentro del conjunto');
 
 module.exports = mongoose.model('Conjunto', ConjuntoSchema);

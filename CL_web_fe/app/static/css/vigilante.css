@@ -278,3 +278,135 @@ span.event-ghost { background-color:transparent; }
 .calendar {
   margin: 50px auto;
 }
+
+#btnSalida {
+  background-color: #dc3545; /* Rojo Bootstrap */
+  border-color: #dc3545;
+  color: #fff;
+  margin-top: 1%;
+}
+
+/* Puedes agregar esto a tu archivo CSS */
+#formPeaton label {
+  display: block;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+#formPeaton input {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+#formPeaton button {
+  margin-right: 8px;
+  margin-top: 10px;
+}
+
+#dialogPeaton {
+  min-width: 400px;
+  padding: 20px;
+}
+
+#formPeaton {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+
+#formPeaton button[type="submit"] {
+  background-color: #007bff; /* Azul */
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  margin-right: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#formPeaton button[type="button"] {
+  background-color: #dc3545; /* Rojo */
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Aplica a ambos formularios si usas las mismas clases/IDs */
+#registroDialogBody label {
+  display: block;
+  margin-bottom: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+#registroDialogBody input,
+#registroDialogBody select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fafafa;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+#registroDialogBody input:focus,
+#registroDialogBody select:focus {
+  border-color: #007bff;
+  outline: none;
+  background: #fff;
+}
+
+#registroDialogFooter {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding-top: 12px;
+}
+
+#registroDialogFooter button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#registroDialogFooter button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+#registroDialogFooter button[type="button"] {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#registroDialogFooter button[type="button"]:hover {
+  background-color: #a71d2a;
+}
+
+#registroDialogFooter button[type="submit"] {
+  background-color: #007bff;
+  color: #fff;
+}
+#registroDialogFooter button[type="button"] {
+  background-color: #dc3545;
+  color: #fff;
+}

@@ -29,3 +29,7 @@ def propietario():
 @frontend_bp.route('/reservas')
 def reservas():
     return render_template('reservas.html')
+
+@frontend_bp.route('/admin')
+def admin():
+    return render_template('adminhome.html')

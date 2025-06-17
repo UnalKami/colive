@@ -9,6 +9,7 @@ const conjuntosData = [
     nombreAdministrador: "Laura Martínez",
     direccion: "Calle 123 #45-67",
     ciudad: "Bogotá",
+    departamento: "Cundinamarca", 
     amenidades: [
       {
         nombre: "Piscina",
@@ -31,6 +32,7 @@ const conjuntosData = [
     nombreAdministrador: "Carlos Pérez",
     direccion: "Av. Central 456",
     ciudad: "Medellín",
+    departamento: "Antioquia", 
     amenidades: [
       {
         nombre: "Salón Social",

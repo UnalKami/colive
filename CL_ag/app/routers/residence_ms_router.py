@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from app.services.residence_ms_services import (
     crear_reserva, validar_reserva_disponible,
-    editar_reserva, eliminar_reserva
+    editar_reserva, eliminar_reserva,
+    obtener_conjuntos_residencias, obtener_reservas
 )
 
 router = APIRouter()
@@ -93,3 +94,21 @@ async def eliminar_reserva_endpoint(data: EliminarReservaInput):
         return {"success": result.get("data", {}).get("eliminarReserva", False)}
     except Exception as e:
         return {"success": False, "motivo": "Error interno al eliminar la reserva."}
+
+# esto es temporal, debe usar el token 
+@router.get("/conjuntosResidencias")
+async def conjuntos_residencias_endpoint():
+    try:
+        data = await obtener_conjuntos_residencias()
+        return data
+    except Exception as e:
+        return {"error": str(e)}
+
+# esto es temporal, debe usar el token 
+@router.get("/reservas")
+async def obtener_reservas_endpoint(residenciaId: str = None):
+    try:
+        data = await obtener_reservas(residenciaId=residenciaId)
+        return {"reservas": data}
+    except Exception as e:
+        return {"error": str(e)}
