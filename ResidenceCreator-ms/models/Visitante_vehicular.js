@@ -12,7 +12,7 @@ const VisitanteV = sequelize.define('VisitanteV', {
     tipoVehiculo: { type: DataTypes.STRING, allowNUll: false},
     espacioAsignado: {type: DataTypes.INTEGER, allowNUll: false},
     salidaVehiculo: { type: DataTypes.DATE, default: null},
-    idConjunto: {type: DataTypes.UUID, allowNull: false}
+    idConjunto: {type: DataTypes.UUID}
 })
 
 

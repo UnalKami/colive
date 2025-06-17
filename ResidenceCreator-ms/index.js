@@ -7,6 +7,9 @@ const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
 const Reserva = require('./models/Reserva'); //modelo de Reserva
 
+const visitantesRouter = require('./routes/visitantes');
+app.use('/api/visitantes', visitantesRouter);
+
 const app = express();
 // app.use(bodyParser.json());
 
