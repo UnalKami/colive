@@ -102,82 +102,61 @@ object SesionAgentRoutes {
 
     pathPrefix("msg" / "sesion") {
       concat(
-        // POST /msg/sesion/crear  JSON {"token":"..."}
+        // POST /msg/sesion/crear
         path("crear") {
           post {
-            extractClientIP {
-              case RemoteAddress.IP(ip, _) =>
-                val ipStr = ip.getHostAddress
-                entity(as[TokenRequest]) { dto =>
-                  val tokenObj = Token(dto.token, ipStr)
-                  val resultF: Future[OperationResult] =
-                    actor.ask(ref => SesionAgent.SetSesionToken(tokenObj, ref))
-                  onSuccess(resultF) { result =>
-                    if result.success then
-                      complete(StatusCodes.Created, result.message)
-                    else
-                      complete(StatusCodes.InternalServerError, result.message)
-                  }
+            extractClientIP { clientIp =>
+              val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
+              entity(as[TokenRequest]) { dto =>
+                val tokenObj = Token(dto.token, ipStr)
+                val resultF: Future[OperationResult] =
+                  actor.ask(ref => SesionAgent.SetSesionToken(tokenObj, ref))
+                onSuccess(resultF) { result =>
+                  if result.success then complete(StatusCodes.Created, result.message)
+                  else complete(StatusCodes.InternalServerError, result.message)
                 }
-
-              case _ =>
-                complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
+              }
             }
           }
         },
-         // GET /msg/sesion/activo/{token}
-        path("activo" / Segment) { token =>
-          extractClientIP {
-           case RemoteAddress.IP(ip, _) =>
-              val ipStr = ip.getHostAddress
-              val resultF: Future[OperationResult] =
-                actor.ask(ref => SesionAgent.ActiveSesionToken(Token(token, ipStr), ref))
-              onSuccess(resultF) { result =>
-                if result.success then
-                  complete(StatusCodes.OK, result.message)
-                else
-                  complete(StatusCodes.Unauthorized, result.message)
-              }
 
-            case _ =>
-              complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
+        // GET /msg/sesion/activo/{token}
+        path("activo" / Segment) { token =>
+          extractClientIP { clientIp =>
+            val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
+            val resultF: Future[OperationResult] =
+              actor.ask(ref => SesionAgent.ActiveSesionToken(Token(token, ipStr), ref))
+            onSuccess(resultF) { result =>
+              if result.success then complete(StatusCodes.OK, result.message)
+              else complete(StatusCodes.Unauthorized, result.message)
+            }
           }
         },
+
         // PUT /msg/sesion/refrescar/{token}
         path("refrescar" / Segment) { token =>
-          extractClientIP {
-            case RemoteAddress.IP(ip, _) =>
-              val ipStr = ip.getHostAddress
-              val resultF: Future[OperationResult] =
-                actor.ask(ref => SesionAgent.RefreshSesionToken(Token(token, ipStr), ref))
-              onSuccess(resultF) { result =>
-                if result.success then
-                  complete(StatusCodes.OK, result.message)
-                else
-                  complete(StatusCodes.Unauthorized, result.message)
-              }
-
-            case _ =>
-              complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
+          extractClientIP { clientIp =>
+            val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
+            val resultF: Future[OperationResult] =
+              actor.ask(ref => SesionAgent.RefreshSesionToken(Token(token, ipStr), ref))
+            onSuccess(resultF) { result =>
+              if result.success then complete(StatusCodes.OK, result.message)
+              else complete(StatusCodes.Unauthorized, result.message)
+            }
           }
         },
+
         // DELETE /msg/sesion/{token}
         path(Segment) { token =>
           delete {
-            extractClientIP {
-              case RemoteAddress.IP(ip, _)  =>
-                val ipStr = ip.getHostAddress
-                val resultF: Future[OperationResult] =
-                  actor.ask(ref => SesionAgent.DeleteSesionToken(Token(token, ipStr), ref))
-                onSuccess(resultF) { result =>
-                  if result.success then
-                    complete(StatusCodes.OK, result.message)
-                  else
-                    complete(StatusCodes.NotFound, result.message)
-                }
-
-              case _ =>
-                complete(StatusCodes.BadRequest, "No se pudo determinar la IP del cliente")
+            extractClientIP { clientIp =>
+              val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
+              val resultF: Future[OperationResult] =
+                actor.ask(ref => SesionAgent.DeleteSesionToken(Token(token, ipStr), ref))
+              onSuccess(resultF) { result =>
+                if result.success then complete(StatusCodes.OK, result.message)
+                else complete(StatusCodes.NotFound, result.message)
+              }
             }
           }
         }
