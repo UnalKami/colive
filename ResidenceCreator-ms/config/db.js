@@ -10,7 +10,6 @@ const sequelize = new Sequelize(POSTGRES_URI, {
 });
 
 const connectDB = async () => {
-  try {
     // Conexión MongoDB
     await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
     console.log('MongoDB conectado');
@@ -19,10 +18,7 @@ const connectDB = async () => {
     await sequelize.authenticate();
     console.log('PostgreSQL conectado');
 
-  } catch (error) {
-    console.error('Error al conecetar a las bases de datos:', error.message);
-    process.exit(1);
-  }
+
 };
 
 module.exports = {connectDB, sequelize};

@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nombreAdministrador: document.getElementById('administratorFullname').value,
             direccion: document.getElementById('address').value,
             ciudad: document.getElementById('city').value,
-            departamentos: document.getElementById('department').value,
+            departamento: document.getElementById('department').value,
             amenidades: Array.from(document.querySelectorAll('input[name="amenities"]:checked')).map(cb => ({
                 nombre: cb.value,
             })),
@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
             $nombreAdministrador: String!,
             $direccion: String!,
             $ciudad: String!,
-            $departamentos: String!,
+            $departamento: String!,
             $amenidades: [AmenidadInput],
             $configuraciones: [ConfigInput]
         ) {
@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 nombreAdministrador: $nombreAdministrador,
                 direccion: $direccion,
                 ciudad: $ciudad,
-                departamentos: $departamentos,
+                departamento: $departamento,
                 amenidades: $amenidades,
                 configuraciones: $configuraciones
             ) {
