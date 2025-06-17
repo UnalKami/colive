@@ -1,5 +1,5 @@
 // URL base de la API backend
-const api_url = "http://localhost:8000";
+const api_url = "http://localhost:5000/fe-api";
 
 // Referencias al formulario y elementos
 const form = document.getElementById("login-form");
@@ -47,10 +47,10 @@ form.addEventListener("submit", async function(event) {
 
   let valid = true;
 
-  if (!emailInput.value || !emailInput.checkValidity()) {
-    emailInput.classList.add("is-invalid");
-    valid = false;
-  }
+  //if (!emailInput.value || !emailInput.checkValidity()) {
+  //  emailInput.classList.add("is-invalid");
+  //  valid = false;
+  //}
 
   if (!passwordInput.value) {
     passwordInput.classList.add("is-invalid");
@@ -65,13 +65,14 @@ form.addEventListener("submit", async function(event) {
 
   try {
     // Enviar credenciales al backend
-    const res = await fetch(`${api_url}/auth/login`, {
+    const res = await fetch(`${api_url}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         username: emailInput.value,
         password: passwordInput.value
-      })
+      }),
+      credentials: "include"
     });
 
     const data = await res.json();
@@ -81,12 +82,13 @@ form.addEventListener("submit", async function(event) {
       showAlert("Inicio de sesión fallido. Verifica tus datos.");
     } else {
       // Guardar datos en localStorage y redirigir
-      localStorage.setItem("token", data.body.token);
-      localStorage.setItem("rol", data.body.rol);
-      localStorage.setItem("id", data.body.user[0].USUARIO_ID_Usuario);
+      //localStorage.setItem("token", data.body.token);
+      //localStorage.setItem("rol", data.body.rol);
+      //localStorage.setItem("id", data.body.user[0].USUARIO_ID_Usuario);
 
       showAlert("¡Bienvenido!", "success");
-      setTimeout(() => window.location.href = "../templates/adminhome.html", 1000);
+      setTimeout(() => window.location.href = "/propietario", 1000);
+      /*../templates/adminhome.html*/
     }
   } catch (err) {
     showAlert("Error del servidor. Intenta más tarde.");

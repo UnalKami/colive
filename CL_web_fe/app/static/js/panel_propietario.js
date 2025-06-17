@@ -1,15 +1,67 @@
-document.addEventListener('DOMContentLoaded', function() {
-  // Cargar el modal desde el archivo externo
-  fetch('../../partials/reservar_amenidad.html')
-    .then(response => response.text())
-    .then(html => {
-      document.getElementById('modal-reserva-container').innerHTML = html;
-      initializeModalLogic();
-    })
-    .catch(error => console.error('Error al cargar el modal:', error));
+document.addEventListener('DOMContentLoaded', async function() {
+  // Simulación: ID de residencia (en producción, obtén esto del login/session)
+  const residenciaId = "ID_RESIDENCIA_DEL_USUARIO";
 
-  function initializeModalLogic() {
-    // Ahora los elementos existen en el DOM
+  const listaReservas = document.getElementById('listaReservas');
+  const resumenNotificaciones = document.getElementById('resumenNotificaciones');
+
+  // Mensaje de carga inicial con clases de Bootstrap
+  listaReservas.innerHTML = '<li class="list-group-item text-muted">Cargando reservas...</li>';
+  resumenNotificaciones.innerHTML = '<li class="text-muted">Cargando notificaciones...</li>';
+
+  async function cargarPanelPropietario() {
+    try {
+      const query = `
+        query {
+          reservas(residenciaId: "${residenciaId}") {
+            amenidad
+            fecha
+            horaInicio
+            horaFin
+            estado
+          }
+          notificacionesResidencia(residenciaId: "${residenciaId}") {
+            mensaje
+            fecha
+          }
+        }
+      `;
+      const res = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+
+      // Mostrar reservas activas/próximas
+      if (data?.data?.reservas?.length > 0) {
+        listaReservas.innerHTML = data.data.reservas.map(res =>
+          `<li class="list-group-item">
+            <b>${res.amenidad}</b> - ${new Date(res.fecha).toLocaleDateString()} 
+            ${res.horaInicio} a ${res.horaFin} 
+            <span style="color:${res.estado === 'aprobada' ? 'green' : 'orange'}">[${res.estado}]</span>
+          </li>`
+        ).join('');
+      } else {
+        listaReservas.innerHTML = '<li class="list-group-item text-muted">No tienes reservas activas.</li>';
+      }
+
+      // Mostrar notificaciones
+      if (data?.data?.notificacionesResidencia?.length > 0) {
+        resumenNotificaciones.innerHTML = data.data.notificacionesResidencia.map(n =>
+          `<li class="mb-2">${n.mensaje} <small class="text-muted">(${new Date(n.fecha).toLocaleDateString()})</small></li>`
+        ).join('');
+      } else {
+        resumenNotificaciones.innerHTML = '<li class="text-muted">No tienes notificaciones recientes.</li>';
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      listaReservas.innerHTML = '<li class="list-group-item text-danger">Error al cargar reservas.</li>';
+      resumenNotificaciones.innerHTML = '<li class="text-danger">Error al cargar notificaciones.</li>';
+    }
+  }
+
+  
     const openModalBtn = document.getElementById('btnAbrirModalReserva');
     const modalEl = document.getElementById('modalReservarAmenidad');
     const conjuntoSel = document.getElementById('conjuntoId');
@@ -60,6 +112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         conjuntoSel.innerHTML = '<option value="">Seleccione un conjunto</option>' +
           conjuntos.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
       }
+      console.log('datos cargados:', conjuntos, residencias);
     }
 
     cargarDatos();
@@ -128,98 +181,29 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
-      // Validación de solapamiento y doble reserva
-      const validacionQuery = `
-        query ValidarDisponibilidad($amenidad: String!, $fecha: String!, $horaInicio: String!, $horaFin: String!, $residenciaId: ID!) {
-          validarReservaDisponible(amenidad: $amenidad, fecha: $fecha, horaInicio: $horaInicio, horaFin: $horaFin, residenciaId: $residenciaId) {
-            disponible
-            motivo
-          }
-        }
-      `;
+  const res = await fetch('/fe-api/crearReserva', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(reservaData)
+  });
 
-      const validacionRes = await fetch('http://localhost:3001/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: validacionQuery,
-          variables: {
-            amenidad: reservaData.amenidad,
-            fecha: reservaData.fecha,
-            horaInicio: reservaData.horaInicio,
-            horaFin: reservaData.horaFin,
-            residenciaId: reservaData.residenciaId
-          }
-        })
-      });
+  const result = await res.json();
 
-      const validacionData = await validacionRes.json();
-      const validacion = validacionData.data && validacionData.data.validarReservaDisponible;
-      if (!validacion || !validacion.disponible) {
-        mensajeDiv.textContent = validacion && validacion.motivo
-          ? validacion.motivo
-          : "La amenidad ya está reservada para ese horario o ya tienes una reserva activa.";
-        return;
-      }
-
-      // Enviar reserva
-      const mutation = `
-        mutation CrearReserva($reserva: ReservaInput!) {
-          crearReserva(reserva: $reserva) {
-            id
-            conjuntoId
-            residenciaId
-            amenidad
-            fecha
-            horaInicio
-            horaFin
-            cantidadPersonas
-            motivo
-            estado
-            observaciones
-          }
-}
-      `;
-
-    const variables = {
-    reserva: {
-      conjuntoId: reservaData.conjuntoId,
-      residenciaId: reservaData.residenciaId,
-      amenidad: reservaData.amenidad,
-      fecha: reservaData.fecha,
-      horaInicio: reservaData.horaInicio,
-      horaFin: reservaData.horaFin,
-      cantidadPersonas: reservaData.cantidadPersonas,
-      motivo: reservaData.motivo,
-      estado: reservaData.estado,
-      observaciones: reservaData.observaciones
+  // Revisa si la amenidad ya esta reservada o si el usuario ya tiene una reserva activa
+  if (result.disponible === false) {
+    mensajeDiv.textContent = result.motivo || "La amenidad ya está reservada para ese horario o ya tienes una reserva activa.";
+    return;
   }
-    };
 
-      const res = await fetch('http://localhost:3001/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          query: mutation, 
-          variables : variables,
-        })
-      });
+  if (result.disponible === true && result.reserva) {
+    mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.reserva.estado;
+    form.reset();
+    precioTexto.textContent = "Seleccione una amenidad";
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+  } else {
+    mensajeDiv.textContent = 'Error al reservar.';
+  }
 
-      console.log("fecha enviada:", variables.reserva.fecha);
-
-      const result = await res.json();
-      //console.log('Resultado de la reserva:', result);
-      if (result.data && result.data.crearReserva) {
-        mensajeDiv.textContent = 'Reserva enviada correctamente. Estado: ' + result.data.crearReserva.estado;
-        form.reset();
-        precioTexto.textContent = "Seleccione una amenidad";
-        // Cierra el modal automáticamente SOLO si fue exitoso
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        if (modal) modal.hide();
-      } else {
-        mensajeDiv.textContent = 'Error al reservar.';
-        // NO cerrar el modal aquí
-      }
     });
-  }
 });

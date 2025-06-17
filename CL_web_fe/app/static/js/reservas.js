@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+//eliminar reserva
 reservasTbody.addEventListener('click', async function(e) {
     const row = e.target.closest('tr');
     if (!row) return;
@@ -118,25 +119,17 @@ reservasTbody.addEventListener('click', async function(e) {
     if (e.target.classList.contains('btn-eliminar')) {
         if (reserva) {
             if (confirm('¿Está seguro de que desea eliminar esta reserva?')) {
-                // Mutation para eliminar
-                const mutation = `
-                  mutation EliminarReserva($id: ID!) {
-                    eliminarReserva(id: $id)
-                  }
-                `;
-                const variables = { id: reservaId };
-                const res = await fetch('http://localhost:3001/graphql', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: mutation, variables })
-                });
-                const data = await res.json();
-                if (data.data && data.data.eliminarReserva) {
-                    // Recargar la lista de reservas
-                    buscarBtn.click();
-                } else {
-                    alert('Error al eliminar la reserva.');
-                }
+              const res = await fetch('/fe-api/eliminarReserva', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: reservaId })
+              });
+              const data = await res.json();
+              if (data.success) {
+                  buscarBtn.click();
+              } else {
+                  alert(data.motivo || 'Error al eliminar la reserva.');
+              }
             }
         }
     }
@@ -226,60 +219,38 @@ document.getElementById('formEditarReserva').addEventListener('submit', async fu
     return;
   }
 
-  const mutation = `
-    mutation EditarReserva($id: ID!, $reserva: ReservaInput!) {
-      editarReserva(id: $id, reserva: $reserva) {
-        id
-        conjuntoId
-        residenciaId
-        amenidad
-        fecha
-        horaInicio
-        horaFin
-        cantidadPersonas
-        motivo
-        estado
-        observaciones
-      }
+    const res = await fetch('/fe-api/editarReserva', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            id,
+            reserva: {
+                conjuntoId: reservaOriginal.conjuntoId,
+                residenciaId: reservaOriginal.residenciaId,
+                amenidad: reservaOriginal.amenidad,
+                fecha,
+                horaInicio,
+                horaFin,
+                cantidadPersonas,
+                motivo,
+                estado: reservaOriginal.estado,
+                observaciones
+            }
+        })
+    });
+
+    const data = await res.json();
+    if (data.disponible === false) {
+        mensajeDiv.textContent = data.motivo;
+        return;
     }
-  `;
-
-  const variables = {
-    id,
-    reserva: {
-      conjuntoId: reservaOriginal.conjuntoId,
-      residenciaId: reservaOriginal.residenciaId,
-      amenidad: reservaOriginal.amenidad,
-      fecha,
-      horaInicio,
-      horaFin,
-      cantidadPersonas,
-      motivo,
-      estado: reservaOriginal.estado,
-      observaciones
+    if (data.success || (data.disponible && data.reserva)) {
+        buscarBtn.click();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarReserva'));
+        modal.hide();
+    } else {
+        mensajeDiv.textContent = "Error al editar la reserva. Intente de nuevo.";
     }
-  };
-
-  //console.log("amenidad de la reserva original:", reservaOriginal.amenidad);
-  //console.log("Variables enviadas a GraphQL:", variables);
-
-  const res = await fetch('http://localhost:3001/graphql', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      query: mutation,
-      variables: variables
-    })
-  });
-
-  const data = await res.json();
-  if (data.data && data.data.editarReserva) {
-    buscarBtn.click();
-    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarReserva'));
-    modal.hide();
-  } else {
-    mensajeDiv.textContent = "Error al editar la reserva. Intente de nuevo.";
-  }
 
 });
     

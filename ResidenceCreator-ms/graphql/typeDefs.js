@@ -14,12 +14,19 @@ module.exports = gql`
     horas: String!
   }
 
+  type Config {
+    tipoParqueadero: Boolean!
+    numParqueadero: Int
+    tipoAlmacen: Boolean!
+    numAlmacen: Int
+  }
+
   input AmenidadInput {
     nombre: String!
-    horario: HorarioInput!
-    estado: String!
-    costo: Float!
-    capacidad: Int!
+    horario: HorarioInput
+    estado: String
+    costo: Float
+    capacidad: Int
   }
 
   input HorarioInput {
@@ -27,13 +34,22 @@ module.exports = gql`
     horas: String!
   }
 
+  input ConfigInput {
+    tipoParqueadero: Boolean!
+    numParqueadero: Int
+    tipoAlmacen: Boolean!
+    numAlmacen: Int
+  }
+
   type Conjunto {
     id: ID!
     nombre: String!
     nombreAdministrador: String!
     direccion: String!
+    departamento: String!
     ciudad: String!
     amenidades: [Amenidad]
+    configuraciones: [Config]
   }
 
   type Residence {
@@ -96,6 +112,8 @@ module.exports = gql`
       horaInicio: String!
       horaFin: String!
       residenciaId: ID!
+      conjuntoId: ID!
+      excluirId: ID
     ): ValidacionReservaResult!
     
   }
@@ -107,7 +125,9 @@ module.exports = gql`
       nombreAdministrador: String!
       direccion: String!
       ciudad: String!
+      departamentos: String!
       amenidades: [AmenidadInput]
+      configuraciones: [ConfigInput]
     ): Conjunto
 
     createResidence(

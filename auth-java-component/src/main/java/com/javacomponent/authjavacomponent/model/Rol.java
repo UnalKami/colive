@@ -24,6 +24,25 @@ public class Rol {
 
     private String nombreRol;
 
+    @OneToMany(mappedBy = "rol")
+    private List<Usuario> usuarios;
+
+    public Rol() {}
+
+    public Rol(Long idRol, String nombreRol, List<Usuario> usuarios) {
+        this.idRol = idRol;
+        this.nombreRol = nombreRol;
+        this.usuarios = usuarios;
+    }
+
+    public Long getIdRol() {
+        return idRol;
+    }
+
+    public void setIdRol(Long idRol) {
+        this.idRol = idRol;
+    }
+
     public String getNombreRol() {
         return nombreRol;
     }
@@ -32,7 +51,11 @@ public class Rol {
         this.nombreRol = nombreRol;
     }
 
+    public List<Usuario> getUsuarios() {
+        return usuarios;
+    }
 
-    @OneToMany(mappedBy = "rol")
-    private List<Usuario> usuarios;
+    public void setUsuarios(List<Usuario> usuarios) {
+        this.usuarios = usuarios;
+    }
 }

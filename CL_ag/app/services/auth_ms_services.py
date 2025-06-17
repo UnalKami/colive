@@ -20,13 +20,15 @@ async def register_admin(admin_data):
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice
 
-async def post_login(username: str, password: str):
-    async with httpx.AsyncClient() as client:
+async def post_login(username: str, password: str, return_full_response=False):
+    async with httpx.AsyncClient() as client:        
         response = await client.post(
             f"{AUTH_MS_URL}/auth/login",
             json={"username": username, "password": password}
         )
-        response.raise_for_status()
+        response.raise_for_status()        
+        if return_full_response:
+            return response
         return response.json()
 
 async def delete_user(user_id):

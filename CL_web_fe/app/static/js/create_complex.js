@@ -1,3 +1,4 @@
+//const Conjunto = require("../../../../ResidenceCreator-ms/models/Conjunto");
 
 document.addEventListener('DOMContentLoaded', function() {
     //-- Validacion visul de la contraseña --//
@@ -72,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Las contraseñas no coinciden');
                 return;
             }
-            if (pw1.length <= 8) {
+            if (pw1.length < 8) {
                 alert('La contraseña no cumple con los requisitos');
                 return;
             }
@@ -135,5 +136,91 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             storageNumberGroup.style.display = "none";
         }
+    });
+
+       document.getElementById('submitBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const variablesConjuntos = {
+            nombre: document.getElementById('complex_name').value,
+            nombreAdministrador: document.getElementById('administratorFullname').value,
+            direccion: document.getElementById('address').value,
+            ciudad: document.getElementById('city').value,
+            departamentos: document.getElementById('department').value,
+            amenidades: Array.from(document.querySelectorAll('input[name="amenities"]:checked')).map(cb => ({
+                nombre: cb.value,
+            })),
+            configuraciones: [{
+                tipoParqueadero: document.getElementById('parking').value === "1",
+                numParqueadero: parseInt(document.getElementById('parkingNumber').value) || 0,
+                tipoAlmacen: document.getElementById('storage').value === "1",
+                numAlmacen: parseInt(document.getElementById('storageNumber').value) || 0
+            }]
+        };
+
+        const correo = document.getElementById('administratorEmail').value;
+        const username = correo.split('@')[0];
+
+        const variablesUsuario = {
+            username: username,
+            nombre: document.getElementById('administratorFullname').value,
+            correo: correo,
+            password: document.getElementById('administratorPassword').value,
+            celular:0
+        }
+        
+        const queryConjunto = `
+        mutation CrearConjunto(
+            $nombre: String!,
+            $nombreAdministrador: String!,
+            $direccion: String!,
+            $ciudad: String!,
+            $departamentos: String!,
+            $amenidades: [AmenidadInput],
+            $configuraciones: [ConfigInput]
+        ) {
+            createConjunto(
+                nombre: $nombre,
+                nombreAdministrador: $nombreAdministrador,
+                direccion: $direccion,
+                ciudad: $ciudad,
+                departamentos: $departamentos,
+                amenidades: $amenidades,
+                configuraciones: $configuraciones
+            ) {
+                id
+                nombre
+                direccion
+                ciudad
+            }
+        }
+        `;
+
+        const payload = {
+            conjunto: {
+                query: queryConjunto,
+                variables: variablesConjuntos
+            },
+            user: variablesUsuario
+        };
+
+        fetch('fe-api/registrarUsuarioConjunto', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+       .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en el registro');
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert('¡Registro exitoso!');
+            window.location.href = "http://localhost:5000/login";
+        })
+        .catch(error => {
+            alert('El registro falló: ' + error.message);
+        });
     });
 });

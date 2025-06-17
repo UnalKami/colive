@@ -21,3 +21,11 @@ def registerCR():
 @frontend_bp.route('/testAuth')
 def pruebaConexionAuth():
     return render_template('pruebaSaludo.html')
+
+@frontend_bp.route('/propietario')
+def propietario():
+    return render_template('panel_propietario.html')
+
+@frontend_bp.route('/reservas')
+def reservas():
+    return render_template('reservas.html')

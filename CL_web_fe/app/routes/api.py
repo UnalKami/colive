@@ -35,3 +35,56 @@ def registrar_usuario_conjunto():
         return jsonify(data)
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
+
+
+@api_bp.route('/login', methods=['POST'])
+def login():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/auth/login',
+            json=payload
+        )
+        response.raise_for_status()
+        data = response.json()
+        flask_response = jsonify(data)
+        # Copiar la cabecera Set-Cookie si existe
+        
+        if 'set-cookie' in response.headers:
+            flask_response.headers['Set-Cookie'] = response.headers['set-cookie']
+        return flask_response
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+    
+@api_bp.route('/crearReserva', methods=['POST'])
+def crear_reserva():
+    datos = request.json
+    try:
+        response = requests.post('http://CL_ag:8000/residence/crearReserva', json=datos)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/editarReserva', methods=['POST'])
+def editar_reserva():
+    datos = request.json
+    try:
+        response = requests.post('http://CL_ag:8000/residence/editarReserva', json=datos)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"success": False, "motivo": str(e)}), 500
+
+@api_bp.route('/eliminarReserva', methods=['POST'])
+def eliminar_reserva():
+    datos = request.json
+    try:
+        response = requests.post('http://CL_ag:8000/residence/eliminarReserva', json=datos)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"success": False, "motivo": str(e)}), 500
