@@ -88,3 +88,26 @@ def eliminar_reserva():
     except Exception as e:
         print("Error al llamar al gateway:", e)
         return jsonify({"success": False, "motivo": str(e)}), 500
+
+# esto es temporal, debe usar el token 
+@api_bp.route('/conjuntosResidencias', methods=['GET'])
+def conjuntos_residencias():
+    try:
+        response = requests.get('http://CL_ag:8000/residence/conjuntosResidencias')
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"error": str(e)}), 500
+    
+# esto es temporal, debe usar el token 
+@api_bp.route('/reservas', methods=['GET'])
+def obtener_reservas():
+    residencia_id = request.args.get('residenciaId')
+    try:
+        response = requests.get(f'http://CL_ag:8000/residence/reservas?residenciaId={residencia_id}')
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"error": str(e)}), 500

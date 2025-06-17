@@ -10,28 +10,11 @@ document.addEventListener('DOMContentLoaded', function() {
 //Por el momento se hace selecion de conjunto y residencia para buscar reservas, pero se usara simplemente verificando el usuario
   // Cargar conjuntos y residencias al iniciar
   async function cargarDatos() {
-    const query = `
-      query {
-        conjuntos {
-          id
-          nombre
-        }
-        residences {
-          id
-          code
-          conjuntoId
-        }
-      }
-    `;
-    const res = await fetch('http://localhost:3001/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
-    });
+    const res = await fetch('/fe-api/conjuntosResidencias');
     const data = await res.json();
-    if (data.data) {
-      conjuntos = data.data.conjuntos;
-      residencias = data.data.residences;
+    if (data.conjuntos && data.residencias) {
+      conjuntos = data.conjuntos;
+      residencias = data.residencias;
       conjuntoSel.innerHTML = '<option value="">Seleccione un conjunto</option>' +
         conjuntos.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
       residenciaSel.innerHTML = '<option value="">Seleccione una residencia</option>';
@@ -56,36 +39,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     reservasTbody.innerHTML = `<tr><td colspan="5" class="text-center">Cargando reservas...</td></tr>`;
 
-    const query = `
-      query {
-        reservas(residenciaId: "${residenciaId}") {
-          id
-          conjuntoId
-          residenciaId
-          amenidad
-          fecha
-          horaInicio
-          horaFin
-          estado
-          motivo
-          cantidadPersonas
-          observaciones
-        }
-      }
-    `;
-    const res = await fetch('http://localhost:3001/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query })
-    });
+    // Cambia esto:
+    // const query = `...`;
+    // const res = await fetch('http://localhost:3001/graphql', { ... });
+
+    // Por esto:
+    const res = await fetch(`/fe-api/reservas?residenciaId=${encodeURIComponent(residenciaId)}`);
     const data = await res.json();
-    //console.log("Datos de reservas:", data);
-    //console.log("Reservas encontradas:", data.data && data.data.reservas ? data.data.reservas.length : 0);
-    console.log("fechas de reservas:", data.data && data.data.reservas ? data.data.reservas.map(r => r.fecha) : []);
-    
-    if (data.data && data.data.reservas && data.data.reservas.length > 0) {
-        reservasCache = data.data.reservas;
-        reservasTbody.innerHTML = data.data.reservas.map(r => `
+
+    if (data.reservas && data.reservas.length > 0) {
+        reservasCache = data.reservas;
+        reservasTbody.innerHTML = data.reservas.map(r => `
         <tr data-reserva-id="${r.id}">
             <td>${r.amenidad}</td>
             <td>${formatTimestamp(r.fecha)}</td>

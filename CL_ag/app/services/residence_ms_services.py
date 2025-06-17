@@ -106,3 +106,59 @@ async def eliminar_reserva(id_reserva):
         )
         response.raise_for_status()
         return response.json()
+
+# esto es temporal, debe usar el token 
+async def obtener_conjuntos_residencias():
+    query = '''
+    query {
+      conjuntos {
+        id
+        nombre
+      }
+      residences {
+        id
+        code
+        conjuntoId
+      }
+    }
+    '''
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/graphql",
+            json={"query": query}
+        )
+        response.raise_for_status()
+        data = response.json()
+        return {
+            "conjuntos": data["data"]["conjuntos"],
+            "residencias": data["data"]["residences"]
+        }
+  
+# esto es temporal, debe usar el token 
+async def obtener_reservas(residenciaId=None):
+    query = '''
+    query Reservas($residenciaId: ID) {
+      reservas(residenciaId: $residenciaId) {
+        id
+        conjuntoId
+        residenciaId
+        amenidad
+        fecha
+        horaInicio
+        horaFin
+        estado
+        motivo
+        cantidadPersonas
+        observaciones
+      }
+    }
+    '''
+    variables = {"residenciaId": residenciaId}
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/graphql",
+            json={"query": query, "variables": variables}
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["data"]["reservas"]
