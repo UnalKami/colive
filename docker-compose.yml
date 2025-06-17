@@ -108,9 +108,7 @@ services:
       - CL_ag
       - CL_web_fe
       - CL_messaging-ms
-      - CL_residence-ms
-      - CL_auth_db
-      - CL_residence_db
+      - CL_residence_ms
 
 volumes:
   cl_auth_db_data:

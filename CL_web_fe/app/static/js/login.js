@@ -87,7 +87,7 @@ form.addEventListener("submit", async function(event) {
       //localStorage.setItem("id", data.body.user[0].USUARIO_ID_Usuario);
 
       showAlert("¡Bienvenido!", "success");
-      setTimeout(() => window.location.href = "/propietario", 1000);
+      setTimeout(() => window.location.href = "/admin", 1000);
       /*../templates/adminhome.html*/
     }
   } catch (err) {
