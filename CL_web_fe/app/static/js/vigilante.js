@@ -1,36 +1,41 @@
-document.addEventListener('DOMContentLoaded', function() {
-  const btnPeaton = document.getElementById('btnPeaton');
-  const btnVehiculo = document.getElementById('btnVehiculo');
-  const registroDialog = document.getElementById('registroDialog');
-  const tipoRegistro = document.getElementById('tipoRegistro');
+document.getElementById('btnPeaton').onclick = function(e) {
+  e.preventDefault();
+  document.getElementById('dialogPeaton').showModal();
+};
+document.getElementById('btnVehiculo').onclick = function(e) {
+  e.preventDefault();
+  document.getElementById('dialogVehiculo').showModal();
+};
 
-  if (registroDialog) {
-    const closeBtns = registroDialog.querySelectorAll('[data-action="close"]');
+document.getElementById('btnPeaton').onclick = function(e) {
+  e.preventDefault();
+  // Obtener fecha y hora actual en formato compatible con datetime-local
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  const localDate = new Date(now.getTime() - (offset * 60000));
+  document.getElementById('diaIngreso').value = localDate.toISOString().slice(0,16);
+  document.getElementById('dialogPeaton').showModal();
+};
 
-    btnPeaton?.addEventListener('click', function(e) {
-      e.preventDefault();
-      tipoRegistro.textContent = "Tipo: Peatón";
-      if (typeof registroDialog.showModal === 'function') {
-        registroDialog.showModal();
-      } else {
-        alert('Tu navegador no soporta <dialog>. Actualiza tu navegador.');
-      }
-    });
+document.getElementById('btnVehiculo').onclick = function(e) {
+  e.preventDefault();
+  // Obtener fecha y hora actual en formato compatible con datetime-local
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  const localDate = new Date(now.getTime() - (offset * 60000));
+  document.getElementById('diaIngresoVehicular').value = localDate.toISOString().slice(0,16);
+  document.getElementById('registroVehicularDialog').showModal();
+};
 
-    btnVehiculo?.addEventListener('click', function(e) {
-      e.preventDefault();
-      tipoRegistro.textContent = "Tipo: Vehículo";
-      if (typeof registroDialog.showModal === 'function') {
-        registroDialog.showModal();
-      } else {
-        alert('Tu navegador no soporta <dialog>. Actualiza tu navegador.');
-      }
-    });
 
-    closeBtns.forEach(btn => {
-      btn.addEventListener('click', () => registroDialog.close());
-    });
-  } else {
-    console.warn('No se encontró el elemento #registroDialog');
-  }
-});
+document.getElementById('btnSalida').onclick = function(e) {
+  e.preventDefault();
+  document.getElementById('salidaVehiculoDialog').showModal();
+};
+
+// Opcional: puedes agregar lógica para manejar el submit del formulario
+document.getElementById('formSaida').onsubmit = function(e) {
+  // Aquí puedes agregar la lógica para verificar la placa
+  // Por ejemplo, enviar los datos por fetch/AJAX
+  // e.preventDefault(); // Descomenta si quieres manejar el envío manualmente
+};
