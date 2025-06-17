@@ -1,34 +1,68 @@
 # connect.py
+import requests
 
-def login_user(email: str, password: str) -> (bool, str):
+BASE_URL = "http://localhost:8000"
+
+def login_user(username: str, password: str):
+    url = f"{BASE_URL}/auth/login"
+    payload = {"username": username, "password": password}
+    try:
+        r = requests.post(url, json=payload, timeout=5)
+    except requests.RequestException as e:
+        return False, f"Error de red: {e}"
+    if r.ok:
+        return True, r.json()
+    # extraemos mensaje de error
+    try:
+        detail = r.json().get("detail") or r.json().get("error")
+    except ValueError:
+        detail = r.text
+    return False, detail
+
+def register_user(user_fields: dict, conjunto_fields: dict):
     """
-    Intenta autenticar al usuario.
-    Retorna (True, "") si es exitoso, o (False, mensaje_error) en caso contrario.
+    user_fields debe contener:
+      username, nombre, correo, contraseña
+    conjunto_fields debe contener las variables de tu GraphQL:
+      nombre, nombreAdministrador, direccion, ciudad, departamentos, amenidades, configuraciones
     """
-    # Validación de campos vacíos
-    if not email or not password:
-        return False, "No dejes campos vacíos."
-    # Lógica ejemplo
-    if email == "admin@colive.com" and password == "secret":
-        return True, ""
-    return False, "Correo o contraseña incorrectos."
-
-
-def register_user(data: dict) -> (bool, str):
+    # Tu query GraphQL
+    query = """
+    mutation CrearConjunto(
+        $nombre: String!, $nombreAdministrador: String!,
+        $direccion: String!, $ciudad: String!, $departamentos: String!,
+        $amenidades: [AmenidadInput], $configuraciones: [ConfigInput]
+    ) {
+        createConjunto(
+            nombre: $nombre,
+            nombreAdministrador: $nombreAdministrador,
+            direccion: $direccion,
+            ciudad: $ciudad,
+            departamentos: $departamentos,
+            amenidades: $amenidades,
+            configuraciones: $configuraciones
+        ) { id nombre direccion ciudad }
+    }
     """
-    Intenta registrar un nuevo usuario.
-    data debe incluir: role, fullname, email, phone, username, pwd1, pwd2
-    Retorna (True, "") o (False, mensaje_error).
-    """
-    # 1) Validar campos vacíos y rol seleccionado
-    required = ["role", "fullname", "email", "phone", "username", "pwd1", "pwd2"]
-    for key in required:
-        if not data.get(key) or (key == "role" and data["role"] == "Selecciona un rol"):
-            return False, "No dejes campos vacíos."
+    payload = {
+        "conjunto": {
+            "query": query,
+            "variables": conjunto_fields
+        },
+        "user": user_fields
+    }
 
-    # 2) Validar que coincidan las contraseñas
-    if data["pwd1"] != data["pwd2"]:
-        return False, "Las contraseñas no coinciden."
+    url = f"{BASE_URL}/orc/registerUserCR"
+    try:
+        r = requests.post(url, json=payload, timeout=5)
+    except requests.RequestException as e:
+        return False, f"Error de red: {e}"
 
-    # Aquí iría la lógica real de inserción en BD...
-    return True, ""
+    if r.ok:
+        return True, "✅ Registro exitoso."
+    try:
+        # Orchestrator suele devolver {"detail":"…"} o {"errors":[…]}
+        detail = r.json().get("detail") or r.json().get("errors") or r.text
+    except ValueError:
+        detail = r.text
+    return False, detail
