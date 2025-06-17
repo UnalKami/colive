@@ -31,5 +31,5 @@ def reservas():
     return render_template('reservas.html')
 
 @frontend_bp.route('/admin')
-def reservas():
+def admin():
     return render_template('adminhome.html')

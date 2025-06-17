@@ -103,12 +103,9 @@ services:
     env_file:
       - ./stadistics/.env
     depends_on:
-      - CL_auth_db
-      - CL_residence_db
       - CL_ag
       - CL_web_fe
-      - CL_messaging-ms
-      - CL_residence-ms
+      - CL_residence_ms
       - CL_auth_db
       - CL_residence_db
   CL_guest_db:
