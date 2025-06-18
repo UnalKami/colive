@@ -24,13 +24,13 @@ def register_user(user_fields: dict, conjunto_fields: dict):
     user_fields debe contener:
       username, nombre, correo, contraseña
     conjunto_fields debe contener las variables de tu GraphQL:
-      nombre, nombreAdministrador, direccion, ciudad, departamentos, amenidades, configuraciones
+      nombre, nombreAdministrador, direccion, ciudad, departamento, amenidades, configuraciones
     """
     # Tu query GraphQL
     query = """
     mutation CrearConjunto(
         $nombre: String!, $nombreAdministrador: String!,
-        $direccion: String!, $ciudad: String!, $departamentos: String!,
+        $direccion: String!, $ciudad: String!, $departamento: String!,
         $amenidades: [AmenidadInput], $configuraciones: [ConfigInput]
     ) {
         createConjunto(
@@ -38,7 +38,7 @@ def register_user(user_fields: dict, conjunto_fields: dict):
             nombreAdministrador: $nombreAdministrador,
             direccion: $direccion,
             ciudad: $ciudad,
-            departamentos: $departamentos,
+            departamento: $departamento,
             amenidades: $amenidades,
             configuraciones: $configuraciones
         ) { id nombre direccion ciudad }
