@@ -3,10 +3,10 @@ const { gql } = require('apollo-server-express');
 module.exports = gql`
   type Amenidad {
     nombre: String!
-    horario: Horario!
-    estado: String!
-    costo: Float!
-    capacidad: Int!
+    horario: Horario
+    estado: String
+    costo: Float
+    capacidad: Int
   }
 
   type Horario {
