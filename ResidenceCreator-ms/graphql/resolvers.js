@@ -54,13 +54,15 @@ module.exports = {
   Mutation: {
     createConjunto: async (_, args) => {
       // args incluye: nombre, direccion, ciudad, amenidades, configuraciones
+      console.log('ARGS:', args);
       const conjunto = new Conjunto({
         nombre: args.nombre,
         nombreAdministrador: args.nombreAdministrador,
         departamento: args.departamento,
         direccion: args.direccion,
         ciudad: args.ciudad,
-        amenidades: args.amenidades,
+        departamento: args.departamento,
+        amenidades: args.amenidades
       });
       await conjunto.save();
       return conjunto;
