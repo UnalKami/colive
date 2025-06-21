@@ -1,6 +1,6 @@
 package com.COLive.Services
 
-import com.COLive.Models.{SalidaCorreo, SalidaCorreoConfig}
+import com.COLive.Models.{SalidaCorreo, SalidaCorreoConfig, CorreoEnCola}
 import com.COLive.Utils.CryptoUtil
 
 import com.mongodb.ConnectionString
@@ -8,6 +8,8 @@ import com.mongodb.MongoClientSettings
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.ReplaceOptions
 import com.mongodb.client.result.UpdateResult
+import com.mongodb.client.result.InsertOneResult
+import com.mongodb.client.result.DeleteResult
 import com.mongodb.reactivestreams.client.{MongoClients, MongoClient, MongoDatabase, MongoCollection}
 import org.bson.codecs.configuration.{CodecRegistry, CodecRegistries}
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
@@ -20,6 +22,7 @@ import org.reactivestreams.Publisher
 import akka.actor.typed.ActorSystem
 import akka.stream.scaladsl.Source
 import akka.stream.{Materializer, SystemMaterializer}
+import org.bson.types.ObjectId
 
 object MongoService {
   // Leer variables de entorno
@@ -31,6 +34,7 @@ object MongoService {
   // Configurar codec registry para POJO
   private val pojoCodecProvider = PojoCodecProvider.builder()
     .register(classOf[SalidaCorreo]) 
+    .register(classOf[CorreoEnCola])
     .automatic(true)
     .build()
 
@@ -46,6 +50,7 @@ object MongoService {
   private val client = MongoClients.create(settings)
   private val database = client.getDatabase("correos").withCodecRegistry(codecRegistry)
   private val collection = database.getCollection("salida_correos", classOf[SalidaCorreo])
+  private val colaCollection = database.getCollection("cola_envio", classOf[CorreoEnCola])
 
 
   /** Guarda o actualiza la configuración SMTP en Mongo.
@@ -113,5 +118,46 @@ object MongoService {
     implicit val ec: ExecutionContext = system.executionContext
 
     Source.fromPublisher(collection.find())
-}
+  }
+
+  def agregarAColaEnvio(de: String, para: String, asunto: String, cuerpo: String)
+                       (implicit ec: ExecutionContext): Future[ObjectId] = {
+    val correo = CorreoEnCola(
+      de = de,
+      para = para,
+      asunto = asunto,
+      cuerpo = cuerpo
+    )
+    val promise = Promise[ObjectId]()
+    colaCollection.insertOne(correo).subscribe(new org.reactivestreams.Subscriber[InsertOneResult] {
+      override def onSubscribe(s: org.reactivestreams.Subscription): Unit = s.request(1)
+      override def onNext(result: InsertOneResult): Unit = promise.success(correo.id)
+      override def onError(t: Throwable): Unit = promise.failure(t)
+      override def onComplete(): Unit = ()
+    })
+    promise.future
+  }
+
+  def obtenerPrimerCorreoEnCola()(implicit ec: ExecutionContext): Future[Option[CorreoEnCola]] = {
+    val promise = Promise[Option[CorreoEnCola]]()
+    colaCollection.find().first().subscribe(new org.reactivestreams.Subscriber[CorreoEnCola] {
+      private var received: Option[CorreoEnCola] = None
+      override def onSubscribe(s: org.reactivestreams.Subscription): Unit = s.request(1)
+      override def onNext(result: CorreoEnCola): Unit = received = Some(result)
+      override def onError(t: Throwable): Unit = promise.failure(t)
+      override def onComplete(): Unit = promise.success(received)
+    })
+    promise.future
+  }
+
+  def eliminarDeColaEnvio(id: ObjectId)(implicit ec: ExecutionContext): Future[Unit] = {
+    val promise = Promise[Unit]()
+    colaCollection.deleteOne(Filters.eq("_id", id)).subscribe(new org.reactivestreams.Subscriber[DeleteResult] {
+      override def onSubscribe(s: org.reactivestreams.Subscription): Unit = s.request(1)
+      override def onNext(result: DeleteResult): Unit = ()
+      override def onError(t: Throwable): Unit = promise.failure(t)
+      override def onComplete(): Unit = promise.success(())
+    })
+    promise.future
+  }
 }

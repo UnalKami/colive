@@ -4,9 +4,11 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.stream.scaladsl.Sink
 import akka.stream.SystemMaterializer
+import akka.util.Timeout
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Failure}
+import scala.concurrent.duration._
 
 import com.COLive.Services.MongoService
 import com.COLive.Models.SalidaCorreoConfig
@@ -17,6 +19,7 @@ import com.COLive.Models.SMTPConfigs
 // Import JavaMail con alias para evitar ambigüedades con Akka HTTP
 import javax.mail.{Session => MailSession, Message => MailMessage, Transport => MailTransport, Authenticator => MailAuthenticator, PasswordAuthentication}
 import javax.mail.internet.{InternetAddress, MimeMessage}
+import org.slf4j.LoggerFactory
 
 object SMTPAgent {
   sealed trait Command
@@ -39,10 +42,17 @@ object SMTPAgent {
   ) extends Command
 
   final case class ListarSMTP(replyTo: ActorRef[SMTPConfigs]) extends Command
+  private case object ProcesarColaTick extends Command
 
   def apply(): Behavior[Command] =
     Behaviors.setup { context =>
       implicit val ec: ExecutionContext = context.executionContext
+      implicit val timeout: Timeout = Timeout(15.seconds)
+      val logger = LoggerFactory.getLogger(getClass)
+
+      context.system.scheduler.scheduleAtFixedRate(5.seconds, 60.seconds) { () =>
+        context.self ! ProcesarColaTick
+      }(using context.executionContext)
 
       Behaviors.receiveMessage {
         case RegistrarSMTP(email, host, port, user, pass, replyTo) =>
@@ -50,62 +60,43 @@ object SMTPAgent {
             case Success(_) =>
               replyTo ! OperationResult(success = true, message = s"SMTP registrado para '$email'.")
             case Failure(ex) =>
-              context.log.error("Error guardando SMTP para {}: {}", email, ex)
+              logger.error("Error guardando SMTP para {}: {}", email, ex)
               replyTo ! OperationResult(success = false, message = s"Error registrando SMTP: ${ex.getMessage}")
           }
           Behaviors.same
 
         case EnviarSMTP(de, para, asunto, cuerpo, replyTo) =>
-          context.log.info(s"Recibido EnviarSMTP de=$de para=$para asunto=$asunto")
+          logger.info(s"Recibido EnviarSMTP de=$de para=$para asunto=$asunto")
           MongoService.obtenerCorreoConfig(de).onComplete {
             case Success(optConfig) =>
-              context.log.info(s"Resultado obtenerCorreoConfig: $optConfig")
               optConfig match {
                 case None =>
-                  context.log.warn(s"No hay configuración SMTP para '$de'")
+                  logger.warn(s"No hay configuración SMTP para '$de'")
                   replyTo ! OperationResult(success = false, message = s"No hay configuración SMTP para '$de'.")
                 case Some(config) =>
-                  context.log.info(s"Configuración SMTP encontrada para $de: $config")
-                  Future {
-                    context.log.info(s"Enviando correo de $de a $para")
-                    val props = new java.util.Properties()
-                    props.put("mail.smtp.auth", "true")
-                    props.put("mail.smtp.starttls.enable", "true")
-                    props.put("mail.smtp.host", config.smtpHost)
-                    props.put("mail.smtp.port", config.smtpPort.toString)
-                    props.put("mail.smtp.connectiontimeout", "5000")
-                    props.put("mail.smtp.timeout", "5000")
-                    props.put("mail.smtp.writetimeout", "5000")
-
-                    val session = MailSession.getInstance(props, new MailAuthenticator() {
-                      override protected def getPasswordAuthentication =
-                        new PasswordAuthentication(config.username, config.passwordPlain)
-                    })
-
-                    val message = new MimeMessage(session)
-                    message.setFrom(new InternetAddress(de))
-                    message.setRecipients(MailMessage.RecipientType.TO, para)
-                    message.setSubject(asunto)
-                    message.setText(cuerpo)
-
-                    MailTransport.send(message)
-                  }(using ec).onComplete {
-                    case Success(_) =>
-                      context.log.info(s"Correo enviado exitosamente de $de a $para")
-                      replyTo ! OperationResult(success = true, message = s"Correo enviado de '$de' a '$para'.")
-                    case Failure(exSend) =>
-                      context.log.error(s"Error enviando correo de $de a $para: ${exSend.getMessage}")
-                      replyTo ! OperationResult(success = false, message = s"Error al enviar correo: ${exSend.getMessage}")
+                  logger.info(s"Configuración SMTP encontrada para $de")
+                  MongoService.agregarAColaEnvio(
+                    de = de,
+                    para = para,
+                    asunto = asunto,
+                    cuerpo = cuerpo
+                  ).onComplete {
+                    case Success(idCola) =>
+                      logger.info(s"Correo encolado con id $idCola")
+                      replyTo ! OperationResult(success = true, message = s"Correo encolado para envío.")
+                    case Failure(ex) =>
+                      logger.error(s"Error encolando correo: ${ex.getMessage}")
+                      replyTo ! OperationResult(success = false, message = s"Error encolando correo: ${ex.getMessage}")
                   }
               }
             case Failure(ex) =>
-              context.log.error(s"Error obteniendo configuración SMTP para $de: ${ex.getMessage}")
+              logger.error(s"Error obteniendo configuración SMTP para $de: ${ex.getMessage}")
               replyTo ! OperationResult(success = false, message = s"Error interno al obtener configuración: ${ex.getMessage}")
           }(using ec)
           Behaviors.same
 
         case ListarSMTP(replyTo) =>
-          context.log.info("SMTPAgent: ListarSMTP recibido")
+          logger.info("SMTPAgent: ListarSMTP recibido")
           implicit val system: akka.actor.typed.ActorSystem[?] = context.system
           implicit val ec: ExecutionContext = context.executionContext
           val source = MongoService.listarTodos()
@@ -117,10 +108,50 @@ object SMTPAgent {
               )
               replyTo ! SMTPConfigs(infos.toList)
             case Failure(ex) =>
-              context.log.error("SMTPAgent: Error al listar configuraciones SMTP", ex)
+              logger.error("SMTPAgent: Error al listar configuraciones SMTP", ex)
               replyTo ! SMTPConfigs(Nil)
           }
           Behaviors.same
+
+        case ProcesarColaTick =>
+          procesarCola()(using ec, logger)
+          Behaviors.same
       }
     }
+
+  def procesarCola()(using ec: ExecutionContext, logger: org.slf4j.Logger): Unit = {
+    MongoService.obtenerPrimerCorreoEnCola().foreach {
+      case Some(correo) =>
+        MongoService.obtenerCorreoConfig(correo.de).foreach {
+          case Some(config) =>
+            val props = new java.util.Properties()
+            props.put("mail.smtp.auth", "true")
+            props.put("mail.smtp.ssl.enable", "true")
+            props.put("mail.smtp.host", config.smtpHost)
+            props.put("mail.smtp.port", config.smtpPort.toString)
+            val session = MailSession.getInstance(props, new MailAuthenticator() {
+              override protected def getPasswordAuthentication =
+                new PasswordAuthentication(config.username, config.passwordPlain)
+            })
+            val message = new MimeMessage(session)
+            message.setFrom(new InternetAddress(correo.de))
+            message.setRecipients(MailMessage.RecipientType.TO, correo.para)
+            message.setSubject(correo.asunto)
+            message.setText(correo.cuerpo)
+            try {
+              logger.info(s"Enviando correo de ${correo.de} a ${correo.para}")
+              MailTransport.send(message)
+              MongoService.eliminarDeColaEnvio(correo.id)
+              logger.info(s"Correo enviado y eliminado de la cola: ${correo.id}")
+            } catch {
+              case ex: Throwable =>
+                logger.error(s"Error enviando correo de ${correo.de} a ${correo.para}: ${ex.getMessage}")
+            }
+          case None =>
+            logger.warn(s"No hay configuración SMTP para el correo de ${correo.de} a ${correo.para}")
+        }
+      case None =>
+        logger.info("No hay correos pendientes en la cola de envío.")
+    }
+  }
 }
