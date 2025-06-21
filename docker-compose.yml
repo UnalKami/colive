@@ -79,11 +79,10 @@ services:
       - "7000:7000"
     environment:
       SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
-      MONGO_URI: "mongodb://root:cincopatodos@cl_messaging_db:27018/correos?authSource=admin"
+      MONGO_URI: "mongodb://root:cincopatodos@cl_messaging_db:27017/correos?authSource=admin"
     command: ["sbt", "run"]
     depends_on:
       - CL_messaging_db
-      - CL_auth_db
     restart: unless-stopped
 
   CL_web_fe:

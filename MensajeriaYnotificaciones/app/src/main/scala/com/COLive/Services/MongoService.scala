@@ -55,15 +55,6 @@ object MongoService {
                    (implicit ec: ExecutionContext): Future[UpdateResult] = {
     val encrypted = CryptoUtil.encrypt(secretKey, password)
     val doc = SalidaCorreo(email, smtpHost, smtpPort, username, encrypted)
-    println(s"...................................... [MongoService] Documento a guardar: $doc")
-
-    println(s"[MongoService] Base de datos usada: ${database.getName}")
-    println(s"[MongoService] Colección usada: ${collection.getNamespace.getCollectionName}")
-    println(s"[MongoService] URI de conexión: $mongoUri")
-    println(s"[MongoService] Encriptando password: $encrypted")
-    println(s"[MongoService] Email: $email, SMTP Host: $smtpHost, SMTP Port: $smtpPort, Username: $username")
-    println(s"[MongoService] Encriptando password: $encrypted")
-    println(s"..................................[MongoService] Guardando documento: $doc")
     val publisher: Publisher[UpdateResult] =
       collection.replaceOne(
         Filters.eq("email", email),

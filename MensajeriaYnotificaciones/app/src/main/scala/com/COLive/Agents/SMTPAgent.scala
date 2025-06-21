@@ -56,19 +56,23 @@ object SMTPAgent {
           Behaviors.same
 
         case EnviarSMTP(de, para, asunto, cuerpo, replyTo) =>
+          context.log.info(s"Recibido EnviarSMTP de=$de para=$para asunto=$asunto")
           MongoService.obtenerCorreoConfig(de).onComplete {
             case Success(optConfig) =>
+              context.log.info(s"Resultado obtenerCorreoConfig: $optConfig")
               optConfig match {
                 case None =>
+                  context.log.warn(s"No hay configuración SMTP para '$de'")
                   replyTo ! OperationResult(success = false, message = s"No hay configuración SMTP para '$de'.")
                 case Some(config) =>
+                  context.log.info(s"Configuración SMTP encontrada para $de: $config")
                   Future {
+                    context.log.info(s"Enviando correo de $de a $para")
                     val props = new java.util.Properties()
                     props.put("mail.smtp.auth", "true")
                     props.put("mail.smtp.starttls.enable", "true")
                     props.put("mail.smtp.host", config.smtpHost)
                     props.put("mail.smtp.port", config.smtpPort.toString)
-                    // Timeouts en ms
                     props.put("mail.smtp.connectiontimeout", "5000")
                     props.put("mail.smtp.timeout", "5000")
                     props.put("mail.smtp.writetimeout", "5000")
@@ -80,7 +84,6 @@ object SMTPAgent {
 
                     val message = new MimeMessage(session)
                     message.setFrom(new InternetAddress(de))
-                    // Se usa sobrecarga que acepta String de destinatarios (comma-separated)
                     message.setRecipients(MailMessage.RecipientType.TO, para)
                     message.setSubject(asunto)
                     message.setText(cuerpo)
@@ -88,18 +91,17 @@ object SMTPAgent {
                     MailTransport.send(message)
                   }(using ec).onComplete {
                     case Success(_) =>
+                      context.log.info(s"Correo enviado exitosamente de $de a $para")
                       replyTo ! OperationResult(success = true, message = s"Correo enviado de '$de' a '$para'.")
                     case Failure(exSend) =>
-                      context.log.error("Error enviando correo de {} a {}: {}", de, para, exSend.getMessage)
+                      context.log.error(s"Error enviando correo de $de a $para: ${exSend.getMessage}")
                       replyTo ! OperationResult(success = false, message = s"Error al enviar correo: ${exSend.getMessage}")
                   }
               }
-
             case Failure(ex) =>
-              context.log.error("Error obteniendo configuración SMTP para {}: {}", de, ex)
+              context.log.error(s"Error obteniendo configuración SMTP para $de: ${ex.getMessage}")
               replyTo ! OperationResult(success = false, message = s"Error interno al obtener configuración: ${ex.getMessage}")
           }(using ec)
-
           Behaviors.same
 
         case ListarSMTP(replyTo) =>
