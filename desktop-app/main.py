@@ -1,13 +1,14 @@
-# main.py
 import sys, os
 from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 import connect
 
-COMMON_STYLE = """
-QWidget { background-color: #f2f2f2; }
+# Estilos
+LIGHT_STYLE = """
+QWidget { background-color: #f2f2f2; color: #000; }
 QLineEdit {
     height: 30px; border: 1px solid #ccc; border-radius: 12px;
-    padding: 4px; font-size: 14px;
+    padding: 4px; font-size: 14px; background-color: #fff;
 }
 QPushButton {
     border: 1px solid #4CAF50; border-radius: 12px;
@@ -16,13 +17,41 @@ QPushButton {
 }
 QPushButton:hover { background-color: #e8f5e9; }
 QLabel#link { color: #c5b566; font-size: 13px; }
+QCheckBox, QComboBox, QTextEdit {
+    background-color: #fff; color: #000;
+    border-radius: 8px;
+}
+"""
+
+DARK_STYLE = """
+QWidget { background-color: #121212; color: #fff; }
+QLineEdit {
+    height: 30px; border: 1px solid #555; border-radius: 12px;
+    padding: 4px; font-size: 14px; background-color: #1e1e1e;
+}
+QPushButton {
+    border: 1px solid #00c853; border-radius: 12px;
+    padding: 6px; font-size: 16px;
+    color: #00c853; background-color: transparent;
+}
+QPushButton:hover { background-color: #1b5e20; }
+QLabel#link { color: #f9a825; font-size: 13px; }
+QCheckBox, QComboBox, QTextEdit {
+    background-color: #1e1e1e; color: #fff;
+    border-radius: 8px;
+}
 """
 
 class LoginScreen(QtWidgets.QWidget):
     switch_to_register = QtCore.pyqtSignal()
+    login_success = QtCore.pyqtSignal()
+
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(COMMON_STYLE)
+        self._build_ui()
+
+    def _build_ui(self):
+        self.setStyleSheet(LIGHT_STYLE)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
         layout.setContentsMargins(10,10,10,10)
@@ -30,13 +59,11 @@ class LoginScreen(QtWidgets.QWidget):
 
         # Logo
         logo = QtWidgets.QLabel()
-        basedir = os.path.dirname(__file__)
-        logo_path = os.path.join(basedir, 'Colive_Logo_.png')
+        logo_path = os.path.join(os.path.dirname(__file__), 'Colive_Logo_.png')
         pixmap = QtGui.QPixmap(logo_path).scaledToWidth(200, QtCore.Qt.SmoothTransformation)
         logo.setPixmap(pixmap)
         logo.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(logo)
-        layout.addSpacing(10)
 
         # Email
         self.email = QtWidgets.QLineEdit()
@@ -49,34 +76,34 @@ class LoginScreen(QtWidgets.QWidget):
         self.password.setEchoMode(QtWidgets.QLineEdit.Password)
         layout.addWidget(self._labeled("Contraseña", self.password))
 
-        # Login button
+        # Buttons
         login_btn = QtWidgets.QPushButton("Iniciar sesión")
         login_btn.clicked.connect(self.handle_login)
         layout.addWidget(login_btn)
-        layout.addSpacing(5)
 
-        # Switch to register
         register_link = QtWidgets.QLabel('¿No tienes cuenta? <a href="#">Regístrate</a>')
         register_link.setTextFormat(QtCore.Qt.RichText)
         register_link.linkActivated.connect(lambda: self.switch_to_register.emit())
         register_link.setObjectName("link")
         register_link.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(register_link)
-        layout.addSpacing(5)
 
-        # Message
         self.message = QtWidgets.QLabel()
         self.message.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(self.message)
 
+        # Theme toggle
+        self.theme_switch = QtWidgets.QCheckBox("Modo oscuro")
+        self.theme_switch.stateChanged.connect(self.toggle_theme)
+        layout.addWidget(self.theme_switch)
+
     def _labeled(self, text, widget):
-        container = QtWidgets.QVBoxLayout()
-        container.setContentsMargins(0,0,0,0)
-        container.setSpacing(2)
-        container.addWidget(QtWidgets.QLabel(text))
-        container.addWidget(widget)
+        box = QtWidgets.QVBoxLayout()
+        box.setSpacing(2)
+        box.addWidget(QtWidgets.QLabel(text))
+        box.addWidget(widget)
         w = QtWidgets.QWidget()
-        w.setLayout(container)
+        w.setLayout(box)
         return w
 
     def handle_login(self):
@@ -89,13 +116,21 @@ class LoginScreen(QtWidgets.QWidget):
         if not ok:
             self.message.setText(f"❌ {res}")
         else:
-            self.message.setText(f"✅ ¡Bienvenido, {u}!")
+            self.login_success.emit()
+
+    def toggle_theme(self, state):
+        style = DARK_STYLE if state == QtCore.Qt.Checked else LIGHT_STYLE
+        QtWidgets.QApplication.instance().setStyleSheet(style)
 
 class RegisterScreen(QtWidgets.QWidget):
     switch_to_login = QtCore.pyqtSignal()
+
     def __init__(self):
         super().__init__()
-        self.setStyleSheet(COMMON_STYLE)
+        self._build_ui()
+
+    def _build_ui(self):
+        self.setStyleSheet(LIGHT_STYLE)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignHCenter)
         layout.setContentsMargins(10,10,10,10)
@@ -103,47 +138,39 @@ class RegisterScreen(QtWidgets.QWidget):
 
         # Logo
         logo = QtWidgets.QLabel()
-        basedir = os.path.dirname(__file__)
-        logo_path = os.path.join(basedir, 'Colive_Logo_.png')
+        logo_path = os.path.join(os.path.dirname(__file__), 'Colive_Logo_.png')
         pixmap = QtGui.QPixmap(logo_path).scaledToWidth(200, QtCore.Qt.SmoothTransformation)
         logo.setPixmap(pixmap)
         logo.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(logo)
-        layout.addSpacing(10)
 
-        # Role combobox
+        # Role combo
         self.role_cb = QtWidgets.QComboBox()
         self.role_cb.addItems(['Selecciona un rol','Administrador','Propietario','Residente','Seguridad','Mantenimiento','Aseo'])
         layout.addWidget(self._labeled("Rol de usuario", self.role_cb))
-        layout.addSpacing(5)
 
         # Full name
         self.fullname = QtWidgets.QLineEdit()
         self.fullname.setPlaceholderText("Juan Pérez")
         layout.addWidget(self._labeled("Nombre completo", self.fullname))
-        layout.addSpacing(5)
 
-        # Email + Phone
+        # Email & Phone
         row1 = QtWidgets.QHBoxLayout()
-        row1.setSpacing(5)
         self.email = QtWidgets.QLineEdit()
-        self.email.setPlaceholderText("ejemplo@dominio.com")
+        self.email.setPlaceholderText("correo@ejemplo.com")
         self.phone = QtWidgets.QLineEdit()
         self.phone.setPlaceholderText("3001234567")
         row1.addWidget(self._labeled("Correo electrónico", self.email))
         row1.addWidget(self._labeled("Celular", self.phone))
         layout.addLayout(row1)
-        layout.addSpacing(5)
 
         # Username
         self.username = QtWidgets.QLineEdit()
         self.username.setPlaceholderText("usuario123")
         layout.addWidget(self._labeled("Nombre de usuario", self.username))
-        layout.addSpacing(5)
 
         # Passwords
         row2 = QtWidgets.QHBoxLayout()
-        row2.setSpacing(5)
         self.pwd1 = QtWidgets.QLineEdit()
         self.pwd1.setPlaceholderText("********")
         self.pwd1.setEchoMode(QtWidgets.QLineEdit.Password)
@@ -153,36 +180,36 @@ class RegisterScreen(QtWidgets.QWidget):
         row2.addWidget(self._labeled("Contraseña", self.pwd1))
         row2.addWidget(self._labeled("Confirmar", self.pwd2))
         layout.addLayout(row2)
-        layout.addSpacing(5)
 
         # Terms
         self.terms = QtWidgets.QCheckBox("Acepto términos y condiciones")
         layout.addWidget(self.terms)
-        layout.addSpacing(5)
 
         # Buttons
         reg_btn = QtWidgets.QPushButton("Registrarse")
         reg_btn.clicked.connect(self.handle_register)
         layout.addWidget(reg_btn)
-        layout.addSpacing(5)
 
         back_btn = QtWidgets.QPushButton("Volver al login")
         back_btn.clicked.connect(lambda: self.switch_to_login.emit())
         layout.addWidget(back_btn)
 
-        # Message
         self.message = QtWidgets.QLabel()
         self.message.setAlignment(QtCore.Qt.AlignCenter)
         layout.addWidget(self.message)
 
+        # Theme toggle
+        self.theme_switch = QtWidgets.QCheckBox("Modo oscuro")
+        self.theme_switch.stateChanged.connect(self.toggle_theme)
+        layout.addWidget(self.theme_switch)
+
     def _labeled(self, text, widget):
-        container = QtWidgets.QVBoxLayout()
-        container.setContentsMargins(0,0,0,0)
-        container.setSpacing(2)
-        container.addWidget(QtWidgets.QLabel(text))
-        container.addWidget(widget)
+        box = QtWidgets.QVBoxLayout()
+        box.setSpacing(2)
+        box.addWidget(QtWidgets.QLabel(text))
+        box.addWidget(widget)
         w = QtWidgets.QWidget()
-        w.setLayout(container)
+        w.setLayout(box)
         return w
 
     def handle_register(self):
@@ -195,7 +222,6 @@ class RegisterScreen(QtWidgets.QWidget):
             "pwd1": self.pwd1.text().strip(),
             "pwd2": self.pwd2.text().strip()
         }
-        # Validaciones
         if "" in fields.values() or fields["role"] == "Selecciona un rol":
             self.message.setText("❌ No dejes campos vacíos.")
             return
@@ -205,27 +231,41 @@ class RegisterScreen(QtWidgets.QWidget):
         if fields["pwd1"] != fields["pwd2"]:
             self.message.setText("❌ Contraseñas no coinciden.")
             return
-
         ok, res = connect.register_user(fields)
-        if not ok:
-            self.message.setText(f"❌ {res}")
-        else:
-            self.message.setText("✅ Registro exitoso.")
+        self.message.setText("✅ Registro exitoso." if ok else f"❌ {res}")
+
+    def toggle_theme(self, state):
+        style = DARK_STYLE if state == QtCore.Qt.Checked else LIGHT_STYLE
+        QtWidgets.QApplication.instance().setStyleSheet(style)
+
+class WebAppView(QtWidgets.QWidget):
+    def __init__(self, url):
+        super().__init__()
+        self.browser = QWebEngineView()
+        self.browser.load(QtCore.QUrl(url))
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.setContentsMargins(0,0,0,0)
+        layout.addWidget(self.browser)
 
 class MainWindow(QtWidgets.QStackedWidget):
     def __init__(self):
         super().__init__()
         self.login = LoginScreen()
         self.register = RegisterScreen()
+        self.webview = WebAppView("http://localhost:5000/admin#")
+
         self.addWidget(self.login)
         self.addWidget(self.register)
+        self.addWidget(self.webview)
+
         self.login.switch_to_register.connect(lambda: self.setCurrentWidget(self.register))
         self.register.switch_to_login.connect(lambda: self.setCurrentWidget(self.login))
+        self.login.login_success.connect(lambda: self.setCurrentWidget(self.webview))
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     win = MainWindow()
     win.setWindowTitle("Colive - Escritorio")
-    win.setFixedSize(400, 750)
+    win.setFixedSize(420, 800)
     win.show()
     sys.exit(app.exec_())
