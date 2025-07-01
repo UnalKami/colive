@@ -98,3 +98,26 @@ form.addEventListener("submit", async function(event) {
     spinner.style.display = "none";
   }
 });
+
+// Add this to your login.js file
+document.addEventListener('DOMContentLoaded', function() {
+    loadComplexes();
+});
+
+async function loadComplexes() {
+    try {
+        const response = await fetch('/api/complexes'); // Adjust endpoint as needed
+        const complexes = await response.json();
+        
+        const selectElement = document.getElementById('complex');
+        
+        complexes.forEach(complex => {
+            const option = document.createElement('option');
+            option.value = complex.id; // or complex.name, depending on your needs
+            option.textContent = complex.name;
+            selectElement.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading complexes:', error);
+    }
+}
