@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.CascadeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +34,9 @@ public class ConjuntoResidencial {
 
     @OneToMany(mappedBy = "conjuntoResidencial")
     private List<Apartamento> apartamentos;
+
+    @OneToOne(mappedBy = "conjuntoResidencial", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private UsuarioConjunto usuarioConjunto;
 
     public Long getIdConjuntoResidencial() {
         return idConjuntoResidencial;

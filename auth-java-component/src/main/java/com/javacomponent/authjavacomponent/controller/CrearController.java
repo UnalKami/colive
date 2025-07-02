@@ -23,9 +23,9 @@ public class CrearController {
     public ResponseEntity<Map<String,Object>> crearConjunto(@RequestBody ConjuntoResidencialRequestDTO dto) {
         System.out.println("Recibido DTO: " + dto);
         try {
-            conjuntoService.crearConjunto(dto);
+            Long idConjunto = conjuntoService.crearConjunto(dto);
             System.out.println("Conjunto creado exitosamente");
-            return ResponseEntity.ok(Map.of("success", true, "message", "Creación exitosa"));
+            return ResponseEntity.ok(Map.of("success", true, "message", "Conjunto creado exitosamente", "idConjunto", idConjunto));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "error", e.getMessage()));
         }
@@ -38,6 +38,22 @@ public class CrearController {
             return ResponseEntity.ok("Apartamentos creados correctamente");
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/conjunto/{id}")
+    public ResponseEntity<Map<String, Object>> eliminarConjunto(@PathVariable Long id) {
+        try {
+            conjuntoService.eliminarConjuntoPorId(id);
+            return ResponseEntity.ok(Map.of(
+                "success", true,
+                "message", "Conjunto eliminado exitosamente"
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "error", e.getMessage()
+            ));
         }
     }
 }

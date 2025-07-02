@@ -38,6 +38,9 @@ public class Usuario {
     @OneToMany(mappedBy = "duenio", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConjuntoResidencial> conjuntosResidenciales;
 
+    @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private UsuarioConjunto usuarioConjunto;
+
     public Long getIdUsuario() {
         return idUsuario;
     }

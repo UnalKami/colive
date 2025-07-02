@@ -11,6 +11,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
     ports:
       - "8080:8080"
+    #volumes:
+    #  - ./JWT_private.key:/run/secrets/JWT_private.key:ro
+    #  - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     depends_on:
       - CL_auth_db
 
@@ -103,6 +106,8 @@ services:
     container_name: CL_ag
     ports:
       - "8000:8000"
+    #volumes:
+    #  - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
 
   stadistics:
     build: ./stadistics
@@ -112,8 +117,8 @@ services:
       - ./stadistics:/app
     ports:
       - "8010:8010"
-    env_file:
-      - ./stadistics/.env
+    #env_file:
+    #  - ./stadistics/.env
     depends_on:
       - CL_ag
       - CL_web_fe
