@@ -41,6 +41,14 @@ public class Usuario {
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private UsuarioConjunto usuarioConjunto;
 
+    public UsuarioConjunto getUsuarioConjunto() {
+        return usuarioConjunto;
+    }
+
+    public void setUsuarioConjunto(UsuarioConjunto usuarioConjunto) {
+        this.usuarioConjunto = usuarioConjunto;
+    }
+
     public Long getIdUsuario() {
         return idUsuario;
     }

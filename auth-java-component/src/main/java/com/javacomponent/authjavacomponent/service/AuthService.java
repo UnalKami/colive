@@ -4,6 +4,7 @@ import com.javacomponent.authjavacomponent.dto.LoginRequestDTO;
 import com.javacomponent.authjavacomponent.model.Usuario;
 import com.javacomponent.authjavacomponent.repository.UsuarioRepository;
 import com.javacomponent.authjavacomponent.security.JwtUtil;
+import com.javacomponent.authjavacomponent.model.UsuarioConjunto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,29 +37,44 @@ public class AuthService {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getRol().getIdRol());
+        // Obtener datos para el token
+        Long idUsuario = usuario.getIdUsuario();
+        String username = usuario.getUsername();
+        Long idRol = usuario.getRol().getIdRol();
+        UsuarioConjunto usuarioConjunto = usuario.getUsuarioConjunto();
+        Long conjuntoId = usuarioConjunto != null ? usuarioConjunto.getConjuntoResidencial().getIdConjuntoResidencial() : null;
+        String hashConjunto = usuarioConjunto != null ? usuarioConjunto.getConjuntoResidencial().getHashConjuntoResidencial() : null;
+
+        // Obtener el nombre del rol
+        String roleName = usuario.getRol().getNombreRol();
+
+        String token = jwtUtil.generateToken(
+            idUsuario,
+            username,
+            idRol,
+            roleName,
+            conjuntoId,
+            hashConjunto
+        );
 
         Cookie cookie = new Cookie("authToken", token);
         cookie.setHttpOnly(true);
         //cookie.setSecure(true); // Solo en HTTPS
         cookie.setPath("/");
-        cookie.setMaxAge(10 * 60); // 10 minutos
+        cookie.setMaxAge(7200); // 2 horas en segundos        
         //cookie.setSameSite("Strict"); // Requiere Servlet 4.0+ o set manualmente
 
         response.addCookie(cookie);
 
-        Map<String, Object> userData = new HashMap<>();
-        userData.put("USUARIO_ID_Usuario", usuario.getIdUsuario());
-
         Map<String, Object> responseBody = new HashMap<>();
-        //responseBody.put("token", token);
-        responseBody.put("rol", usuario.getRol().getIdRol());
-        responseBody.put("user", Collections.singletonList(userData));
+        responseBody.put("userId", idUsuario);
+        responseBody.put("username", username);
+        responseBody.put("roleId", idRol);
+        responseBody.put("roleName", roleName);
+        responseBody.put("conjuntoId", conjuntoId);
+        responseBody.put("hashConjunto", hashConjunto);
 
-        Map<String, Object> finalResponse = new HashMap<>();
-        finalResponse.put("body", responseBody);
-
-        return finalResponse;
+        return responseBody;
     }
 
 }
