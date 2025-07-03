@@ -15,11 +15,14 @@ async def register_admin(admin_data):
     """
     Register an admin user in the authentication microservice.
     """
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         print(f"Registering admin in auth with data: {admin_data}")
-        response = await client.post(f"{AUTH_MS_URL}/api/registro/admin", json=admin_data)        
+        response = await client.post(f"{AUTH_MS_URL}/api/registro/admin", json=admin_data)
+        print(f"Response from auth ms in gateway: {response}")
+        print(f"Response from auth ms in gateway: {response.text}")
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice
+        
 
 async def post_login(username: str, password: str, return_full_response=False):
     async with httpx.AsyncClient() as client:        
@@ -46,7 +49,7 @@ async def register_conjunto_auth(conjunto_data):
     Register a residential complex in the authentication microservice.
     """
     print(f"Registering conjunto in auth with data: {conjunto_data}")
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.post(f"{AUTH_MS_URL}/api/crear/conjunto", json=conjunto_data)
         print(f"Response from auth ms in gateway: {response}")
         response.raise_for_status()  # Raise an error for bad responses
