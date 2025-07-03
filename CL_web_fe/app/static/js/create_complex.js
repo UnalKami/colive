@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             alert('¡Registro exitoso!');
-            window.location.href = "http://localhost:5000/login";
+            window.location.href = "http://localhost/login";
         })
         .catch(error => {
             alert('El registro falló: ' + error.message);
