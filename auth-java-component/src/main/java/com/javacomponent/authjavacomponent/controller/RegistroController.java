@@ -18,6 +18,7 @@ public class RegistroController {
     @PostMapping("/admin")
     public ResponseEntity<Map<String, Object>> registrarAdmin(@RequestBody RegistroRequestDTO dto) {
         try {
+            System.out.println("Registro de administrador: " + dto);
             Map<String, Object> response = registroService.registrarUsuario(dto, Rol.ADMIN_CR);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -28,6 +29,7 @@ public class RegistroController {
     @PostMapping("/propietario")
     public ResponseEntity<Map<String, Object>> registrarPropietario(@RequestBody RegistroRequestDTO dto) {
         try {
+            System.out.println("Registro de propietario: " + dto);
             Map<String, Object> response = registroService.registrarUsuario(dto, Rol.PROPIEDAD_CR);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -38,6 +40,7 @@ public class RegistroController {
     @PostMapping("/residente")
     public ResponseEntity<Map<String, Object>> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
         try {
+            System.out.println("Registro de residente: " + dto);
             Map<String, Object> response = registroService.registrarUsuario(dto, Rol.RESIDENTE_CR);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -48,6 +51,7 @@ public class RegistroController {
     @PostMapping("/seguridad")
     public ResponseEntity<Map<String, Object>> registrarSeguridad(@RequestBody RegistroRequestDTO dto) {
         try {
+            System.out.println("Registro de seguridad: " + dto);
             Map<String, Object> response = registroService.registrarUsuario(dto, Rol.SEGURIDAD_CR);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -58,6 +62,7 @@ public class RegistroController {
     @PostMapping("/mantenimiento")
     public ResponseEntity<Map<String, Object>> registrarMantenimiento(@RequestBody RegistroRequestDTO dto) {
         try {
+            System.out.println("Registro de mantenimiento: " + dto);
             Map<String, Object> response = registroService.registrarUsuario(dto, Rol.MANTENIMIENTO_CR);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -68,6 +73,7 @@ public class RegistroController {
     @PostMapping("/aseo")
     public ResponseEntity<Map<String, Object>> registrarAseo(@RequestBody RegistroRequestDTO dto) {
         try {
+            System.out.println("Registro de aseo: " + dto);
             Map<String, Object> response = registroService.registrarUsuario(dto, Rol.ASEO_CR);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -77,6 +83,7 @@ public class RegistroController {
     @DeleteMapping("/usuario/{id}")
     public ResponseEntity<Map<String, Object>> eliminarUsuario(@PathVariable Long id) {
         try {
+            System.out.println("Eliminación de usuario con ID: " + id);
             registroService.eliminarUsuario(id);
             return ResponseEntity.ok(Map.of("success", true));
         } catch (RuntimeException e) {

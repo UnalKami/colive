@@ -5,7 +5,8 @@ async def get_saludo():
     """
     Fetch a greeting message from the authentication microservice.
     """
-    async with httpx.AsyncClient() as client:
+    # EJEMPLO DE COMO MODIFICAR LA URL PARA QUE FUNCIONE CON CERTIFICADOS AUTOFIRMADOS
+    async with httpx.AsyncClient(verify=False) as client:
         response = await client.get(f"{AUTH_MS_URL}/saludo")        
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice

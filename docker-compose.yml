@@ -1,7 +1,9 @@
+version: '3.8'
+
 services:
-  CL_Auth_ms:
+  CL_Auth_ms1:
     image: openjdk:24-slim-bookworm
-    container_name: CL_Auth_ms
+    container_name: CL_Auth_ms1
     hostname: cl-auth-ms
     build:
       context: ./auth-java-component  
@@ -9,15 +11,43 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
-    ports:
-      - "8080:8080"
     depends_on:
       - CL_auth_db
+    networks:
+      - private_network
+
+  CL_Auth_ms2:
+    image: openjdk:24-slim-bookworm
+    container_name: CL_Auth_ms2
+    hostname: cl-auth-ms
+    build:
+      context: ./auth-java-component  
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=cincopatodos
+    depends_on:
+      - CL_auth_db
+    networks:
+      - private_network
+
+  CL_Auth_ms3:
+    image: openjdk:24-slim-bookworm
+    container_name: CL_Auth_ms3
+    hostname: cl-auth-ms
+    build:
+      context: ./auth-java-component  
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=cincopatodos
+    depends_on:
+      - CL_auth_db
+    networks:
+      - private_network
 
   CL_auth_db:
     container_name: CL_auth_db
-    ports:
-      - 5432:5432
     image: postgres:16.9-alpine3.21 
     restart: unless-stopped
     environment:
@@ -31,43 +61,45 @@ services:
       retries: 5
     volumes:
       - cl_auth_db_data:/var/lib/postgresql/data
+    networks:
+      - private_network
 
   CL_residence_db:
     image: mongo:8.0.9-noble
     container_name: CL_residence_db
-    ports:
-      - "27017:27017" 
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
       - MONGO_INITDB_DATABASE=residence_db
     volumes:
       - cl_residence_db_data:/data/db
+    networks:
+      - private_network
 
   CL_messaging_db:
     image: mongo:8.0.9-noble
     container_name: CL_messaging_db
-    ports:
-      - "27018:27017" 
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
       - MONGO_INITDB_DATABASE=messaging_db
     volumes:
       - cl_messaging_db_data:/data/db
+    networks:
+      - private_network
 
   CL_residence_ms:
     image: node:23.11.1-alpine3.21
     container_name: CL_residence-ms
     build:
       context: ./ResidenceCreator-ms  
-    ports:
-      - "3001:3001"
     depends_on:
       - CL_residence_db
       - CL_guest_db
     env_file:
       - ./ResidenceCreator-ms/.env
+    networks:
+      - private_network
 
   CL_messaging-ms:
     image: cl_messaging_ms:latest
@@ -75,26 +107,26 @@ services:
       context: ./MensajeriaYnotificaciones
       dockerfile: Dockerfile.sbt-alpine
     container_name: CL_messaging-ms
-    ports:
-      - "7000:7000"
     environment:
-      SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
+      SMTP_SECRET_KEY: "claveaes12345678"
       MONGO_URI: "mongodb://root:cincopatodos@cl_messaging_db:27017/correos?authSource=admin"
     command: ["sbt", "run"]
     depends_on:
       - CL_messaging_db
     restart: unless-stopped
+    networks:
+      - private_network
 
   CL_web_fe:
     image: cl_web_fe:latest
     build: 
       context: ./CL_web_fe      
     container_name: CL_web_fe
-    ports:
-      - "5000:5000"
     environment:
       - FLASK_ENV=development
     restart: unless-stopped
+    networks:
+      - private_network
 
   CL_ag:
     image: cl_ag:latest
@@ -103,27 +135,28 @@ services:
     container_name: CL_ag
     ports:
       - "8000:8000"
+    networks:
+      - private_network
 
-  stadistics:
-    build: ./stadistics
-    container_name: stadistics
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./stadistics:/app
-    ports:
-      - "8010:8010"
-    env_file:
-      - ./stadistics/.env
-    depends_on:
-      - CL_ag
-      - CL_web_fe
-      - CL_residence_ms
-      - CL_auth_db
-      - CL_residence_db
+  #stadistics:
+  #  build: ./stadistics
+  #  container_name: stadistics
+  #  command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+  #  volumes:
+  #    - ./stadistics:/app
+  #  env_file:
+  #    - ./stadistics/.env
+  #  depends_on:
+  #    - CL_ag
+  #    - CL_web_fe
+  #    - CL_residence_ms
+  #    - CL_auth_db
+  #    - CL_residence_db
+  #  networks:
+  #    - private_network
+
   CL_guest_db:
     container_name: CL_guest_db
-    ports:
-      - 5433:5432
     image: postgres:16.9-alpine3.21 
     restart: unless-stopped
     environment:
@@ -137,24 +170,38 @@ services:
       retries: 5
     volumes:
       - pg_guest_data:/var/lib/postgresql/data
+    networks:
+      - private_network
 
   CL_LoadBalance:
-   image: nginx:1.28.0-alpine-perl
-   container_name: CL_LB
-   ports:
-       - "80:80"
-       - "443:443"
-   volumes:
-     - ./NetworkManager/nginx:/etc/nginx
-     - ./frontend:/usr/share/nginx/html
-   depends_on:
-     - CL_Auth_ms
-     - CL_Auth_ms2
-     - CL_Auth_ms3
-     - CL_ag
+    image: nginx:1.28.0-alpine-perl
+    container_name: CL_LoadBalance
+    ports:
+      - "80:80"
+      - "443:443"
+      # No se exponen los puertos 8080, 3001, 7000, 8001, 5000 porque son internos
+    volumes:
+      - ./NetworkManager/nginx:/etc/nginx
+      - ./NetworkManager/nginx/certs:/etc/nginx/certs
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - CL_ag
+      - CL_web_fe
+      - CL_residence_ms
+      - CL_messaging-ms
+      #- stadistics
+      - CL_Auth_ms1
+      - CL_Auth_ms2
+      - CL_Auth_ms3
+    networks:
+      - private_network
 
 volumes:
   cl_auth_db_data:
   cl_residence_db_data:
   cl_messaging_db_data:
   pg_guest_data:
+
+networks:
+  private_network:
+    driver: bridge

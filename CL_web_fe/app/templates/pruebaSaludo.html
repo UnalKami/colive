@@ -13,7 +13,9 @@
   <script>
     async function enviarPeticion() {
       try {
-        const res = await fetch('http://localhost:5000/fe-api/testAuth');
+        // EJEMPLO DE COMO MODIFICAR LA URL PARA QUE FUNCIONE EN PRODUCCIÓN
+        // const res = await fetch(`http/localhost:5000/fe-api/testAuth`);
+        const res = await fetch(`${window.location.origin}/fe-api/testAuth`);
         if (!res.ok) throw new Error("Error en la respuesta del servidor");
         const data = await res.json();
         document.getElementById('respuesta').innerText = data.mensaje || JSON.stringify(data);

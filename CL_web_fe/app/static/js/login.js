@@ -1,5 +1,5 @@
 // URL base de la API backend
-const api_url = "http://localhost:5000/fe-api";
+const api_url = `${window.location.origin}/fe-api`;
 
 // Referencias al formulario y elementos
 const form = document.getElementById("login-form");
