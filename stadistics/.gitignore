@@ -3,12 +3,10 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-*.pyc
 
 # Django
 *.log
 *.pot
-*.pyc
 db.sqlite3
 media/
 staticfiles/
@@ -19,12 +17,11 @@ env/
 venv/
 ENV/
 .venv/
-.env/
-.env
 
 # Archivos de configuración y variables de entorno
-*.env
-*.env.*
+# -- Eliminamos o comentamos estas líneas:
+# .env
+# *.env.*
 
 # Archivos de bases de datos
 *.sqlite3
