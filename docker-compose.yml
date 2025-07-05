@@ -137,7 +137,7 @@ services:
       - FLASK_ENV=development
     restart: unless-stopped
     networks:
-      - public
+      - secure_internal
 
   CL_ag:
     image: cl_ag:latest

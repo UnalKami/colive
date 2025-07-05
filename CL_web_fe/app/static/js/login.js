@@ -1,5 +1,5 @@
 // URL base de la API backend
-const api_url = "http://localhost:5000/fe-api";
+const api_url = "/fe-api";
 
 // Referencias al formulario y elementos
 const form = document.getElementById("login-form");
@@ -106,17 +106,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadComplexes() {
     try {
-        const response = await fetch('/api/complexes'); // Adjust endpoint as needed
-        const complexes = await response.json();
+        const response = await fetch('/residence/conjuntosResidencias');
+        const data = await response.json();
+        
+        console.log('Response data:', data); // Para debug
         
         const selectElement = document.getElementById('complex');
+        if (!selectElement) return; // Verificar que existe el elemento
         
-        complexes.forEach(complex => {
-            const option = document.createElement('option');
-            option.value = complex.id; // or complex.name, depending on your needs
-            option.textContent = complex.name;
-            selectElement.appendChild(option);
-        });
+        // Manejar diferentes estructuras de respuesta
+        let complexes = data;
+        if (data.data) complexes = data.data;
+        if (data.conjuntos) complexes = data.conjuntos;
+        
+        if (Array.isArray(complexes)) {
+            complexes.forEach(complex => {
+                const option = document.createElement('option');
+                option.value = complex.id || complex._id || complex.nombre;
+                option.textContent = complex.name || complex.nombre;
+                selectElement.appendChild(option);
+            });
+        }
     } catch (error) {
         console.error('Error loading complexes:', error);
     }
