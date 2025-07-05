@@ -1,3 +1,118 @@
-# Conjunto-Residencial
-Proyecto de arquitectura de software.
-![ojala funcione](https://raw.githubusercontent.com/denitdao/o-rly-collection/refs/heads/main/public/book_covers/compile-and-pray.jpeg)
+# **Prototipo 3 Arquitectura de Software 2025-1**
+
+# **Team**
+### Equipo 1B
+
+- Daniel Felipe Villamor (Arquitecto líder)
+- Byron Daniel Giraldo Castro
+- Camilo Andres Roncancio Toca 
+- Ivan Yesid Sepulveda Paez
+- Javier Santiago Vargas Parra
+- Jonathan Steven Ochoa Celis
+- Julian David Huertas Dominguez
+
+# **Software System**
+### Name: **COLive**
+### Logo:
+ ![Logo del Sistema](./readmeAssets/COLiveLogo.png)
+### Description
+COLive es una plataforma digital diseñada para optimizar la administración de conjuntos residenciales. El sistema permite a los propietarios registrar su conjunto en la plataforma y gestionar de manera centralizada todos los procesos asociados a la convivencia y operación del conjunto.
+
+Entre sus funcionalidades destacan la creación y administración de cuentas para apartamentos e inquilinos, la reserva de espacios comunes, la gestión de parqueaderos y visitantes, el envío de mensajes internos, la generación de notificaciones y la administración del personal encargado del conjunto (como administradores, personal de aseo y vigilancia).
+
+COLive busca mejorar la comunicación, eficiencia y transparencia en la gestión residencial, brindando a administradores y residentes una herramienta moderna y confiable para el manejo diario de su comunidad.
+# **Architectural Structures**
+### **Component-and Connector (C&C) Structure**
+### C&C View
+ ![VistaCC](./readmeAssets/VistaCC-COLive-P3.png)
+### Description of architectural styles and patterns used
+
+### Description of architectural elements and relations
+
+### **Layered Structure**
+#### Layered View
+#### Description of architectural patterns used (if applicable)
+#### Description of architectural elements and relations
+
+### **Deployment Structure**
+#### Deployment View
+#### Description of architectural patterns used (if applicable)
+#### Description of architectural elements and relations
+
+### **Decomposition Structure**
+#### Decomposition View
+#### Description of architectural elements and relations
+
+# **Quality Attributes**
+### **Security**
+### Security scenarios
+
+* Scenario 1: Secure Channel Pattern (HTTPS)
+    * Source: Atacante conectado a la misma red que un usuario de la aplicación.
+    * Stimulus: Interceptación del tráfico HTTPS (Man in the middle) para robar información.
+    * Environment: Operaciones normales
+    * Artifact: Conector HTTPS Navegador <-> Proxy inverso web
+    * Response: Transmite la información cifrada.
+    * Response measure: Se reciben todos los paquetes.
+
+* Scenario 2: Reverse Proxy Pattern
+    * Source: Atacante 
+    * Stimulus: Ataque de Denegación de Servicio (DoS)
+    * Environment: Operaciones normales
+    * Artifact: CL_web_rp, CL_desktop_rp
+    * Response: Rechaza las peticiones maliciosas.
+    * Response measure: Identifica el origen de las peticiones y lo bloquea.
+
+* Scenario 3: Network Segmentation Pattern
+    * Source: 
+    * Stimulus: 
+    * Environment:
+    * Artifact: 
+    * Response: 
+    * Response measure: 
+
+* Scenario 4: Authentication with Asymmetric JWT Pattern
+    * Source: Atacante que quiere acceder a información que no corresponde a su usuario
+    * Stimulus: Altera el payload del token
+    * Environment: Operaciones normales
+    * Artifact: CL_ag
+    * Response: Rechaza la petición 
+    * Response measure: Detecta la alteración en el payload del token por el hash
+
+### Applied architectural tactics
+ * Encrypt Data (Resist Attack)
+ * Limit Access (Resist Attack)
+ * Authenticate Actor (Resist Attack)
+
+### Applied architectural patterns
+ * Secure Channel Pattern (HTTPS)
+ * Reverse Proxy Pattern
+ * Network Segmentation Pattern
+ * Authentication with Asymmetric JWT Pattern
+ 
+### **Performance and Scalability**
+### Performance scenarios
+
+* Scenario 1: Registro usuario administrador y conjunto
+    * Source: X usuarios
+    * Stimulus: X cantidad de peticion en un intervalo de Y tiempo
+    * Environment: Operaciones normales
+    * Artifact: CL_web_rp, CL_web_fe, CL_ag, CL_auth_ms, CL_residence_ms, CL_auth_db, CL_residence_db
+    * Response: Procesa todas las solicitudes.
+    * Response measure: X ms de respuesta por petición.
+     
+### Applied architectural tactics
+
+* Mantain Multiple Copies of Computations (Manage Resources)
+* Limit event responses (Control Resource Demand)
+* Increase Efficiency (Control Resource Demand)
+
+### Applied architectural patterns
+
+* Load Balancer Pattern
+* Reverse Proxy Pattern
+
+### Performance testing analysis and results
+
+## **Prototype**
+### Instructions for deploying the software system locally
