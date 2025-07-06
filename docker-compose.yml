@@ -57,6 +57,8 @@ services:
     environment:
       - FLASK_ENV=development
     restart: unless-stopped
+    volumes:
+      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     networks:
       - private-network
   
@@ -70,7 +72,7 @@ services:
     #ports:
     #  - "8000:8000"
     volumes:
-      - ./JWT_public-network.key.pub:/run/secrets/JWT_public-network.key.pub:ro
+      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     networks:
       - private-network
 
@@ -100,7 +102,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=cincopatodos      
     volumes:
       - ./JWT_private.key:/run/secrets/JWT_private.key:ro
-      - ./JWT_public-network.key.pub:/run/secrets/JWT_public-network.key.pub:ro
+      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     depends_on:
       - CL_auth_db
     networks:
@@ -118,7 +120,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
     volumes:
       - ./JWT_private.key:/run/secrets/JWT_private.key:ro
-      - ./JWT_public-network.key.pub:/run/secrets/JWT_public-network.key.pub:ro
+      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     networks:
       - private-network
     depends_on:
@@ -136,7 +138,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
     volumes:
       - ./JWT_private.key:/run/secrets/JWT_private.key:ro
-      - ./JWT_public-network.key.pub:/run/secrets/JWT_public-network.key.pub:ro
+      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     networks:
       - private-network
     depends_on:
