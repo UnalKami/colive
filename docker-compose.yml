@@ -147,8 +147,8 @@ services:
     container_name: CL_residence-ms
     build:
       context: ./ResidenceCreator-ms  
-    ports:
-       - "3001:3001"
+    #ports:
+    #   - "3001:3001"
     depends_on:
       - CL_residence_db
       - CL_guest_db
