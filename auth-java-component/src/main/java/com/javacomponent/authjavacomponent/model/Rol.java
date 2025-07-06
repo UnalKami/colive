@@ -35,6 +35,10 @@ public class Rol {
         this.usuarios = usuarios;
     }
 
+    public Rol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
     public Long getIdRol() {
         return idRol;
     }

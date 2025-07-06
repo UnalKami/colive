@@ -1,5 +1,3 @@
 .vscode
 .metals
 .scala-build
-JWT_private.key
-JWT_public.key.pub
