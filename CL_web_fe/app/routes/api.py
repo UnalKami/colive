@@ -2,6 +2,9 @@ from flask import Blueprint, jsonify, request
 import requests
 
 api_bp = Blueprint('api', __name__)
+ESPERA_MAXIMA = 10  # Tiempo máximo de espera en segundos para las peticiones al gateway
+
+# TODAS las rutas de la API deben comenzar con /fe-api en el frontend
 
 @api_bp.route('/status', methods=['GET'])
 def status():
@@ -122,4 +125,50 @@ def obtener_reservas():
         return jsonify(response.json())
     except Exception as e:
         print("Error al llamar al gateway:", e)
+        return jsonify({"error": str(e)}), 500
+
+ENDPOINT_MENSAJERIA = 'http://CL_messaging_ms:7000/msg'
+    
+@api_bp.route('/registrarSMTP', methods=['POST'])
+def registrar_smtp():
+    try:
+        payload = request.get_json()
+        #TODO: @jhuertasd validar el payload antes de enviarlo
+        """
+        verifica que el usuario tenga rol administrador, 
+        si no lo tiene, retorna un error 403 Forbidden.
+        """
+        
+        response = requests.post(
+            ENDPOINT_MENSAJERIA +'/smtp/registrar',
+            json=payload
+        )
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+    
+@api_bp.route('/enviarCorreo', methods=['POST'])
+def enviar_correo():
+    try:
+        payload = request.get_json()
+        #TODO: @jhuertasd validar el payload antes de enviarlo
+        """
+        verifica que el usuario tenga rol administrador, 
+        si no lo tiene, retorna un error 403 Forbidden.
+        """
+        
+        response = requests.post(
+            ENDPOINT_MENSAJERIA +'/smtp/enviar',
+            json=payload
+        )
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500

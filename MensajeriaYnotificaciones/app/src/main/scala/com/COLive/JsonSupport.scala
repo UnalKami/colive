@@ -25,5 +25,5 @@ object JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
     jsonFormat5(RegistrarSMTPDTO.apply)
 
   implicit val enviarSMTPDTOFormat: RootJsonFormat[EnviarSMTPDTO] =
-    jsonFormat4(EnviarSMTPDTO.apply)
+    jsonFormat5(EnviarSMTPDTO.apply)
 }
