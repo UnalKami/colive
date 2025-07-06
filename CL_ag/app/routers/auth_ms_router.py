@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel
-from app.services.auth_ms_services import get_saludo, post_login
+from app.services.auth_ms_services import get_saludo, post_login, get_admin_info
 import httpx
 from httpx import HTTPStatusError
 
@@ -25,6 +25,15 @@ async def login(request: LoginRequest, response: Response):
         if set_cookie:
             response.headers["set-cookie"] = set_cookie
         return ms_response.json()
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/admin-info")
+async def obtener_admin_info(request: Request):
+    try:
+        return await get_admin_info(request.cookies)
     except httpx.HTTPStatusError as e:
         raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
     except Exception as e:

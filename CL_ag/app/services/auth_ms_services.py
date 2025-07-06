@@ -32,6 +32,18 @@ async def post_login(username: str, password: str, return_full_response=False):
             return response
         return response.json()
 
+async def get_admin_info(cookies):
+    """
+    Get admin information from the authentication microservice using cookies.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{AUTH_MS_URL}/auth/admin-info",
+            cookies=cookies
+        )
+        response.raise_for_status()
+        return response.json()
+
 async def delete_user(user_id):
     """
     Delete a user in the authentication microservice by user ID.

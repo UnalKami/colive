@@ -2,7 +2,9 @@ package com.javacomponent.authjavacomponent.service;
 
 import com.javacomponent.authjavacomponent.dto.LoginRequestDTO;
 import com.javacomponent.authjavacomponent.model.Usuario;
+import com.javacomponent.authjavacomponent.model.Persona;
 import com.javacomponent.authjavacomponent.repository.UsuarioRepository;
+import com.javacomponent.authjavacomponent.repository.PersonaRepository;
 import com.javacomponent.authjavacomponent.security.JwtUtil;
 import com.javacomponent.authjavacomponent.model.UsuarioConjunto;
 
@@ -22,6 +24,9 @@ public class AuthService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PersonaRepository personaRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -77,4 +82,32 @@ public class AuthService {
         return responseBody;
     }
 
+    public Map<String, Object> getAdminInfoFromToken(String token) {
+        try {
+            // Extraer userId del token
+            Long userId = jwtUtil.getUserIdFromToken(token);
+            
+            // Buscar usuario
+            Usuario usuario = usuarioRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            // Buscar persona asociada
+            Persona persona = personaRepository.findByUsuario(usuario);
+            if (persona == null) {
+                throw new RuntimeException("Información de persona no encontrada");
+            }
+            
+            // Retornar información del admin
+            Map<String, Object> adminInfo = new HashMap<>();
+            adminInfo.put("userId", userId);
+            adminInfo.put("username", usuario.getUsername());
+            adminInfo.put("nombreAdmin", persona.getNombre());
+            adminInfo.put("correo", persona.getCorreo());
+            
+            return adminInfo;
+            
+        } catch (Exception e) {
+            throw new RuntimeException("Error al extraer información del token: " + e.getMessage());
+        }
+    }
 }

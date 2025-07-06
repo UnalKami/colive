@@ -11,7 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 @Component
@@ -32,6 +34,17 @@ public class JwtUtil {
     return kf.generatePrivate(spec);
 }
 
+    private PublicKey loadPublicKey(String filename) throws Exception {
+        String key = new String(Files.readAllBytes(Paths.get(filename)))
+            .replaceAll("-----BEGIN PUBLIC KEY-----", "")
+            .replaceAll("-----END PUBLIC KEY-----", "")
+            .replaceAll("\\s", "");
+        byte[] keyBytes = Base64.getDecoder().decode(key);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(spec);
+    }
+
     public String generateToken(Long userId, String username, Long roleId, String role_name, Long conjuntoId, String hashConjunto) {
     try {
         PrivateKey privateKey = loadPrivateKey("/run/secrets/JWT_private.key");
@@ -50,6 +63,27 @@ public class JwtUtil {
         throw new RuntimeException("Error al firmar el token JWT", e);
     }
 }
+
+    public Long getUserIdFromToken(String token) {
+        try {
+            PublicKey publicKey = loadPublicKey("/run/secrets/JWT_public.key.pub");
+            Claims claims = Jwts.parserBuilder()
+                .setSigningKey(publicKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+            
+            Object userIdObj = claims.get("userId");
+            if (userIdObj instanceof Integer) {
+                return ((Integer) userIdObj).longValue();
+            } else if (userIdObj instanceof Long) {
+                return (Long) userIdObj;
+            }
+            return null;
+        } catch (Exception e) {
+            throw new RuntimeException("Error al extraer userId del token JWT", e);
+        }
+    }
 
 /*     public String extractUsername(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build()

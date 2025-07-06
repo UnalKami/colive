@@ -55,6 +55,18 @@ def login():
         return flask_response
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/admin-info', methods=['GET'])
+def obtener_admin_info():
+    try:
+        response = requests.get(
+            'http://CL_ag:8000/auth/admin-info',
+            cookies=request.cookies
+        )
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
     
 @api_bp.route('/crearReserva', methods=['POST'])
 def crear_reserva():
