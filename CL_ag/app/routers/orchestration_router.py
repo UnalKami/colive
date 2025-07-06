@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request, HTTPException
 import httpx
-from app.services.auth_ms_services import register_admin, delete_user, register_conjunto_auth
+from app.services.auth_ms_services import register_admin, delete_user, register_conjunto_auth, asociar_usuario_conjunto, delete_conjunto_auth
 from app.services.residence_ms_services import register_conjunto, delete_conjunto
 router = APIRouter()
 
@@ -50,13 +50,36 @@ async def registerUserCR(request: Request):
             "hashConjuntoResidencial": str(conjunto_hash),
             "idDuenio": str(user_id)
         })
-        print(f"Respuesta de registro en autenticación: {auth_conjunto_response}")
+        print(f"Respuesta de registro en autenticación, paso 4: {auth_conjunto_response}")
         if auth_conjunto_response.status_code != 200:
             # Revertir conjunto y usuario
             #await delete_conjunto(conjunto_hash)
             await delete_user(user_id)
             raise Exception("No se pudo registrar el conjunto en autenticación.")
-        print("Conjunto registrado en autenticación exitosamente.")
+        print("Conjunto registrado en autenticación exitosamente.")        
+
+        print("Status code:", auth_conjunto_response.status_code)
+        print("Raw response text:", await auth_conjunto_response.aread())
+
+        # Si auth_conjunto_response es un objeto httpx.Response:
+        data = auth_conjunto_response.json()
+        print(f"Datos de la respuesta de autenticación: {data}")
+        id_conjunto = data.get("idConjunto")
+
+        print(f"ID del conjunto registrado en autenticación: {id_conjunto}")
+
+        # Paso 4.5: Asociar usuario y conjunto en autenticación
+        try:
+            asociacion_response = await asociar_usuario_conjunto(
+                usuario_id=int(user_id),
+                conjunto_residencial_id=int(id_conjunto)
+            )
+        except Exception as e:
+            # Rollback: borrar usuario y conjunto
+            await delete_user(user_id)
+            #await delete_conjunto(conjunto_hash)
+            await delete_conjunto_auth(id_conjunto)
+            raise Exception(f"No se pudo asociar usuario y conjunto: {str(e)}")
 
         # Paso 5: Todo exitoso
         return {
@@ -66,6 +89,8 @@ async def registerUserCR(request: Request):
         }
 
     except Exception as e:
+        import traceback
+        print("Ocurrió un error:", e)
         # Rollback adicional si es necesario
         if conjunto_hash:
             print(f"Error al registrar el conjunto, intentando revertir: {conjunto_hash}")

@@ -7,6 +7,10 @@ import com.javacomponent.authjavacomponent.model.Usuario;
 import com.javacomponent.authjavacomponent.repository.PersonaRepository;
 import com.javacomponent.authjavacomponent.repository.RolRepository;
 import com.javacomponent.authjavacomponent.repository.UsuarioRepository;
+import com.javacomponent.authjavacomponent.model.UsuarioConjunto;
+import com.javacomponent.authjavacomponent.model.ConjuntoResidencial;
+import com.javacomponent.authjavacomponent.repository.UsuarioConjuntoRepository;
+import com.javacomponent.authjavacomponent.repository.ConjuntoResidencialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,26 @@ public class RegistroService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UsuarioConjuntoRepository usuarioConjuntoRepository;
+
+    @Autowired
+    private ConjuntoResidencialRepository conjuntoResidencialRepository;
+
+    public void asociarUsuarioConjunto(Long usuarioId, Long conjuntoResidencialId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario con id " + usuarioId + " no encontrado"));
+
+        ConjuntoResidencial conjunto = conjuntoResidencialRepository.findById(conjuntoResidencialId)
+                .orElseThrow(() -> new RuntimeException("Conjunto con id " + conjuntoResidencialId + " no encontrado"));
+
+        UsuarioConjunto usuarioConjunto = new UsuarioConjunto();
+        usuarioConjunto.setUsuario(usuario);
+        usuarioConjunto.setConjuntoResidencial(conjunto);
+
+        usuarioConjuntoRepository.save(usuarioConjunto);
+    }
 
     public Map<String, Object> registrarUsuario(RegistroRequestDTO dto, Long rolId) {
         if (usuarioRepository.findByUsername(dto.getUsername()).isPresent()) {

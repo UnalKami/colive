@@ -17,7 +17,7 @@ public class ConjuntoResidencialService {
     @Autowired
     private ConjuntoResidencialRepository conjuntoResidencialRepository;
 
-    public void crearConjunto(ConjuntoResidencialRequestDTO dto) {
+    public Long crearConjunto(ConjuntoResidencialRequestDTO dto) {
         System.out.println("Id Dueño: " + dto.getIdDuenio());
         System.out.println("Hash Conjunto Residencial: " + dto.getHashConjuntoResidencial());
         Usuario duenio = usuarioRepository.findById(dto.getIdDuenio())
@@ -30,5 +30,14 @@ public class ConjuntoResidencialService {
         conjuntoResidencialRepository.save(conjunto);
         System.out.println("Conjunto Residencial creado: " + conjunto.getHashConjuntoResidencial());
 
+        return conjunto.getIdConjuntoResidencial(); // Retorna el ID generado
     }
+
+    public void eliminarConjuntoPorId(Long idConjuntoResidencial) {
+        if (!conjuntoResidencialRepository.existsById(idConjuntoResidencial)) {
+            throw new RuntimeException("Conjunto residencial no encontrado con id: " + idConjuntoResidencial);
+        }
+        conjuntoResidencialRepository.deleteById(idConjuntoResidencial);
+    }
+
 }

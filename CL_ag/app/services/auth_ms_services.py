@@ -21,6 +21,7 @@ async def register_admin(admin_data):
         return response.json()  # Return the JSON response from the microservice
 
 async def post_login(username: str, password: str, return_full_response=False):
+    print(f"Logging in user {username} with password {password}")
     async with httpx.AsyncClient() as client:        
         response = await client.post(
             f"{AUTH_MS_URL}/auth/login",
@@ -50,3 +51,28 @@ async def register_conjunto_auth(conjunto_data):
         print(f"Response from auth ms in gateway: {response}")
         response.raise_for_status()  # Raise an error for bad responses
         return response  # Return the JSON response from the microservice
+
+async def asociar_usuario_conjunto(usuario_id: int, conjunto_residencial_id: int):
+    """
+    Asociar un usuario con un conjunto residencial en el microservicio de autenticación.
+    """
+    payload = {
+        "usuarioId": usuario_id,
+        "conjuntoResidencialId": conjunto_residencial_id
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{AUTH_MS_URL}/api/usuario-conjunto/asociar",
+            json=payload
+        )
+        response.raise_for_status()
+        return response.json()
+        
+async def delete_conjunto_auth(conjunto_id):
+    """
+    Delete a conjunto in the authentication microservice by conjunto ID.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.delete(f"{AUTH_MS_URL}/api/crear/conjunto/{conjunto_id}")
+        response.raise_for_status()
+        return response.json()

@@ -25,7 +25,7 @@ public class AuthController {
         try {
             Map<String, Object> resp = authService.login(loginDTO, response);
             for (String headerName : response.getHeaderNames()) {
-            System.out.println(headerName + ": " + response.getHeader(headerName));
+                System.out.println(headerName + ": " + response.getHeader(headerName));
             }
             return ResponseEntity.ok(resp);
         } catch (RuntimeException e) {
