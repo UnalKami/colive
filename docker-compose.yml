@@ -179,6 +179,7 @@ services:
 
   CL_stadistics_ms:
     build: ./stadistics
+    image: conjunto-residencial-cl-stadistics-ms
     container_name: stadistics
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:

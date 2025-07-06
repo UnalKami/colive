@@ -60,9 +60,13 @@ object MongoService {
                    (implicit ec: ExecutionContext): Future[UpdateResult] = {
     val encrypted = CryptoUtil.encrypt(secretKey, password)
     val doc = SalidaCorreo(email, smtpHost, smtpPort, username, encrypted)
+    val filtro = Filters.and(
+      Filters.eq("email", email),
+      Filters.eq("username", username)
+    )
     val publisher: Publisher[UpdateResult] =
       collection.replaceOne(
-        Filters.eq("email", email),
+        filtro,
         doc,
         new ReplaceOptions().upsert(true)
       )
@@ -78,8 +82,12 @@ object MongoService {
   }
 
   /** Obtiene configuración SMTP desde Mongo, descifra password y la envuelve en SalidaCorreoConfig. */
-  def obtenerCorreoConfig(email: String)(implicit ec: ExecutionContext): Future[Option[SalidaCorreoConfig]] = {
-    val publisher: Publisher[SalidaCorreo] = collection.find(Filters.eq("email", email)).first()
+  def obtenerCorreoConfig(email: String, username: String)(implicit ec: ExecutionContext): Future[Option[SalidaCorreoConfig]] = {
+    val filtro = Filters.and(
+      Filters.eq("email", email),
+      Filters.eq("username", username)
+    )
+    val publisher: Publisher[SalidaCorreo] = collection.find(filtro).first()
 
     val promise = Promise[Option[SalidaCorreo]]()
     publisher.subscribe(new org.reactivestreams.Subscriber[SalidaCorreo] {
@@ -120,10 +128,11 @@ object MongoService {
     Source.fromPublisher(collection.find())
   }
 
-  def agregarAColaEnvio(de: String, para: String, asunto: String, cuerpo: String)
+  def agregarAColaEnvio(de: String, para: String, asunto: String, username: String, cuerpo: String)
                        (implicit ec: ExecutionContext): Future[ObjectId] = {
     val correo = CorreoEnCola(
       de = de,
+      username = username,
       para = para,
       asunto = asunto,
       cuerpo = cuerpo
