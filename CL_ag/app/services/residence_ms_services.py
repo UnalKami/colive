@@ -1,5 +1,5 @@
 import httpx
-from app.config import RESIDENCE_MS_URL
+from app.config import RESIDENCE_MS_URL, AUTH_MS_URL
 
 async def register_conjunto(conjunto_data):
     """
@@ -19,6 +19,54 @@ async def delete_conjunto(hash_conjunto):
         response = await client.post(f"{RESIDENCE_MS_URL}/graphql/{hash_conjunto}")        
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()  # Return the JSON response from the microservice
+
+async def crear_residence_con_admin(residence_data, cookies):
+    """
+    Crear residence obteniendo el nombre del admin desde la cookie.
+    """
+    try:
+        print(f"[DEBUG] Iniciando crear_residence_con_admin con datos: {residence_data}")
+        print(f"[DEBUG] Cookies recibidas: {cookies}")
+        
+        # 1. Obtener información del admin desde el microservicio de auth
+        async with httpx.AsyncClient() as client:
+            print(f"[DEBUG] Consultando admin info en: {AUTH_MS_URL}/auth/admin-info")
+            auth_response = await client.get(
+                f"{AUTH_MS_URL}/auth/admin-info",
+                cookies=cookies
+            )
+            auth_response.raise_for_status()
+            admin_info = auth_response.json()
+            print(f"[DEBUG] Admin info obtenida: {admin_info}")
+            
+            # 2. Agregar nombreAdmin a los datos de residence
+            residence_payload = {
+                "nombreAdmin": admin_info["nombreAdmin"],
+                "code": residence_data["code"],
+                "parqueadero": residence_data.get("parqueadero"),
+                "bodega": residence_data.get("bodega")
+            }
+            print(f"[DEBUG] Payload para residence: {residence_payload}")
+            
+            # 3. Crear residence en el microservicio
+            print(f"[DEBUG] Enviando a: {RESIDENCE_MS_URL}/api/residences/crear")
+            residence_response = await client.post(
+                f"{RESIDENCE_MS_URL}/api/residences/crear",
+                json=residence_payload
+            )
+            print(f"[DEBUG] Respuesta del microservicio: {residence_response.status_code}")
+            residence_response.raise_for_status()
+            
+            result = residence_response.json()
+            print(f"[DEBUG] Resultado final: {result}")
+            return result
+            
+    except httpx.HTTPStatusError as e:
+        print(f"[ERROR] HTTP Error: {e.response.status_code} - {e.response.text}")
+        raise e
+    except Exception as e:
+        print(f"[ERROR] Error general: {str(e)}")
+        raise Exception(f"Error al crear residence: {str(e)}")
 
 async def crear_reserva(reserva_data):
     mutation = '''

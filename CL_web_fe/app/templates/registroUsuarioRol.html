@@ -130,17 +130,11 @@
       <input type="text" id="descripcionApartamento" placeholder="Ej: Torre 1 Apto 303">
 
       <label for="numeroParqueadero">Número de parqueadero (opcional)</label>
-      <input type="text" id="numeroParqueadero" placeholder="Ej: P12">
+      <input type="number" id="numeroParqueadero" placeholder="Ej: 12">
 
       <label for="numeroBodega">Número de bodega (opcional)</label>
-      <input type="text" id="numeroBodega" placeholder="Ej: B7">
+      <input type="number" id="numeroBodega" placeholder="Ej: 7">
     </div>
-
-
-    <!-- <div class="checkbox">
-      <input type="checkbox" id="terminos">
-      <label for="terminos">Acepto los <a href="#">términos y condiciones</a></label>
-    </div> -->
 
     <button class="button" onclick="registrarUsuario()">Registrar</button>
 
@@ -157,9 +151,6 @@
     // Cargar roles desde backend
     async function cargarRoles() {
       try {
-        //const res = await fetch('https://tuservidor/api/roles');
-        //const roles = await res.json();
-
          const roles = [
             { id: 1, nombre: 'ADMIN_CR' },
             { id: 2, nombre: 'PROPIEDAD_CR' },
@@ -191,46 +182,71 @@
 
     async function registrarUsuario() {
       const rol = rolSelect.value;
-      //const terminos = document.getElementById('terminos').checked;
       const descripcionApartamento = document.getElementById('descripcionApartamento').value;
       const numeroParqueadero = document.getElementById('numeroParqueadero').value;
       const numeroBodega = document.getElementById('numeroBodega').value;
 
-      if (!rol/* || !terminos*/) {
-        mostrarMensaje('Por favor completa todos los campos requeridos.', false);
+      if (!rol) {
+        mostrarMensaje('Por favor selecciona un rol.', false);
         return;
       }
 
+      // Preparar datos para enviar - manejar correctamente los valores vacíos
       const data = {
-        rol        
+        code: descripcionApartamento || `Usuario_${rol}_${Date.now()}`
       };
 
+      // Solo agregar parqueadero si tiene valor válido
+      if (numeroParqueadero && numeroParqueadero.trim() !== '') {
+        const parqueaderoNum = parseInt(numeroParqueadero);
+        if (!isNaN(parqueaderoNum)) {
+          data.parqueadero = parqueaderoNum;
+        }
+      }
+
+      // Solo agregar bodega si tiene valor válido
+      if (numeroBodega && numeroBodega.trim() !== '') {
+        const bodegaNum = parseInt(numeroBodega);
+        if (!isNaN(bodegaNum)) {
+          data.bodega = bodegaNum;
+        }
+      }
+
+      // Validar datos específicos por rol
       if (rol === 'PROPIEDAD_CR') {
-        if(!descripcionApartamento || !numeroParqueadero || !numeroBodega) {
-          mostrarMensaje('Por favor completa todos los campos de propiedad.', false);
+        if (!descripcionApartamento) {
+          mostrarMensaje('Por favor completa la descripción del apartamento.', false);
           return;
         }
-        data.descripcionApartamento = descripcionApartamento;
-        data.numeroParqueadero = numeroParqueadero;
-        data.numeroBodega = numeroBodega;
       }
 
       mostrarCargando(true);
       mensaje.classList.add('hidden');
 
       try {
-        const res = await fetch('https://tuservidor/api/crear-usuario', {
+        const res = await fetch('/fe-api/crear-residence', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify(data)
         });
 
-        if (!res.ok) throw new Error('Error en la creación');
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || 'Error en la creación');
+        }
 
         const result = await res.json();
-        mostrarMensaje(`Usuario creado. <br><a href="${result.link}" target="_blank">Haz clic aquí para continuar</a>`, true);
+        
+        if (result.success) {
+          mostrarMensaje(`¡${rol.replace('_CR', '')} registrado exitosamente!<br>Código: ${result.data.code}`, true);
+        } else {
+          throw new Error(result.message || 'Error desconocido');
+        }
+        
       } catch (err) {
-        mostrarMensaje('Hubo un error al registrar el usuario.', false);
+        console.error('Error:', err);
+        mostrarMensaje(`Error al registrar: ${err.message}`, false);
       } finally {
         mostrarCargando(false);
       }

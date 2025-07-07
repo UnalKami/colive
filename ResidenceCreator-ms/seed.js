@@ -54,8 +54,8 @@ const conjuntosData = [
 
 async function seed() {
   await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-  await Conjunto.deleteMany({});
-  await Residence.deleteMany({});
+  //await Conjunto.deleteMany({});
+  //await Residence.deleteMany({});
 
   const conjuntos = await Conjunto.insertMany(conjuntosData);
 
