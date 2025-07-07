@@ -52,3 +52,11 @@ def reservas():
 @require_roles('ADMIN_CR')
 def admin():
     return render_template('adminhome.html')
+
+@frontend_bp.route('/setSMTP')
+def setSMTP():
+    return render_template('setSMTP.html')
+
+@frontend_bp.route('/sendMail')
+def sendEmail():
+    return render_template('sendMail.html')

@@ -47,7 +47,7 @@ object SMTPAgentRoutes {
           post {
             entity(as[EnviarSMTPDTO]) { (dto: EnviarSMTPDTO) =>
               val askF: Future[OperationResult] =
-                actor.ask(ref => SMTPAgent.EnviarSMTP(dto.de, dto.para, dto.asunto, dto.cuerpo, ref))
+                actor.ask(ref => SMTPAgent.EnviarSMTP(dto.de, dto.para, dto.asunto, dto.username, dto.cuerpo, ref))
               onSuccess(askF) { result =>
                 if result.success then complete(StatusCodes.OK, result.message)
                 else            complete(StatusCodes.BadRequest, result.message)

@@ -179,6 +179,7 @@ services:
 
   CL_stadistics_ms:
     build: ./stadistics
+    image: conjunto-residencial-cl-stadistics-ms
     container_name: stadistics
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
@@ -257,7 +258,7 @@ services:
       - POSTGRES_USER=postgres2
       - POSTGRES_PASSWORD=cincopatodos
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres2"]
+      test: ["CMD-SHELL", "pg_isready -U postgres2 -d db2"]
       interval: 10s
       timeout: 5s
       retries: 5
