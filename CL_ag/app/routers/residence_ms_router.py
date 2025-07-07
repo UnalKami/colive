@@ -39,7 +39,7 @@ class UsuarioData(BaseModel):
     username: str
     password: str
     celular: str = "0"
-    rol: str = "RESIDENTE_CR"
+    rol: str = "PROPIEDAD_CR"  # ✅ CORREGIDO A PROPIEDAD_CR
 
 class ResidenceData(BaseModel):
     code: str

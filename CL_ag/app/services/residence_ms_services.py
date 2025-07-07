@@ -70,7 +70,7 @@ async def crear_residence_con_admin(residence_data, cookies):
 
 async def crear_usuario_propiedad_con_admin(data, cookies):
     """
-    Crear usuario residente y propiedad asociada obteniendo el nombre del admin desde la cookie.
+    Crear usuario propietario y propiedad asociada obteniendo el nombre del admin desde la cookie.
     """
     try:
         print(f"[DEBUG] Iniciando crear_usuario_propiedad_con_admin con datos: {data}")
@@ -85,7 +85,7 @@ async def crear_usuario_propiedad_con_admin(data, cookies):
             admin_info = auth_response.json()
             print(f"[DEBUG] Admin info obtenida: {admin_info}")
             
-            # 2. Crear usuario residente en el microservicio de auth
+            # 2. Crear usuario PROPIETARIO en el microservicio de auth
             user_payload = {
                 "username": data["user"]["username"],
                 "nombre": data["user"]["nombre"],
@@ -93,16 +93,17 @@ async def crear_usuario_propiedad_con_admin(data, cookies):
                 "password": data["user"]["password"],
                 "celular": int(data["user"]["celular"]) if data["user"]["celular"].isdigit() else 0
             }
-            print(f"[DEBUG] Creando usuario residente: {user_payload}")
+            print(f"[DEBUG] Creando usuario propietario: {user_payload}")
             
+            # ✅ CAMBIO: Usar endpoint de propietario en lugar de residente
             user_response = await client.post(
-                f"{AUTH_MS_URL}/api/registro/residente",
+                f"{AUTH_MS_URL}/api/registro/propietario",
                 json=user_payload
             )
             user_response.raise_for_status()
             user_result = user_response.json()
             user_id = user_result.get("usuarioId")
-            print(f"[DEBUG] Usuario creado con ID: {user_id}")
+            print(f"[DEBUG] Usuario propietario creado con ID: {user_id}")
             
             # 3. Crear residence asociada CON EL USER ID
             residence_payload = {
@@ -125,11 +126,12 @@ async def crear_usuario_propiedad_con_admin(data, cookies):
             # 4. Retornar ambos resultados
             return {
                 "success": True,
-                "message": "Usuario y propiedad creados y relacionados exitosamente",
+                "message": "Usuario propietario y propiedad creados y relacionados exitosamente",
                 "user": {
                     "id": user_id,
                     "username": data["user"]["username"],
-                    "nombre": data["user"]["nombre"]
+                    "nombre": data["user"]["nombre"],
+                    "rol": "PROPIEDAD_CR"
                 },
                 "residence": {
                     "id": residence_result["data"]["_id"],
