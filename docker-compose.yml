@@ -80,7 +80,7 @@ services:
     image: nginx:1.28.0-alpine-perl
     container_name: CL_auth_lb   
     volumes:
-      - ./CL_auth_lb/nginx:/etc/nginx     
+      - ./CL_auth_lb/nginx:/etc/nginx
     depends_on:
       - CL_auth_ms1
       - CL_auth_ms2
