@@ -39,11 +39,12 @@ def pruebaConexionAuth():
     return render_template('pruebaSaludo.html')
 
 @frontend_bp.route('/propietario')
+#solo el rol de propietario puede acceder
 def propietario():
     return render_template('panel_propietario.html')
 
 @frontend_bp.route('/reservas')
-@require_roles('RESIDENTE_CR')
+@require_roles('RESIDENTE_CR', 'ADMIN_CR')
 def reservas():
     return render_template('reservas.html')
 

@@ -55,10 +55,21 @@ const conjuntosData = [
 async function seed() {
   await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  const conjuntos = await Conjunto.insertMany(conjuntosData);
+  // Insertar conjuntos solo si no existen (por nombre) y obtener sus _id reales
+  let conjuntos = [];
+  for (const conjunto of conjuntosData) {
+    let exists = await Conjunto.findOne({ nombre: conjunto.nombre });
+    if (!exists) {
+      exists = await Conjunto.create(conjunto);
+      console.log(`Conjunto insertado: ${conjunto.nombre}`);
+    } else {
+      console.log(`Conjunto ya existe: ${conjunto.nombre}`);
+    }
+    conjuntos.push(exists);
+  }
 
+  // AHORA arma residenciasData usando los _id reales de los conjuntos
   const residenciasData = [
-    // Residencias para "Conjunto Altos del Sol"
     {
       code: "C1R1",
       conjuntoId: conjuntos[0]._id,
@@ -141,9 +152,18 @@ async function seed() {
     }
   ];
 
-  await Residence.insertMany(residenciasData);
+  // Insertar residencias solo si no existen (por code)
+  for (const residencia of residenciasData) {
+    const exists = await Residence.findOne({ code: residencia.code });
+    if (!exists) {
+      await Residence.create(residencia);
+      console.log(`Residencia insertada: ${residencia.code}`);
+    } else {
+      console.log(`Residencia ya existe: ${residencia.code}`);
+    }
+  }
 
-  console.log("Datos de prueba insertados correctamente.");
+  console.log("Seed finalizado.");
   process.exit();
 }
 

@@ -3,7 +3,8 @@ from pydantic import BaseModel
 from app.services.residence_ms_services import (
     crear_reserva, validar_reserva_disponible,
     editar_reserva, eliminar_reserva,
-    obtener_conjuntos_residencias, obtener_reservas
+    obtener_conjuntos_residencias, obtener_reservas,
+    obtener_panel_propietario
 )
 
 router = APIRouter()
@@ -110,5 +111,13 @@ async def obtener_reservas_endpoint(residenciaId: str = None):
     try:
         data = await obtener_reservas(residenciaId=residenciaId)
         return {"reservas": data}
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.get("/panelPropietario")
+async def panel_propietario_endpoint():
+    try:
+        data = await obtener_panel_propietario()
+        return data
     except Exception as e:
         return {"error": str(e)}

@@ -16,9 +16,23 @@ async def register_admin(admin_data):
     """
     async with httpx.AsyncClient() as client:
         print(f"Registering admin in auth with data: {admin_data}")
-        response = await client.post(f"{AUTH_MS_URL}/api/registro/admin", json=admin_data)        
-        response.raise_for_status()  # Raise an error for bad responses
-        return response.json()  # Return the JSON response from the microservice
+        try:
+            response = await client.post(
+                f"{AUTH_MS_URL}/api/registro/admin",
+                json=admin_data,
+            )
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            error_msg = f"Error al registrar admin (HTTP {e.response.status_code}): "
+            if e.response.status_code == 400:
+                try:
+                    error_detail = e.response.json().get("detail", "Datos inválidos")
+                    error_msg += f"Validación fallida: {error_detail}"
+                except:
+                    error_msg += "Verifica los campos (celular, correo, etc.)"
+                raise ValueError(error_msg) from e
+            raise  # Relanza otros errores HTTP (500, 401, etc.)
 
 async def post_login(username: str, password: str, return_full_response=False):
     print(f"Logging in user {username} with password {password}")

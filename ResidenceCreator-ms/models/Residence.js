@@ -23,7 +23,7 @@ const ReciboServicioSchema = new Schema({
 }, { _id: false });
 
 const ResidenceSchema = new Schema({
-  code: { type: String, required: true, unique: true },
+  code: { type: String, required: true},
   conjuntoId: { type: Schema.Types.ObjectId, ref: 'Conjunto', required: true },
   parqueaderos: [{ type: String }],
   bodegas: [{ type: String }],

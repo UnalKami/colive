@@ -52,7 +52,7 @@ def registrar_usuario_conjunto():
         data = response.json()
         return jsonify(data)
     except requests.RequestException as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error en api al registrarUsuarioConjunto": str(e)}), 500
 
 
 @api_bp.route('/login', methods=['POST'])
@@ -113,7 +113,7 @@ def eliminar_reserva():
 
 # esto es temporal, debe usar el token 
 @api_bp.route('/conjuntosResidencias', methods=['GET'])
-@require_roles('RESIDENTE_CR')
+@require_roles('RESIDENTE_CR', 'ADMIN_CR')
 def conjuntos_residencias():
     try:
         response = requests.get('http://CL_ag:8000/residence/conjuntosResidencias')
@@ -179,4 +179,15 @@ def enviar_correo():
         response.raise_for_status()
         return response.text
     except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/panelPropietario', methods=['GET'])
+@require_roles('RESIDENTE_CR', 'PROPIEDAD_CR', 'ADMIN_CR')
+def panel_propietario():
+    try:
+        response = requests.get('http://CL_ag:8000/residence/panelPropietario')
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
         return jsonify({"error": str(e)}), 500
