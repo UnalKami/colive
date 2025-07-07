@@ -1,4 +1,6 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
+from app.auth.public_routes import public_route
+from app.auth.decorators import require_roles
 import requests
 
 api_bp = Blueprint('api', __name__)
@@ -6,12 +8,24 @@ ESPERA_MAXIMA = 10  # Tiempo máximo de espera en segundos para las peticiones a
 
 # TODAS las rutas de la API deben comenzar con /fe-api en el frontend
 
+# NOMBRE ROLES:
+#  ADMIN_CR
+#  PROPIEDAD_CR
+#  RESIDENTE_CR
+#  ADMINISTRATIVO_CR
+#  SEGURIDAD_CR
+#  MANTENIMIENTO_CR
+#  ASEO_CR
+
+
 @api_bp.route('/status', methods=['GET'])
+@public_route
 def status():
     return jsonify({"status": "ok"})
 
 
 @api_bp.route('/testAuth', methods=['GET'])
+@public_route
 def testAuth():
     try:
         response = requests.get('http://CL_ag:8000/auth/saludo')
@@ -23,6 +37,7 @@ def testAuth():
 
 
 @api_bp.route('/registrarUsuarioConjunto', methods=['POST'])
+@public_route
 def registrar_usuario_conjunto():
     try:
         # Obtén el JSON enviado por el frontend
@@ -41,6 +56,7 @@ def registrar_usuario_conjunto():
 
 
 @api_bp.route('/login', methods=['POST'])
+@public_route
 def login():
     try:
         payload = request.get_json()
@@ -60,8 +76,11 @@ def login():
         return jsonify({"error": str(e)}), 500
     
 @api_bp.route('/crearReserva', methods=['POST'])
+@require_roles('USER_CR', 'ADMIN_CR',)
 def crear_reserva():
     datos = request.json
+    hash_conjunto = g.current_user.get('hash_conjunto')
+    datos['hashConjunto'] = hash_conjunto  # Añadir el hash del conjunto al payload
     try:
         response = requests.post('http://CL_ag:8000/residence/crearReserva', json=datos)
         response.raise_for_status()
@@ -94,6 +113,7 @@ def eliminar_reserva():
 
 # esto es temporal, debe usar el token 
 @api_bp.route('/conjuntosResidencias', methods=['GET'])
+@require_roles('RESIDENTE_CR')
 def conjuntos_residencias():
     try:
         response = requests.get('http://CL_ag:8000/residence/conjuntosResidencias')
