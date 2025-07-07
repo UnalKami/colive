@@ -267,3 +267,14 @@ services:
       - pg_guest_data:/var/lib/postgresql/data
     networks:
       - private-network
+      
+  kali:
+    build:
+      context: .
+      dockerfile: Dockerfile.kali
+    container_name: kali
+    tty: true
+    stdin_open: true
+    privileged: true
+    networks:
+      - private-network
