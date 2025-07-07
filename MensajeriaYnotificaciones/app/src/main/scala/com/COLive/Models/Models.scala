@@ -14,4 +14,4 @@ final case class SMTPConfigInfo(
 // Tipo de mensaje de respuesta
 final case class SMTPConfigs(configs: List[SMTPConfigInfo])
 final case class RegistrarSMTPDTO(email: String, smtpHost: String, smtpPort: Int, username: String, password: String)
-final case class EnviarSMTPDTO(de: String, para: String, asunto: String, cuerpo: String)
+final case class EnviarSMTPDTO(de: String, para: String, asunto: String, username: String, cuerpo: String)

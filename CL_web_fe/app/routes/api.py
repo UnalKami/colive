@@ -1,14 +1,31 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
+from app.auth.public_routes import public_route
+from app.auth.decorators import require_roles
 import requests
 
 api_bp = Blueprint('api', __name__)
+ESPERA_MAXIMA = 10  # Tiempo máximo de espera en segundos para las peticiones al gateway
+
+# TODAS las rutas de la API deben comenzar con /fe-api en el frontend
+
+# NOMBRE ROLES:
+#  ADMIN_CR
+#  PROPIEDAD_CR
+#  RESIDENTE_CR
+#  ADMINISTRATIVO_CR
+#  SEGURIDAD_CR
+#  MANTENIMIENTO_CR
+#  ASEO_CR
+
 
 @api_bp.route('/status', methods=['GET'])
+@public_route
 def status():
     return jsonify({"status": "ok"})
 
 
 @api_bp.route('/testAuth', methods=['GET'])
+@public_route
 def testAuth():
     try:
         response = requests.get('http://CL_ag:8000/auth/saludo')
@@ -20,6 +37,7 @@ def testAuth():
 
 
 @api_bp.route('/registrarUsuarioConjunto', methods=['POST'])
+@public_route
 def registrar_usuario_conjunto():
     try:
         # Obtén el JSON enviado por el frontend
@@ -38,6 +56,7 @@ def registrar_usuario_conjunto():
 
 
 @api_bp.route('/login', methods=['POST'])
+@public_route
 def login():
     try:
         payload = request.get_json()
@@ -57,8 +76,11 @@ def login():
         return jsonify({"error": str(e)}), 500
     
 @api_bp.route('/crearReserva', methods=['POST'])
+@require_roles('USER_CR', 'ADMIN_CR',)
 def crear_reserva():
     datos = request.json
+    hash_conjunto = g.current_user.get('hash_conjunto')
+    datos['hashConjunto'] = hash_conjunto  # Añadir el hash del conjunto al payload
     try:
         response = requests.post('http://CL_ag:8000/residence/crearReserva', json=datos)
         response.raise_for_status()
@@ -91,6 +113,7 @@ def eliminar_reserva():
 
 # esto es temporal, debe usar el token 
 @api_bp.route('/conjuntosResidencias', methods=['GET'])
+@require_roles('RESIDENTE_CR')
 def conjuntos_residencias():
     try:
         response = requests.get('http://CL_ag:8000/residence/conjuntosResidencias')
@@ -110,4 +133,50 @@ def obtener_reservas():
         return jsonify(response.json())
     except Exception as e:
         print("Error al llamar al gateway:", e)
+        return jsonify({"error": str(e)}), 500
+
+ENDPOINT_MENSAJERIA = 'http://CL_messaging_ms:7000/msg'
+    
+@api_bp.route('/registrarSMTP', methods=['POST'])
+def registrar_smtp():
+    try:
+        payload = request.get_json()
+        #TODO: @jhuertasd validar el payload antes de enviarlo
+        """
+        verifica que el usuario tenga rol administrador, 
+        si no lo tiene, retorna un error 403 Forbidden.
+        """
+        
+        response = requests.post(
+            ENDPOINT_MENSAJERIA +'/smtp/registrar',
+            json=payload
+        )
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+    
+@api_bp.route('/enviarCorreo', methods=['POST'])
+def enviar_correo():
+    try:
+        payload = request.get_json()
+        #TODO: @jhuertasd validar el payload antes de enviarlo
+        """
+        verifica que el usuario tenga rol administrador, 
+        si no lo tiene, retorna un error 403 Forbidden.
+        """
+        
+        response = requests.post(
+            ENDPOINT_MENSAJERIA +'/smtp/enviar',
+            json=payload
+        )
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return response.text
+    except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500

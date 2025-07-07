@@ -37,6 +37,7 @@ object SMTPAgent {
     de: String,
     para: String,
     asunto: String,
+    username: String,
     cuerpo: String,
     replyTo: ActorRef[OperationResult]
   ) extends Command
@@ -65,9 +66,9 @@ object SMTPAgent {
           }
           Behaviors.same
 
-        case EnviarSMTP(de, para, asunto, cuerpo, replyTo) =>
+        case EnviarSMTP(de, para, asunto, username, cuerpo, replyTo) =>
           logger.info(s"Recibido EnviarSMTP de=$de para=$para asunto=$asunto")
-          MongoService.obtenerCorreoConfig(de).onComplete {
+          MongoService.obtenerCorreoConfig(de, username).onComplete {
             case Success(optConfig) =>
               optConfig match {
                 case None =>
@@ -77,6 +78,7 @@ object SMTPAgent {
                   logger.info(s"Configuración SMTP encontrada para $de")
                   MongoService.agregarAColaEnvio(
                     de = de,
+                    username = username,
                     para = para,
                     asunto = asunto,
                     cuerpo = cuerpo
@@ -122,22 +124,29 @@ object SMTPAgent {
   def procesarCola()(using ec: ExecutionContext, logger: org.slf4j.Logger): Unit = {
     MongoService.obtenerPrimerCorreoEnCola().foreach {
       case Some(correo) =>
-        MongoService.obtenerCorreoConfig(correo.de).foreach {
+        MongoService.obtenerCorreoConfig(correo.de, correo.username).foreach {
           case Some(config) =>
+            logger.info(s"Procesando correo de ${correo.de} a ${correo.para} con configuración SMTP: ${config.smtpHost}:${config.smtpPort}")
             val props = new java.util.Properties()
             props.put("mail.smtp.auth", "true")
-            props.put("mail.smtp.ssl.enable", "true")
+            if (config.smtpPort == 587) {
+              logger.info("Usando STARTTLS para SMTP")
+              props.put("mail.smtp.starttls.enable", "true") // Para STARTTLS (Gmail 587)
+            } else if (config.smtpPort == 465) {
+              logger.info("Usando SSL puro para SMTP")
+              props.put("mail.smtp.ssl.enable", "true") // Para SSL puro
+            }
             props.put("mail.smtp.host", config.smtpHost)
             props.put("mail.smtp.port", config.smtpPort.toString)
             val session = MailSession.getInstance(props, new MailAuthenticator() {
               override protected def getPasswordAuthentication =
-                new PasswordAuthentication(config.username, config.passwordPlain)
+                new PasswordAuthentication(config.email, config.passwordPlain)
             })
             val message = new MimeMessage(session)
             message.setFrom(new InternetAddress(correo.de))
             message.setRecipients(MailMessage.RecipientType.TO, correo.para)
             message.setSubject(correo.asunto)
-            message.setText(correo.cuerpo)
+            message.setContent(correo.cuerpo, "text/html; charset=utf-8")
             try {
               logger.info(s"Enviando correo de ${correo.de} a ${correo.para}")
               MailTransport.send(message)
