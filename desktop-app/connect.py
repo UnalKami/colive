@@ -1,37 +1,64 @@
-# connect.py
+# connect2.py
 import requests
+import urllib3
 
-BASE_URL = "http://localhost:8000"
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+BASE_URL = "https://localhost:8443"
+ENDPOINT = f"{BASE_URL}/orc/registerUserCR"
+LOGIN_URL = f"{BASE_URL}/auth/login"
+
 
 def login_user(username: str, password: str):
-    url = f"{BASE_URL}/auth/login"
+    """
+    Realiza autenticación de usuario.
+    Retorna (True, datos) si es exitoso, o (False, mensaje) si falla.
+    """
     payload = {"username": username, "password": password}
     try:
-        r = requests.post(url, json=payload, timeout=5)
+        r = requests.post(LOGIN_URL, json=payload, timeout=5, verify=False)
     except requests.RequestException as e:
         return False, f"Error de red: {e}"
     if r.ok:
         return True, r.json()
-    # extraemos mensaje de error
     try:
         detail = r.json().get("detail") or r.json().get("error")
     except ValueError:
         detail = r.text
     return False, detail
 
+
 def register_user(user_fields: dict, conjunto_fields: dict):
     """
-    user_fields debe contener:
-      username, nombre, correo, contraseña
-    conjunto_fields debe contener las variables de tu GraphQL:
-      nombre, nombreAdministrador, direccion, ciudad, departamento, amenidades, configuraciones
+    Envía el registro de usuario + conjunto al Orquestador.
+    user_fields debe tener:
+      - username
+      - nombre
+      - correo
+      - password
+      - celular
+    conjunto_fields debe tener:
+      - nombre
+      - nombreAdministrador
+      - direccion
+      - ciudad
+      - departamento
+      - amenidades (lista de { nombre: str })
+      - configuraciones (lista de { tipoParqueadero: bool,
+                                   numParqueadero: int,
+                                   tipoAlmacen: bool,
+                                   numAlmacen: int })
+    Retorna (True, respuesta-json) o (False, detalle-error).
     """
-    # Tu query GraphQL
     query = """
     mutation CrearConjunto(
-        $nombre: String!, $nombreAdministrador: String!,
-        $direccion: String!, $ciudad: String!, $departamento: String!,
-        $amenidades: [AmenidadInput], $configuraciones: [ConfigInput]
+        $nombre: String!,
+        $nombreAdministrador: String!,
+        $direccion: String!,
+        $ciudad: String!,
+        $departamento: String!,
+        $amenidades: [AmenidadInput],
+        $configuraciones: [ConfigInput]
     ) {
         createConjunto(
             nombre: $nombre,
@@ -41,28 +68,29 @@ def register_user(user_fields: dict, conjunto_fields: dict):
             departamento: $departamento,
             amenidades: $amenidades,
             configuraciones: $configuraciones
-        ) { id nombre direccion ciudad }
+        ) {
+            id
+            nombre
+            direccion
+            ciudad
+        }
     }
     """
     payload = {
+        "user": user_fields,
         "conjunto": {
             "query": query,
             "variables": conjunto_fields
-        },
-        "user": user_fields
+        }
     }
-
-    url = f"{BASE_URL}/orc/registerUserCR"
     try:
-        r = requests.post(url, json=payload, timeout=5)
+        r = requests.post(ENDPOINT, json=payload, timeout=10, verify=False)
     except requests.RequestException as e:
         return False, f"Error de red: {e}"
-
     if r.ok:
-        return True, "✅ Registro exitoso."
+        return True, r.json()
     try:
-        # Orchestrator suele devolver {"detail":"…"} o {"errors":[…]}
-        detail = r.json().get("detail") or r.json().get("errors") or r.text
+        detail = r.json().get("detail") or r.json().get("errors")
     except ValueError:
         detail = r.text
     return False, detail
