@@ -68,6 +68,83 @@ async def crear_residence_con_admin(residence_data, cookies):
         print(f"[ERROR] Error general: {str(e)}")
         raise Exception(f"Error al crear residence: {str(e)}")
 
+async def crear_usuario_propiedad_con_admin(data, cookies):
+    """
+    Crear usuario residente y propiedad asociada obteniendo el nombre del admin desde la cookie.
+    """
+    try:
+        print(f"[DEBUG] Iniciando crear_usuario_propiedad_con_admin con datos: {data}")
+        
+        # 1. Obtener información del admin desde el microservicio de auth
+        async with httpx.AsyncClient() as client:
+            auth_response = await client.get(
+                f"{AUTH_MS_URL}/auth/admin-info",
+                cookies=cookies
+            )
+            auth_response.raise_for_status()
+            admin_info = auth_response.json()
+            print(f"[DEBUG] Admin info obtenida: {admin_info}")
+            
+            # 2. Crear usuario residente en el microservicio de auth
+            user_payload = {
+                "username": data["user"]["username"],
+                "nombre": data["user"]["nombre"],
+                "correo": data["user"]["correo"],
+                "password": data["user"]["password"],
+                "celular": int(data["user"]["celular"]) if data["user"]["celular"].isdigit() else 0
+            }
+            print(f"[DEBUG] Creando usuario residente: {user_payload}")
+            
+            user_response = await client.post(
+                f"{AUTH_MS_URL}/api/registro/residente",
+                json=user_payload
+            )
+            user_response.raise_for_status()
+            user_result = user_response.json()
+            user_id = user_result.get("usuarioId")
+            print(f"[DEBUG] Usuario creado con ID: {user_id}")
+            
+            # 3. Crear residence asociada CON EL USER ID
+            residence_payload = {
+                "nombreAdmin": admin_info["nombreAdmin"],
+                "code": data["residence"]["code"],
+                "parqueadero": data["residence"].get("parqueadero"),
+                "bodega": data["residence"].get("bodega"),
+                "userId": user_id  # ✅ RELACIÓN AGREGADA
+            }
+            print(f"[DEBUG] Creando residence con userId: {residence_payload}")
+            
+            residence_response = await client.post(
+                f"{RESIDENCE_MS_URL}/api/residences/crear",
+                json=residence_payload
+            )
+            residence_response.raise_for_status()
+            residence_result = residence_response.json()
+            print(f"[DEBUG] Residence creada: {residence_result}")
+            
+            # 4. Retornar ambos resultados
+            return {
+                "success": True,
+                "message": "Usuario y propiedad creados y relacionados exitosamente",
+                "user": {
+                    "id": user_id,
+                    "username": data["user"]["username"],
+                    "nombre": data["user"]["nombre"]
+                },
+                "residence": {
+                    "id": residence_result["data"]["_id"],
+                    "code": residence_result["data"]["code"],
+                    "userId": user_id  # ✅ CONFIRMACIÓN DE RELACIÓN
+                }
+            }
+            
+    except httpx.HTTPStatusError as e:
+        print(f"[ERROR] HTTP Error: {e.response.status_code} - {e.response.text}")
+        raise Exception(f"Error HTTP {e.response.status_code}: {e.response.text}")
+    except Exception as e:
+        print(f"[ERROR] Error general: {str(e)}")
+        raise Exception(f"Error al crear usuario y propiedad: {str(e)}")
+
 async def crear_reserva(reserva_data):
     mutation = '''
     mutation CrearReserva($reserva: ReservaInput!) {

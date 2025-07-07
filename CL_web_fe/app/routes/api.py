@@ -84,6 +84,20 @@ def crear_residence():
         return jsonify(response.json())
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-usuario-propiedad', methods=['POST'])
+def crear_usuario_propiedad():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/residence/crear-usuario-propiedad',
+            json=payload,
+            cookies=request.cookies
+        )
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
     
 @api_bp.route('/crearReserva', methods=['POST'])
 def crear_reserva():

@@ -4,7 +4,7 @@ from app.services.residence_ms_services import (
     crear_reserva, validar_reserva_disponible,
     editar_reserva, eliminar_reserva,
     obtener_conjuntos_residencias, obtener_reservas,
-    crear_residence_con_admin
+    crear_residence_con_admin, crear_usuario_propiedad_con_admin
 )
 
 router = APIRouter()
@@ -33,10 +33,34 @@ class CrearResidenceRequest(BaseModel):
     parqueadero: int = None
     bodega: int = None
 
+class UsuarioData(BaseModel):
+    nombre: str
+    correo: str
+    username: str
+    password: str
+    celular: str = "0"
+    rol: str = "RESIDENTE_CR"
+
+class ResidenceData(BaseModel):
+    code: str
+    parqueadero: int = None
+    bodega: int = None
+
+class CrearUsuarioPropiedadRequest(BaseModel):
+    user: UsuarioData
+    residence: ResidenceData
+
 @router.post("/crear-residence")
 async def crear_residence(request: CrearResidenceRequest, http_request: Request):
     try:
         return await crear_residence_con_admin(request.dict(), http_request.cookies)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/crear-usuario-propiedad")
+async def crear_usuario_propiedad(request: CrearUsuarioPropiedadRequest, http_request: Request):
+    try:
+        return await crear_usuario_propiedad_con_admin(request.dict(), http_request.cookies)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

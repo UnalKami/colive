@@ -6,7 +6,7 @@ const Conjunto = require('../models/Conjunto');
 // POST /api/residences/crear
 router.post('/crear', async (req, res) => {
   try {
-    const { nombreAdmin, code, parqueadero, bodega } = req.body;
+    const { nombreAdmin, code, parqueadero, bodega, userId } = req.body;
 
     // Validar datos requeridos
     if (!nombreAdmin || !code) {
@@ -24,13 +24,18 @@ router.post('/crear', async (req, res) => {
       });
     }
 
-    // 2. Crear residence con conjuntoId
+    // 2. Crear residence con conjuntoId y userId (si se proporciona)
     const residenceData = {
       code: code,
       conjuntoId: conjunto._id,
       parqueadero: parqueadero ? parseInt(parqueadero) : null,
       bodega: bodega ? parseInt(bodega) : null
     };
+
+    // Agregar userId si se proporciona (para relacionar con usuario)
+    if (userId) {
+      residenceData.userId = parseInt(userId);
+    }
 
     const nuevaResidence = new Residence(residenceData);
     const residenceGuardada = await nuevaResidence.save();
