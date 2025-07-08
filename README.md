@@ -161,14 +161,15 @@ Esta arquitectura asegura el aislamiento lógico de capas críticas, refuerza la
 
 El despliegue se realiza localmente en una estación de trabajo que ejecuta múltiples contenedores Docker. Todos los servicios del sistema corren en contenedores que comparten el mismo host físico, organizado en las redes mencionadas anteriormente. Las características relevantes del equipo de despliegue son:
 
-Sistema operativo: [especificar, por ejemplo: Ubuntu 22.04 LTS / Windows 11 Pro WSL2]
+* Sistema operativo: Ubuntu T24
 
-CPU: Ryzen 7 7435HS, 16 Nucleos
+* CPU: Ryzen 7 7435HS - 16 Núcleos
 
-Memoria RAM: 8GB DDR4
+* Memoria RAM: 8GB DDR4/DDR5
 
-Almacenamiento: SSD Adata 215GB
+* Almacenamiento: 215GB SSD Adata
 
+* GPU: RTX 3050 4GB VRAM
 
 | Componente          | Entorno de ejecución       | Red          | Justificación Tecnológica                                                                 |
 |---------------------|----------------------------|--------------|--------------------------------------------------------------------------------------------|
@@ -192,19 +193,19 @@ Almacenamiento: SSD Adata 215GB
 ![VistaDescomposicion](./readmeAssets/DecompositionViewP3.png)
 #### Description of architectural elements and relations
 
-1. Módulo de Autenticación (Login)
+**1. Módulo de Autenticación (Login)**
 Este módulo permite a los usuarios autenticarse en el sistema utilizando sus credenciales (nombre de usuario y contraseña). El flujo comienza desde el cliente (web o escritorio), atraviesa los proxies (CL_web_rp o CL_desktop_rp), y llega al API Gateway (CL_ag). Este último enruta la solicitud al balanceador de carga (CL_auth_lb), que distribuye la validación entre tres instancias del microservicio de autenticación (CL_auth_ms).
 
     El microservicio consulta la base de datos de autenticación (CL_auth_db) para verificar las credenciales. En caso de éxito, se firma un token JWT usando una llave privada, y se devuelve al cliente como una cookie segura, estableciendo la sesión del usuario.
 
-2. Módulo de Registro de Usuarios y Conjuntos
+**2. Módulo de Registro de Usuarios y Conjuntos**
 Este módulo gestiona la creación de nuevos conjuntos residenciales y la asociación del primer usuario como administrador del conjunto. El flujo sigue el mismo camino que el módulo de autenticación hasta llegar al API Gateway, pero allí se activa una orquestación entre los microservicios de autenticación (CL_auth_ms) y conjuntos residenciales (CL_residence_ms).
 
     El Gateway registra al usuario en la base de datos de autenticación (CL_auth_db), luego registra el conjunto en CL_residence_db, y finalmente asocia el conjunto con el usuario mediante una relación que conecta el ObjectId de MongoDB con el identificador del usuario. En caso de fallos durante el proceso, el Gateway ejecuta un rollback transaccional, eliminando cualquier información parcial para garantizar la integridad del sistema.
 
     Adicionalmente, este módulo permite que un administrador cree nuevos usuarios con roles específicos (propietario, residente, personal de aseo, vigilancia, mantenimiento, administrativo), y los asocie a su conjunto residencial correspondiente.
     
-3. Módulo de Mensajería SMTP
+**3. Módulo de Mensajería SMTP**
 Este módulo permite a los usuarios del sistema enviar comunicaciones internas por correo electrónico. Luego de atravesar el flujo tradicional hasta el API Gateway, las solicitudes se redirigen al microservicio de mensajería (CL_messaging_ms), donde los usuarios pueden:
 
     * Registrar una cuenta de correo saliente (por ejemplo, del conjunto residencial).
@@ -215,7 +216,7 @@ Este módulo permite a los usuarios del sistema enviar comunicaciones internas p
 
     El microservicio de mensajería utiliza una base de datos MongoDB (CL_messaging_db) para almacenar la configuración y el historial de los mensajes enviados.
 
-4. Módulo de Servicios Residenciales
+**4. Módulo de Servicios Residenciales**
 Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar reservas y uso de espacios comunes dentro del conjunto residencial, como:
 
     * Salones comunales
@@ -245,15 +246,37 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
 ![VistaDescomposicion](./readmeAssets/escenario4.png)
 
 ### Applied architectural tactics
- * Encrypt Data (Resist Attack)
- * Limit Access (Resist Attack)
- * Authenticate Actor (Resist Attack)
+ * **Encrypt Data (Resist Attack):** Protege la confidencialidad de la información transmitida.
+ * **Limit Access (Resist Attack):** Restringe el acceso directo a componentes internos del sistema.
+ * **Authenticate Actor (Resist Attack):** Verifica la identidad de los actores que interactúan con el sistema.
 
 ### Applied architectural patterns
- * Secure Channel Pattern (HTTPS)
- * Reverse Proxy Pattern
- * Network Segmentation Pattern
- * Authentication with Asymmetric JWT Pattern
+ **1. Secure Channel Pattern (HTTPS):** Para proteger la confidencialidad e integridad de los datos en tránsito entre los clientes (navegador y app de escritorio) y el sistema, se implementa HTTPS mediante servidores NGINX que funcionan como proxies inversos. Estos servidores gestionan los certificados SSL y cifran toda la comunicación entrante desde Internet antes de redirigirla al resto del sistema.
+Aunque los conectores internos del sistema (entre microservicios) usan HTTP sin cifrado, esto no representa una vulnerabilidad, ya que dichos servicios solo son accesibles desde la red privada interna de Docker, protegida por el patrón de segmentación de red.
+
+2. **Reverse Proxy Pattern:** Se utiliza NGINX como reverse proxy en los puntos de entrada (CL_web_rp, CL_desktop_rp) para:
+
+    * Manejar las conexiones HTTPS.
+
+    * Filtrar y enrutar peticiones hacia el API Gateway o el frontend web.
+
+    * Proteger y anonimizar la infraestructura interna, permitiendo que solo estos componentes estén expuestos públicamente.
+
+    Además, NGINX ayuda a mitigar ataques DoS mediante su configuración por defecto y puede ser reforzado con límites de conexión, listas negras, y reglas adicionales para manejo de tráfico malicioso.
+
+ 3. **Network Segmentation Pattern:** Se creó una arquitectura de red segmentada con Docker, dividiendo la infraestructura en:
+
+    * Subred pública: Contiene únicamente los reverse proxies, los únicos servicios accesibles desde el exterior, mapeados al nodo de despliegue.
+
+    * Subred privada: Aloja todos los microservicios y bases de datos, los cuales solo pueden ser accedidos desde los proxies a través del DNS interno de Docker.
+
+    Esta segmentación restringe de manera efectiva el acceso no autorizado a los componentes sensibles del sistema.
+
+ 4. **Authentication with Asymmetric JWT Pattern:** El microservicio de autenticación genera un token JWT firmado con una llave privada tras validar las credenciales del usuario. Este token se almacena como cookie segura en el navegador o la app de escritorio.
+
+    Cuando un componente del sistema (como CL_web_fe o CL_ag) recibe una solicitud, verifica la firma del JWT con una llave pública, garantizando su integridad y origen.
+
+    Esto permite autenticar al usuario, validar su rol y autorizar o denegar el acceso a vistas y recursos protegidos, evitando accesos indebidos incluso si se altera el contenido del token.
  
 ### **Performance and Scalability**
 ### Performance scenarios
@@ -264,21 +287,27 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
      
 ### Applied architectural tactics
 
-* Mantain Multiple Copies of Computations (Manage Resources)
-* Limit event responses (Control Resource Demand)
-* Increase Efficiency (Control Resource Demand)
+* **Mantain Multiple Copies of Computations (Manage Resources):**  Replicación de microservicios en puntos críticos del sistema (como el servicio de autenticación).
+* **Limit event responses (Control Resource Demand):** Limitar los tiempos de espera de respuesta para evitar bloqueos prolongados en el sistema.
+* **Increase Efficiency (Control Resource Demand):** Optimización de algoritmos que se ejecutan en el sistema.
 
 ### Applied architectural patterns
 
-* Load Balancer Pattern
-* Reverse Proxy Pattern
+1. **Load Balancer Pattern:** Se implementó un balanceador de carga (CL_auth_lb) utilizando NGINX, configurado con el algoritmo por defecto Round Robin, para distribuir equitativamente las solicitudes entrantes entre tres instancias del microservicio de autenticación (CL_auth_ms).
+
+    Este microservicio fue seleccionado para replicación debido a su alta carga operativa, ya que gestiona procesos críticos como el inicio de sesión, el registro de usuarios administradores, y la creación de nuevos usuarios con roles específicos.
+
+    Este patrón mejora la disponibilidad, rendimiento y tolerancia a fallos del sistema.
+* **Frontend Server Limit Event Response Pattern:** Este patrón, definido e implementado por el equipo, aplica la táctica de controlar la demanda de recursos desde el lado servidor del frontend.
+Se establece un límite de 10 segundos para esperar la respuesta de cualquier solicitud. Si la respuesta excede este tiempo, la conexión se cierra automáticamente.
+Esto evita que el sistema se sature con conexiones persistentes, permitiendo a los microservicios liberar carga de solicitudes y reducir el riesgo de colapso en el sistema. 
 
 ### Performance testing analysis and results
 
 ### *Recursos fisicos*
 |Nombre del recursos|Modelo|Capacidad|Función|
 |-------------------|------|---------|-------|
-|CPU|Ryzen 7 7435HS|16 Nucleos|Procesamiento de los mucroservicios|
+|CPU|Ryzen 7 7435HS|16 Nucleos|Procesamiento de los microservicios|
 |RAM|DDR4/DDR5|8GB|Almacenamiento temporal de sesiones, cache de autenticación JWT, buffers de bases de datos y memoria heap de aplicaciones Java|
 |Almacenamiento|SSD Adata|215GB|Persistencia de datos en bases de datos (CL_auth_db, CL_residence_db, CL_guest_db, CL_messaging_db) y logs del sistema|
 |Red|Fibra Optica/WiFi|100 Mbps|Comunicación entre contenedores Docker, transferencia de datos HTTP/HTTPS y conexiones TCP a bases de datos|
