@@ -64,9 +64,8 @@ Almacena la información de usuarios, contraseñas encriptadas, roles y relacion
 Base de datos NoSQL que almacena información sobre los conjuntos, reservas, residencias y entradas de visitantes.
 * **CL_messaging_db (Base de Datos de Mensajería):**
 Almacena la cola de correos dentro del sistema.
-# REVISAR
 * **CL_guest_db (Base de Datos de Invitados):**
-Guarda la información de las visitas e invitados que los residentes autorizan para ingresar.
+Guarda la información de las visitas peatonales y vehiculares para ser administrados por un usuario vigilante.
 
 #### Conectores y relaciones
 * **Navegador → HTTPS → CL_web_rp:**  Los navegadores web se comunican de forma segura mediante HTTPS con el proxy inverso web.
@@ -94,7 +93,6 @@ Conexión JDBC sobre TCP para acceder a la base de datos relacional de autentica
 Conexión a base de datos NoSQL usando el driver Mongoose (Node.js).
 * **CL_messaging_ms → TCP/Reactive Streams MongoDB → CL_messaging_db:**
 Conexión entre el microservicio de mensajería (Scala) y la base de datos MongoDB usando el driver oficial Reactive Streams de MongoDB (asincrónico y no bloqueante).
-# REVISAR
 * **CL_residence_ms → TCP/pg → CL_guest_db:**
 Conexión PostgreSQL usando el driver pg para acceder a la base de datos de invitados.
 
@@ -197,36 +195,36 @@ El despliegue se realiza localmente en una estación de trabajo que ejecuta múl
 **1. Módulo de Autenticación (Login)**
 Este módulo permite a los usuarios autenticarse en el sistema utilizando sus credenciales (nombre de usuario y contraseña). El flujo comienza desde el cliente (web o escritorio), atraviesa los proxies (CL_web_rp o CL_desktop_rp), y llega al API Gateway (CL_ag). Este último enruta la solicitud al balanceador de carga (CL_auth_lb), que distribuye la validación entre tres instancias del microservicio de autenticación (CL_auth_ms).
 
-    El microservicio consulta la base de datos de autenticación (CL_auth_db) para verificar las credenciales. En caso de éxito, se firma un token JWT usando una llave privada, y se devuelve al cliente como una cookie segura, estableciendo la sesión del usuario.
+El microservicio consulta la base de datos de autenticación (CL_auth_db) para verificar las credenciales. En caso de éxito, se firma un token JWT usando una llave privada, y se devuelve al cliente como una cookie segura, estableciendo la sesión del usuario.
 
 **2. Módulo de Registro de Usuarios y Conjuntos**
 Este módulo gestiona la creación de nuevos conjuntos residenciales y la asociación del primer usuario como administrador del conjunto. El flujo sigue el mismo camino que el módulo de autenticación hasta llegar al API Gateway, pero allí se activa una orquestación entre los microservicios de autenticación (CL_auth_ms) y conjuntos residenciales (CL_residence_ms).
 
-    El Gateway registra al usuario en la base de datos de autenticación (CL_auth_db), luego registra el conjunto en CL_residence_db, y finalmente asocia el conjunto con el usuario mediante una relación que conecta el ObjectId de MongoDB con el identificador del usuario. En caso de fallos durante el proceso, el Gateway ejecuta un rollback transaccional, eliminando cualquier información parcial para garantizar la integridad del sistema.
+El Gateway registra al usuario en la base de datos de autenticación (CL_auth_db), luego registra el conjunto en CL_residence_db, y finalmente asocia el conjunto con el usuario mediante una relación que conecta el ObjectId de MongoDB con el identificador del usuario. En caso de fallos durante el proceso, el Gateway ejecuta un rollback transaccional, eliminando cualquier información parcial para garantizar la integridad del sistema.
 
-    Adicionalmente, este módulo permite que un administrador cree nuevos usuarios con roles específicos (propietario, residente, personal de aseo, vigilancia, mantenimiento, administrativo), y los asocie a su conjunto residencial correspondiente.
+Adicionalmente, este módulo permite que un administrador cree nuevos usuarios con roles específicos (propietario, residente, personal de aseo, vigilancia, mantenimiento, administrativo), y los asocie a su conjunto residencial correspondiente.
     
 **3. Módulo de Mensajería SMTP**
 Este módulo permite a los usuarios del sistema enviar comunicaciones internas por correo electrónico. Luego de atravesar el flujo tradicional hasta el API Gateway, las solicitudes se redirigen al microservicio de mensajería (CL_messaging_ms), donde los usuarios pueden:
 
-    * Registrar una cuenta de correo saliente (por ejemplo, del conjunto residencial).
+   * Registrar una cuenta de correo saliente (por ejemplo, del conjunto residencial).
 
-    * Redactar mensajes personalizados.
+   * Redactar mensajes personalizados.
 
-    * Enviar correos a múltiples destinatarios internos, filtrando por roles, apartamentos o edificios (por ejemplo, enviar un comunicado a todos los propietarios).
+   * Enviar correos a múltiples destinatarios internos, filtrando por roles, apartamentos o edificios (por ejemplo, enviar un comunicado a todos los propietarios).
 
-    El microservicio de mensajería utiliza una base de datos MongoDB (CL_messaging_db) para almacenar la configuración y el historial de los mensajes enviados.
+   El microservicio de mensajería utiliza una base de datos MongoDB (CL_messaging_db) para almacenar la configuración y el historial de los mensajes enviados.
 
 **4. Módulo de Servicios Residenciales**
 Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar reservas y uso de espacios comunes dentro del conjunto residencial, como:
 
-    * Salones comunales
-    * Piscinas
-    * Canchas deportivas
-    * Parqueaderos
-    * Zonas BBQ u otras amenidades
+   * Salones comunales
+   * Piscinas
+   * Canchas deportivas
+   * Parqueaderos
+   * Zonas BBQ u otras amenidades
 
-    La lógica de este módulo se ejecuta en el microservicio CL_residence_ms, el cual gestiona las reglas de disponibilidad, restricciones por tipo de usuario y control de concurrencia. Toda la información relevante se almacena en CL_residence_db (estructura del conjunto) y CL_guest_db (asociaciones con usuarios).
+   La lógica de este módulo se ejecuta en el microservicio CL_residence_ms, el cual gestiona las reglas de disponibilidad, restricciones por tipo de usuario y control de concurrencia. Toda la información relevante se almacena en CL_residence_db (estructura del conjunto) y CL_guest_db (asociaciones con usuarios).
 
 
 # **Quality Attributes**
