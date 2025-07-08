@@ -62,11 +62,11 @@ Proporciona estadísticas agregadas y métricas sobre la actividad del sistema, 
 Almacena la información de usuarios, contraseñas encriptadas, roles y relaciones con conjuntos residenciales y residencias.
 * **CL_residence_db (Base de Datos de Conjuntos Residenciales):**
 Base de datos NoSQL que almacena información sobre los conjuntos y las residencias.
+* **CL_messaging_db (Base de Datos de Mensajería):**
+Almacena la cola de correos dentro del sistema.
 # REVISAR
 * **CL_guest_db (Base de Datos de Invitados):**
 Guarda la información de las visitas e invitados que los residentes autorizan para ingresar.
-* **CL_messaging_db (Base de Datos de Mensajería):**
-Almacena el historial de conversaciones y mensajes enviados dentro del sistema.
 
 #### Conectores y relaciones
 * **Navegador → HTTPS → CL_web_rp:**  Los navegadores web se comunican de forma segura mediante HTTPS con el proxy inverso web.
@@ -92,11 +92,12 @@ El API Gateway enruta las consultas de estadísticas al microservicio especializ
 Conexión JDBC sobre TCP para acceder a la base de datos relacional de autenticación.
 * **CL_residence_ms → TCP/Mongoose → CL_residence_db:**
 Conexión a base de datos NoSQL usando el driver Mongoose (Node.js).
+* **CL_messaging_ms → TCP/Reactive Streams MongoDB → CL_messaging_db:**
+Conexión entre el microservicio de mensajería (Scala) y la base de datos MongoDB usando el driver oficial Reactive Streams de MongoDB (asincrónico y no bloqueante).
 # REVISAR
 * **CL_residence_ms → TCP/pg → CL_guest_db:**
 Conexión PostgreSQL usando el driver pg para acceder a la base de datos de invitados.
-* **CL_messaging_ms → TCP/MongoDB → CL_messaging_db:**
-Conexión entre el microservicio de mensajería (Scala) y su base de datos NoSQL mediante el driver nativo.
+
 
 ### **Layered Structure**
 #### Layered View
