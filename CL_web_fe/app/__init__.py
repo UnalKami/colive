@@ -4,6 +4,9 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object('app.config.Config')
 
+    from app.auth.middleware import jwt_auth_middleware
+    jwt_auth_middleware(app)
+
     from .routes.frontend import frontend_bp
     from .routes.api import api_bp
 

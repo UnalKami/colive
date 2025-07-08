@@ -7,8 +7,16 @@ async def register_conjunto(conjunto_data):
     """
     async with httpx.AsyncClient() as client:
         print(f"Registering conjunto with data: {conjunto_data}")
-        response = await client.post(f"{RESIDENCE_MS_URL}/graphql", json=conjunto_data)        
-        response.raise_for_status()  # Raise an error for bad responses
+        try:
+            print('dentro del try')
+            response = await client.post(f"{RESIDENCE_MS_URL}/graphql", json=conjunto_data)
+            response.raise_for_status()  # Raise an error for bad responses
+        except httpx.HTTPStatusError as exc:
+            print('dentro del except')
+            # Personaliza el mensaje de error aquí
+            raise Exception(
+                f"Error al registrar el conjunto: {exc.response.status_code} - {exc.response.text}"
+            ) from exc
         return response.json()  # Return the JSON response from the microservice
 
 async def delete_conjunto(hash_conjunto):
@@ -162,3 +170,33 @@ async def obtener_reservas(residenciaId=None):
         response.raise_for_status()
         data = response.json()
         return data["data"]["reservas"]
+
+async def obtener_panel_propietario():
+    query = '''
+    query {
+      conjuntos {
+        id
+        nombre
+        amenidades {
+          nombre
+          costo
+        }
+      }
+      residences {
+        id
+        code
+        conjuntoId
+      }
+    }
+    '''
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/graphql",
+            json={"query": query}
+        )
+        response.raise_for_status()
+        data = response.json()
+        return {
+            "conjuntos": data["data"]["conjuntos"],
+            "residencias": data["data"]["residences"]
+        }

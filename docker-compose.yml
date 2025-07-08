@@ -80,7 +80,7 @@ services:
     image: nginx:1.28.0-alpine-perl
     container_name: CL_auth_lb   
     volumes:
-      - ./CL_auth_lb/nginx:/etc/nginx     
+      - ./CL_auth_lb/nginx:/etc/nginx
     depends_on:
       - CL_auth_ms1
       - CL_auth_ms2
@@ -178,8 +178,9 @@ services:
       - private-network
 
   CL_stadistics_ms:
+    image: cl_stadistics_ms:latest
     build: ./stadistics
-    image: conjunto-residencial-cl-stadistics-ms
+    #image: conjunto-residencial-cl-stadistics-ms
     container_name: stadistics
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     volumes:
@@ -258,11 +259,22 @@ services:
       - POSTGRES_USER=postgres2
       - POSTGRES_PASSWORD=cincopatodos
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres2"]
+      test: ["CMD-SHELL", "pg_isready -U postgres2 -d db2"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - pg_guest_data:/var/lib/postgresql/data
+    networks:
+      - private-network
+      
+  kali:
+    build:
+      context: .
+      dockerfile: Dockerfile.kali
+    container_name: kali
+    tty: true
+    stdin_open: true
+    privileged: true
     networks:
       - private-network
