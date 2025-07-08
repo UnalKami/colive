@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'Results',
 ]
 
 MIDDLEWARE = [
@@ -79,11 +81,11 @@ WSGI_APPLICATION = 'stadistics.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+        'NAME': os.getenv('POSTGRES_DB'),         # "db"
+        'USER': os.getenv('POSTGRES_USER'),       # "postgres"
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),# "cincopatodos"
+        'HOST': os.getenv('POSTGRES_HOST'),       # "CL_auth_db"
+        'PORT': os.getenv('POSTGRES_PORT'),       # "5432"
     },
     'mysql_db': {
         'ENGINE': 'django.db.backends.mysql',
@@ -145,10 +147,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-INSTALLED_APPS = [
-    'rest_framework',
-    'Results',
-]
+
 
 DATABASES = {
     'default': {
