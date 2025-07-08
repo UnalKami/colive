@@ -61,7 +61,7 @@ Proporciona estadísticas agregadas y métricas sobre la actividad del sistema, 
 * **CL_auth_db (Base de Datos de Autenticación):**
 Almacena la información de usuarios, contraseñas encriptadas, roles y relaciones con conjuntos residenciales y residencias.
 * **CL_residence_db (Base de Datos de Conjuntos Residenciales):**
-Base de datos NoSQL que almacena información sobre los conjuntos y las residencias.
+Base de datos NoSQL que almacena información sobre los conjuntos, reservas, residencias y entradas de visitantes.
 * **CL_messaging_db (Base de Datos de Mensajería):**
 Almacena la cola de correos dentro del sistema.
 # REVISAR
