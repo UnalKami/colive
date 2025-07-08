@@ -283,6 +283,8 @@ Aunque los conectores internos del sistema (entre microservicios) usan HTTP sin 
 * Scenario 1: Registro usuario administrador y conjunto
 ![VistaDescomposicion](./readmeAssets/escenario1rend.png)
 
+* Scenario 2: Registro de visitantes peatonales y vehiculares 
+![VistaDescomposicion](./readmeAssets/escenario2rend.png)
      
 ### Applied architectural tactics
 
