@@ -124,13 +124,14 @@
 <body>
   <div class="container">
     <img src="../static/img/Colive_Logo_.png" alt="Colive Logo">
-    <h2>Registrar Usuario y Propiedad</h2>
+    <h2>Registrar Usuario</h2>
 
     <label for="rol">Tipo de usuario</label>
     <select id="rol" required>
       <option value="">Cargando roles...</option>
     </select>
 
+    <!-- Datos de la propiedad (solo para propietarios) -->
     <div id="datos-propiedad" class="hidden">
       <h3>📍 Datos de la Propiedad</h3>
       
@@ -147,8 +148,11 @@
           <input type="number" id="numeroBodega" placeholder="Ej: 7">
         </div>
       </div>
+    </div>
 
-      <h3>👤 Datos del Usuario Residente</h3>
+    <!-- Datos del usuario (para todos los roles) -->
+    <div id="datos-usuario" class="hidden">
+      <h3>👤 Datos del Usuario</h3>
       
       <div class="form-row">
         <div>
@@ -164,7 +168,7 @@
       <div class="form-row">
         <div>
           <label for="usernameUsuario">Nombre de usuario *</label>
-          <input type="text" id="usernameUsuario" placeholder="Ej: juan123" required>
+          <input type="text" id="usernameUsuario" placeholder="Se genera automáticamente" readonly>
         </div>
         <div>
           <label for="celularUsuario">Celular</label>
@@ -184,7 +188,7 @@
       </div>
     </div>
 
-    <button class="button" onclick="registrarUsuario()">Registrar Usuario y Propiedad</button>
+    <button class="button" onclick="registrarUsuario()">Registrar Usuario</button>
 
     <div id="cargando"><div class="spinner"></div><p>Procesando...</p></div>
     <div id="mensaje" class="hidden"></div>
@@ -193,8 +197,11 @@
   <script>
     const rolSelect = document.getElementById('rol');
     const datosPropiedad = document.getElementById('datos-propiedad');
+    const datosUsuario = document.getElementById('datos-usuario');
     const mensaje = document.getElementById('mensaje');
     const cargando = document.getElementById('cargando');
+    const emailUsuario = document.getElementById('emailUsuario');
+    const usernameUsuario = document.getElementById('usernameUsuario');
 
     // Cargar roles desde backend
     async function cargarRoles() {
@@ -219,8 +226,27 @@
       }
     }
 
+    // Mostrar/ocultar secciones según el rol
     rolSelect.addEventListener('change', () => {
-      datosPropiedad.classList.toggle('hidden', rolSelect.value !== 'PROPIEDAD_CR');
+      const rol = rolSelect.value;
+      if (rol) {
+        datosUsuario.classList.remove('hidden');
+        datosPropiedad.classList.toggle('hidden', rol !== 'PROPIEDAD_CR');
+      } else {
+        datosUsuario.classList.add('hidden');
+        datosPropiedad.classList.add('hidden');
+      }
+    });
+
+    // Generar username automáticamente desde el email
+    emailUsuario.addEventListener('input', () => {
+      const email = emailUsuario.value.trim();
+      if (email && email.includes('@')) {
+        const username = email.split('@')[0];
+        usernameUsuario.value = username;
+      } else {
+        usernameUsuario.value = '';
+      }
     });
 
     async function registrarUsuario() {
@@ -231,71 +257,74 @@
         return;
       }
 
-      if (rol === 'PROPIEDAD_CR') {
-        // Validar campos requeridos para propiedad
-        const descripcionApartamento = document.getElementById('descripcionApartamento').value.trim();
-        const nombreUsuario = document.getElementById('nombreUsuario').value.trim();
-        const emailUsuario = document.getElementById('emailUsuario').value.trim();
-        const usernameUsuario = document.getElementById('usernameUsuario').value.trim();
-        const passwordUsuario = document.getElementById('passwordUsuario').value;
-        const confirmPasswordUsuario = document.getElementById('confirmPasswordUsuario').value;
+      // Validar campos comunes
+      const nombreUsuario = document.getElementById('nombreUsuario').value.trim();
+      const emailUsuario = document.getElementById('emailUsuario').value.trim();
+      const usernameUsuario = document.getElementById('usernameUsuario').value.trim();
+      const passwordUsuario = document.getElementById('passwordUsuario').value;
+      const confirmPasswordUsuario = document.getElementById('confirmPasswordUsuario').value;
+      const celularUsuario = document.getElementById('celularUsuario').value.trim();
 
-        if (!descripcionApartamento || !nombreUsuario || !emailUsuario || !usernameUsuario || !passwordUsuario) {
-          mostrarMensaje('Por favor completa todos los campos obligatorios (*).', false);
-          return;
-        }
+      if (!nombreUsuario || !emailUsuario || !usernameUsuario || !passwordUsuario) {
+        mostrarMensaje('Por favor completa todos los campos obligatorios (*).', false);
+        return;
+      }
 
-        if (passwordUsuario !== confirmPasswordUsuario) {
-          mostrarMensaje('Las contraseñas no coinciden.', false);
-          return;
-        }
+      if (passwordUsuario !== confirmPasswordUsuario) {
+        mostrarMensaje('Las contraseñas no coinciden.', false);
+        return;
+      }
 
-        if (passwordUsuario.length < 8) {
-          mostrarMensaje('La contraseña debe tener al menos 8 caracteres.', false);
-          return;
-        }
+      if (passwordUsuario.length < 8) {
+        mostrarMensaje('La contraseña debe tener al menos 8 caracteres.', false);
+        return;
+      }
 
-        // Preparar datos para enviar
-        const numeroParqueadero = document.getElementById('numeroParqueadero').value;
-        const numeroBodega = document.getElementById('numeroBodega').value;
-        const celularUsuario = document.getElementById('celularUsuario').value;
+      mostrarCargando(true);
+      mensaje.classList.add('hidden');
 
-        const data = {
-          // Datos de la propiedad
-          residence: {
-            code: descripcionApartamento
-          },
-          // Datos del usuario
-          user: {
-            nombre: nombreUsuario,
-            correo: emailUsuario,
-            username: usernameUsuario,
-            password: passwordUsuario,
-            celular: celularUsuario || '0',
-            rol: 'RESIDENTE_CR'
+      try {
+        if (rol === 'PROPIEDAD_CR') {
+          // Validar campos específicos de propiedad
+          const descripcionApartamento = document.getElementById('descripcionApartamento').value.trim();
+          if (!descripcionApartamento) {
+            mostrarMensaje('Por favor completa la descripción del apartamento.', false);
+            return;
           }
-        };
 
-        // Agregar parqueadero si tiene valor
-        if (numeroParqueadero && numeroParqueadero.trim() !== '') {
-          const parqueaderoNum = parseInt(numeroParqueadero);
-          if (!isNaN(parqueaderoNum)) {
-            data.residence.parqueadero = parqueaderoNum;
+          const numeroParqueadero = document.getElementById('numeroParqueadero').value;
+          const numeroBodega = document.getElementById('numeroBodega').value;
+
+          const data = {
+            residence: {
+              code: descripcionApartamento
+            },
+            user: {
+              nombre: nombreUsuario,
+              correo: emailUsuario,
+              username: usernameUsuario,
+              password: passwordUsuario,
+              celular: celularUsuario || '0',
+              rol: 'PROPIEDAD_CR'
+            }
+          };
+
+          // Agregar parqueadero si tiene valor
+          if (numeroParqueadero && numeroParqueadero.trim() !== '') {
+            const parqueaderoNum = parseInt(numeroParqueadero);
+            if (!isNaN(parqueaderoNum)) {
+              data.residence.parqueadero = parqueaderoNum;
+            }
           }
-        }
 
-        // Agregar bodega si tiene valor
-        if (numeroBodega && numeroBodega.trim() !== '') {
-          const bodegaNum = parseInt(numeroBodega);
-          if (!isNaN(bodegaNum)) {
-            data.residence.bodega = bodegaNum;
+          // Agregar bodega si tiene valor
+          if (numeroBodega && numeroBodega.trim() !== '') {
+            const bodegaNum = parseInt(numeroBodega);
+            if (!isNaN(bodegaNum)) {
+              data.residence.bodega = bodegaNum;
+            }
           }
-        }
 
-        mostrarCargando(true);
-        mensaje.classList.add('hidden');
-
-        try {
           const res = await fetch('/fe-api/crear-usuario-propiedad', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -312,37 +341,23 @@
           
           if (result.success) {
             mostrarMensaje(`¡Usuario y propiedad registrados exitosamente!<br>Propiedad: ${result.residence.code}<br>Usuario: ${result.user.username}`, true);
-            // Limpiar formulario
-            document.getElementById('descripcionApartamento').value = '';
-            document.getElementById('nombreUsuario').value = '';
-            document.getElementById('emailUsuario').value = '';
-            document.getElementById('usernameUsuario').value = '';
-            document.getElementById('passwordUsuario').value = '';
-            document.getElementById('confirmPasswordUsuario').value = '';
-            document.getElementById('numeroParqueadero').value = '';
-            document.getElementById('numeroBodega').value = '';
-            document.getElementById('celularUsuario').value = '';
+            limpiarFormulario();
           } else {
             throw new Error(result.message || 'Error desconocido');
           }
-          
-        } catch (err) {
-          console.error('Error:', err);
-          mostrarMensaje(`Error al registrar: ${err.message}`, false);
-        } finally {
-          mostrarCargando(false);
-        }
-      } else {
-        // Para otros roles (seguridad, mantenimiento, aseo) - funcionalidad simple
-        const data = {
-          code: `Usuario_${rol}_${Date.now()}`
-        };
 
-        mostrarCargando(true);
-        mensaje.classList.add('hidden');
+        } else {
+          // Para otros roles (seguridad, mantenimiento, aseo)
+          const data = {
+            nombre: nombreUsuario,
+            correo: emailUsuario,
+            username: usernameUsuario,
+            password: passwordUsuario,
+            celular: celularUsuario || '0',
+            rol: rol
+          };
 
-        try {
-          const res = await fetch('/fe-api/crear-residence', {
+          const res = await fetch('/fe-api/crear-usuario-rol', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -357,18 +372,39 @@
           const result = await res.json();
           
           if (result.success) {
-            mostrarMensaje(`¡${rol.replace('_CR', '')} registrado exitosamente!<br>Código: ${result.data.code}`, true);
+            mostrarMensaje(`¡Usuario ${rol.replace('_CR', '')} registrado exitosamente!<br>Usuario: ${result.user.username}`, true);
+            limpiarFormulario();
           } else {
             throw new Error(result.message || 'Error desconocido');
           }
-          
-        } catch (err) {
-          console.error('Error:', err);
-          mostrarMensaje(`Error al registrar: ${err.message}`, false);
-        } finally {
-          mostrarCargando(false);
         }
+        
+      } catch (err) {
+        console.error('Error:', err);
+        mostrarMensaje(`Error al registrar: ${err.message}`, false);
+      } finally {
+        mostrarCargando(false);
       }
+    }
+
+    function limpiarFormulario() {
+      // Limpiar campos de propiedad
+      document.getElementById('descripcionApartamento').value = '';
+      document.getElementById('numeroParqueadero').value = '';
+      document.getElementById('numeroBodega').value = '';
+      
+      // Limpiar campos de usuario
+      document.getElementById('nombreUsuario').value = '';
+      document.getElementById('emailUsuario').value = '';
+      document.getElementById('usernameUsuario').value = '';
+      document.getElementById('passwordUsuario').value = '';
+      document.getElementById('confirmPasswordUsuario').value = '';
+      document.getElementById('celularUsuario').value = '';
+      
+      // Resetear selección
+      rolSelect.value = '';
+      datosUsuario.classList.add('hidden');
+      datosPropiedad.classList.add('hidden');
     }
 
     function mostrarMensaje(msg, exito) {
