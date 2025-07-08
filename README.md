@@ -352,3 +352,17 @@ En este tipo de pruebas se queria hallar el "knee point" de nuestro sistema, par
 ### *Grafica Knee Point*
 ## **Prototype**
 ### Instructions for deploying the software system locally
+#### **Prerequisites**
+Make sure you have the following tools installed on your local machine:
+- **[Git](https://git-scm.com/)** – to clone the repository.
+- **[Docker Engine](https://docs.docker.com/engine/install/)** – to run the containers.
+- **[Docker Compose](https://docs.docker.com/compose/install/)** – to orchestrate the services.
+
+#### **Steps**
+1. **Clone the repository and navigate to the project folder**:
+   ```bash
+   git clone https://github.com/UnalKami/colive
+   
+2. **Run the containers using Docker Compose**:
+    ```bash
+    docker-compose up --build
