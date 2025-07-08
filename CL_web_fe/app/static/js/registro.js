@@ -30,7 +30,7 @@
     }
 
     // ————————————————————————————————————————————————————————————
-    // 3) Validación y envío con fetch al endpoint según el rol
+    // 3) Validación y envío con fetch al endpoint de Flask
     // ————————————————————————————————————————————————————————————
     (function () {
       'use strict';
@@ -55,56 +55,42 @@
           return;
         }
 
-        // 2) Determinar endpoint según el rol seleccionado
+        // 2) Validar rol seleccionado
         const rolValue = rolSelect.value; 
         if (!rolValue) {
           rolSelect.classList.add('is-invalid');
           return;
         }
-        // Mapeo de valor del <select> a ruta de tu servicio
-        const rutaMap = {
-          admin:        '/admin',
-          propietario:  '/propietario',
-          residente:    '/recidente',
-          seguridad:    '/seguridad',
-          mantenimiento:'/mantenimiento',
-          aseo:         '/aseo'
-        };
-        const endpoint = "auth/api/registro/"+rutaMap[rolValue];
-        if (!endpoint) {
-          alert('Rol no válido');
-          return;
-        }
 
-        // 3) Armar el JSON con los campos requeridos por RegistroRequestDTO
-        //    Asumo que RegistroRequestDTO tiene: nombre, correo, celular, username, password
+        // 3) Armar el JSON con los datos del usuario
         const payload = {
           nombre:    document.getElementById('nombre').value.trim(),
           correo:    document.getElementById('correo').value.trim(),
           celular:   document.getElementById('celular').value.trim(),
           username:  document.getElementById('username').value.trim(),
-          password:  pwd
+          password:  pwd,
+          rol:       rolValue
         };
 
-        // 4) Realizar fetch POST con JSON
+        // 4) Realizar fetch POST a la API de Flask
         try {
-          const response = await fetch(`${location.origin}${endpoint}`, {
+          const response = await fetch('/fe-api/registrarUsuarioConjunto', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
             body:    JSON.stringify(payload)
           });
 
           if (response.ok) {
-            // Éxito: mostrar alerta o toast, luego reiniciar formulario
+            // Éxito: mostrar alerta y reiniciar formulario
             alert('Registro exitoso');
             form.reset();
             form.classList.remove('was-validated');
-            // También puedes recargar la página o redirigir, según tu necesidad:
-            // window.location.href = '/otra-página';
+            // Redirigir al login
+            window.location.href = '/login';
           } else {
             // Error de validación / excepción del backend
-            const errorText = await response.text();
-            alert('Error en el registro: ' + errorText);
+            const errorData = await response.json();
+            alert('Error en el registro: ' + (errorData.error || 'Error desconocido'));
           }
         } catch (err) {
           console.error(err);

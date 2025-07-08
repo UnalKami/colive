@@ -195,6 +195,13 @@ services:
       - CL_residence_ms
       - CL_auth_db
       - CL_residence_db
+    environment:
+      - POSTGRES_HOST=CL_auth_db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=cincopatodos
+    # …
     networks:
       - private-network
 

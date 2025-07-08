@@ -12,7 +12,7 @@
     }
 
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 60px auto;
       padding: 30px;
       background-color: white;
@@ -32,6 +32,13 @@
       margin-bottom: 20px;
     }
 
+    h3 {
+      color: #333;
+      border-bottom: 2px solid #00b894;
+      padding-bottom: 5px;
+      margin-top: 25px;
+    }
+
     label {
       display: block;
       margin-top: 15px;
@@ -46,18 +53,17 @@
       border-radius: 6px;
     }
 
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .form-row > div {
+      flex: 1;
+    }
+
     .hidden {
       display: none;
-    }
-
-    .checkbox {
-      margin-top: 15px;
-      display: flex;
-      align-items: center;
-    }
-
-    .checkbox input {
-      margin-right: 8px;
     }
 
     .button {
@@ -125,24 +131,64 @@
       <option value="">Cargando roles...</option>
     </select>
 
+    <!-- Datos de la propiedad (solo para propietarios) -->
     <div id="datos-propiedad" class="hidden">
-      <label for="descripcionApartamento">Descripción del apartamento</label>
-      <input type="text" id="descripcionApartamento" placeholder="Ej: Torre 1 Apto 303">
+      <h3>📍 Datos de la Propiedad</h3>
+      
+      <label for="descripcionApartamento">Descripción del apartamento *</label>
+      <input type="text" id="descripcionApartamento" placeholder="Ej: Torre 1 Apto 303" required>
 
-      <label for="numeroParqueadero">Número de parqueadero (opcional)</label>
-      <input type="text" id="numeroParqueadero" placeholder="Ej: P12">
-
-      <label for="numeroBodega">Número de bodega (opcional)</label>
-      <input type="text" id="numeroBodega" placeholder="Ej: B7">
+      <div class="form-row">
+        <div>
+          <label for="numeroParqueadero">Número de parqueadero</label>
+          <input type="number" id="numeroParqueadero" placeholder="Ej: 12">
+        </div>
+        <div>
+          <label for="numeroBodega">Número de bodega</label>
+          <input type="number" id="numeroBodega" placeholder="Ej: 7">
+        </div>
+      </div>
     </div>
 
+    <!-- Datos del usuario (para todos los roles) -->
+    <div id="datos-usuario" class="hidden">
+      <h3>👤 Datos del Usuario</h3>
+      
+      <div class="form-row">
+        <div>
+          <label for="nombreUsuario">Nombre completo *</label>
+          <input type="text" id="nombreUsuario" placeholder="Ej: Juan Pérez" required>
+        </div>
+        <div>
+          <label for="emailUsuario">Correo electrónico *</label>
+          <input type="email" id="emailUsuario" placeholder="Ej: juan@email.com" required>
+        </div>
+      </div>
 
-    <!-- <div class="checkbox">
-      <input type="checkbox" id="terminos">
-      <label for="terminos">Acepto los <a href="#">términos y condiciones</a></label>
-    </div> -->
+      <div class="form-row">
+        <div>
+          <label for="usernameUsuario">Nombre de usuario *</label>
+          <input type="text" id="usernameUsuario" placeholder="Se genera automáticamente" readonly>
+        </div>
+        <div>
+          <label for="celularUsuario">Celular</label>
+          <input type="tel" id="celularUsuario" placeholder="Ej: 3001234567">
+        </div>
+      </div>
 
-    <button class="button" onclick="registrarUsuario()">Registrar</button>
+      <div class="form-row">
+        <div>
+          <label for="passwordUsuario">Contraseña *</label>
+          <input type="password" id="passwordUsuario" placeholder="Mínimo 8 caracteres" required>
+        </div>
+        <div>
+          <label for="confirmPasswordUsuario">Confirmar contraseña *</label>
+          <input type="password" id="confirmPasswordUsuario" placeholder="Repetir contraseña" required>
+        </div>
+      </div>
+    </div>
+
+    <button class="button" onclick="registrarUsuario()">Registrar Usuario</button>
 
     <div id="cargando"><div class="spinner"></div><p>Procesando...</p></div>
     <div id="mensaje" class="hidden"></div>
@@ -151,32 +197,27 @@
   <script>
     const rolSelect = document.getElementById('rol');
     const datosPropiedad = document.getElementById('datos-propiedad');
+    const datosUsuario = document.getElementById('datos-usuario');
     const mensaje = document.getElementById('mensaje');
     const cargando = document.getElementById('cargando');
+    const emailUsuario = document.getElementById('emailUsuario');
+    const usernameUsuario = document.getElementById('usernameUsuario');
 
     // Cargar roles desde backend
     async function cargarRoles() {
       try {
-        //const res = await fetch('https://tuservidor/api/roles');
-        //const roles = await res.json();
-
          const roles = [
-            { id: 1, nombre: 'ADMIN_CR' },
-            { id: 2, nombre: 'PROPIEDAD_CR' },
-            { id: 3, nombre: 'RESIDENTE_CR' },
-            { id: 4, nombre: 'SEGURIDAD_CR' },
-            { id: 5, nombre: 'MANTENIMIENTO_CR' },
-            { id: 6, nombre: 'ASEO_CR' }
+            { id: 2, nombre: 'PROPIEDAD_CR', display: 'Propietario/Residente' },
+            { id: 4, nombre: 'SEGURIDAD_CR', display: 'Seguridad' },
+            { id: 5, nombre: 'MANTENIMIENTO_CR', display: 'Mantenimiento' },
+            { id: 6, nombre: 'ASEO_CR', display: 'Aseo' }
         ];
-        const opciones = roles.filter(rol =>
-          rol.id !== 1 && rol.id !== 3
-        );
 
-        rolSelect.innerHTML = '<option value="">Selecciona un rol</option>';
-        for (let rol of opciones) {
+        rolSelect.innerHTML = '<option value="">Selecciona un tipo</option>';
+        for (let rol of roles) {
           const option = document.createElement('option');
           option.value = rol.nombre;
-          option.textContent = rol.nombre.replace('_CR', '').toLowerCase().replace(/^./, s => s.toUpperCase());
+          option.textContent = rol.display;
           rolSelect.appendChild(option);
         }
       } catch (err) {
@@ -185,55 +226,185 @@
       }
     }
 
+    // Mostrar/ocultar secciones según el rol
     rolSelect.addEventListener('change', () => {
-      datosPropiedad.classList.toggle('hidden', rolSelect.value !== 'PROPIEDAD_CR');
+      const rol = rolSelect.value;
+      if (rol) {
+        datosUsuario.classList.remove('hidden');
+        datosPropiedad.classList.toggle('hidden', rol !== 'PROPIEDAD_CR');
+      } else {
+        datosUsuario.classList.add('hidden');
+        datosPropiedad.classList.add('hidden');
+      }
+    });
+
+    // Generar username automáticamente desde el email
+    emailUsuario.addEventListener('input', () => {
+      const email = emailUsuario.value.trim();
+      if (email && email.includes('@')) {
+        const username = email.split('@')[0];
+        usernameUsuario.value = username;
+      } else {
+        usernameUsuario.value = '';
+      }
     });
 
     async function registrarUsuario() {
       const rol = rolSelect.value;
-      //const terminos = document.getElementById('terminos').checked;
-      const descripcionApartamento = document.getElementById('descripcionApartamento').value;
-      const numeroParqueadero = document.getElementById('numeroParqueadero').value;
-      const numeroBodega = document.getElementById('numeroBodega').value;
 
-      if (!rol/* || !terminos*/) {
-        mostrarMensaje('Por favor completa todos los campos requeridos.', false);
+      if (!rol) {
+        mostrarMensaje('Por favor selecciona un tipo de usuario.', false);
         return;
       }
 
-      const data = {
-        rol        
-      };
+      // Validar campos comunes
+      const nombreUsuario = document.getElementById('nombreUsuario').value.trim();
+      const emailUsuario = document.getElementById('emailUsuario').value.trim();
+      const usernameUsuario = document.getElementById('usernameUsuario').value.trim();
+      const passwordUsuario = document.getElementById('passwordUsuario').value;
+      const confirmPasswordUsuario = document.getElementById('confirmPasswordUsuario').value;
+      const celularUsuario = document.getElementById('celularUsuario').value.trim();
 
-      if (rol === 'PROPIEDAD_CR') {
-        if(!descripcionApartamento || !numeroParqueadero || !numeroBodega) {
-          mostrarMensaje('Por favor completa todos los campos de propiedad.', false);
-          return;
-        }
-        data.descripcionApartamento = descripcionApartamento;
-        data.numeroParqueadero = numeroParqueadero;
-        data.numeroBodega = numeroBodega;
+      if (!nombreUsuario || !emailUsuario || !usernameUsuario || !passwordUsuario) {
+        mostrarMensaje('Por favor completa todos los campos obligatorios (*).', false);
+        return;
+      }
+
+      if (passwordUsuario !== confirmPasswordUsuario) {
+        mostrarMensaje('Las contraseñas no coinciden.', false);
+        return;
+      }
+
+      if (passwordUsuario.length < 8) {
+        mostrarMensaje('La contraseña debe tener al menos 8 caracteres.', false);
+        return;
       }
 
       mostrarCargando(true);
       mensaje.classList.add('hidden');
 
       try {
-        const res = await fetch('https://tuservidor/api/crear-usuario', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
+        if (rol === 'PROPIEDAD_CR') {
+          // Validar campos específicos de propiedad
+          const descripcionApartamento = document.getElementById('descripcionApartamento').value.trim();
+          if (!descripcionApartamento) {
+            mostrarMensaje('Por favor completa la descripción del apartamento.', false);
+            return;
+          }
 
-        if (!res.ok) throw new Error('Error en la creación');
+          const numeroParqueadero = document.getElementById('numeroParqueadero').value;
+          const numeroBodega = document.getElementById('numeroBodega').value;
 
-        const result = await res.json();
-        mostrarMensaje(`Usuario creado. <br><a href="${result.link}" target="_blank">Haz clic aquí para continuar</a>`, true);
+          const data = {
+            residence: {
+              code: descripcionApartamento
+            },
+            user: {
+              nombre: nombreUsuario,
+              correo: emailUsuario,
+              username: usernameUsuario,
+              password: passwordUsuario,
+              celular: celularUsuario || '0',
+              rol: 'PROPIEDAD_CR'
+            }
+          };
+
+          // Agregar parqueadero si tiene valor
+          if (numeroParqueadero && numeroParqueadero.trim() !== '') {
+            const parqueaderoNum = parseInt(numeroParqueadero);
+            if (!isNaN(parqueaderoNum)) {
+              data.residence.parqueadero = parqueaderoNum;
+            }
+          }
+
+          // Agregar bodega si tiene valor
+          if (numeroBodega && numeroBodega.trim() !== '') {
+            const bodegaNum = parseInt(numeroBodega);
+            if (!isNaN(bodegaNum)) {
+              data.residence.bodega = bodegaNum;
+            }
+          }
+
+          const res = await fetch('/fe-api/crear-usuario-propiedad', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data)
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'Error en la creación');
+          }
+
+          const result = await res.json();
+          
+          if (result.success) {
+            mostrarMensaje(`¡Usuario y propiedad registrados exitosamente!<br>Propiedad: ${result.residence.code}<br>Usuario: ${result.user.username}`, true);
+            limpiarFormulario();
+          } else {
+            throw new Error(result.message || 'Error desconocido');
+          }
+
+        } else {
+          // Para otros roles (seguridad, mantenimiento, aseo)
+          const data = {
+            nombre: nombreUsuario,
+            correo: emailUsuario,
+            username: usernameUsuario,
+            password: passwordUsuario,
+            celular: celularUsuario || '0',
+            rol: rol
+          };
+
+          const res = await fetch('/fe-api/crear-usuario-rol', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(data)
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || 'Error en la creación');
+          }
+
+          const result = await res.json();
+          
+          if (result.success) {
+            mostrarMensaje(`¡Usuario ${rol.replace('_CR', '')} registrado exitosamente!<br>Usuario: ${result.user.username}`, true);
+            limpiarFormulario();
+          } else {
+            throw new Error(result.message || 'Error desconocido');
+          }
+        }
+        
       } catch (err) {
-        mostrarMensaje('Hubo un error al registrar el usuario.', false);
+        console.error('Error:', err);
+        mostrarMensaje(`Error al registrar: ${err.message}`, false);
       } finally {
         mostrarCargando(false);
       }
+    }
+
+    function limpiarFormulario() {
+      // Limpiar campos de propiedad
+      document.getElementById('descripcionApartamento').value = '';
+      document.getElementById('numeroParqueadero').value = '';
+      document.getElementById('numeroBodega').value = '';
+      
+      // Limpiar campos de usuario
+      document.getElementById('nombreUsuario').value = '';
+      document.getElementById('emailUsuario').value = '';
+      document.getElementById('usernameUsuario').value = '';
+      document.getElementById('passwordUsuario').value = '';
+      document.getElementById('confirmPasswordUsuario').value = '';
+      document.getElementById('celularUsuario').value = '';
+      
+      // Resetear selección
+      rolSelect.value = '';
+      datosUsuario.classList.add('hidden');
+      datosPropiedad.classList.add('hidden');
     }
 
     function mostrarMensaje(msg, exito) {

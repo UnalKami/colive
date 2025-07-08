@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Header, Depends
+from fastapi import APIRouter, HTTPException, Request, Header, Depends
 from pydantic import BaseModel
 from app.services.residence_ms_services import (
     crear_reserva, validar_reserva_disponible,
@@ -6,7 +6,8 @@ from app.services.residence_ms_services import (
     obtener_conjuntos_residencias, obtener_reservas,
     obtener_panel_propietario,
     registrar_visitante_peaton, registrar_visitante_vehicular,
-    registrar_salida_vehiculo, obtener_visitantes_conjunto
+    registrar_salida_vehiculo, obtener_visitantes_conjunto,
+    crear_residence_con_admin, crear_usuario_propiedad_con_admin
 )
 
 router = APIRouter()
@@ -50,6 +51,41 @@ class VisitanteVehicularInput(BaseModel):
 class SalidaVehiculoInput(BaseModel):
     placaVehiculo: str
     idConjunto: str
+class CrearResidenceRequest(BaseModel):
+    code: str
+    parqueadero: int = None
+    bodega: int = None
+
+class UsuarioData(BaseModel):
+    nombre: str
+    correo: str
+    username: str
+    password: str
+    celular: str = "0"
+    rol: str = "PROPIEDAD_CR"  # ✅ CORREGIDO A PROPIEDAD_CR
+
+class ResidenceData(BaseModel):
+    code: str
+    parqueadero: int = None
+    bodega: int = None
+
+class CrearUsuarioPropiedadRequest(BaseModel):
+    user: UsuarioData
+    residence: ResidenceData
+
+@router.post("/crear-residence")
+async def crear_residence(request: CrearResidenceRequest, http_request: Request):
+    try:
+        return await crear_residence_con_admin(request.dict(), http_request.cookies)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/crear-usuario-propiedad")
+async def crear_usuario_propiedad(request: CrearUsuarioPropiedadRequest, http_request: Request):
+    try:
+        return await crear_usuario_propiedad_con_admin(request.dict(), http_request.cookies)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/crearReserva")
 async def crear_reserva_endpoint(reserva: ReservaInput):

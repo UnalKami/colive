@@ -54,6 +54,10 @@ def reservas():
 def admin():
     return render_template('adminhome.html')
 
+@frontend_bp.route('/registro-rol')
+def registro_rol():
+    return render_template('registroUsuarioRol.html')
+
 @frontend_bp.route('/setSMTP')
 def setSMTP():
     return render_template('setSMTP.html')

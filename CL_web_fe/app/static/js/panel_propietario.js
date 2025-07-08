@@ -9,6 +9,58 @@ document.addEventListener('DOMContentLoaded', async function() {
   listaReservas.innerHTML = '<li class="list-group-item text-muted">Cargando reservas...</li>';
   resumenNotificaciones.innerHTML = '<li class="text-muted">Cargando notificaciones...</li>';
 
+  async function cargarPanelPropietario() {
+    try {
+      const query = `
+        query {
+          reservas(residenciaId: "${residenciaId}") {
+            amenidad
+            fecha
+            horaInicio
+            horaFin
+            estado
+          }
+          notificacionesResidencia(residenciaId: "${residenciaId}") {
+            mensaje
+            fecha
+          }
+        }
+      `;
+      const res = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+
+      // Mostrar reservas activas/próximas
+      if (data?.data?.reservas?.length > 0) {
+        listaReservas.innerHTML = data.data.reservas.map(res =>
+          `<li class="list-group-item">
+            <b>${res.amenidad}</b> - ${new Date(res.fecha).toLocaleDateString()} 
+            ${res.horaInicio} a ${res.horaFin} 
+            <span style="color:${res.estado === 'aprobada' ? 'green' : 'orange'}">[${res.estado}]</span>
+          </li>`
+        ).join('');
+      } else {
+        listaReservas.innerHTML = '<li class="list-group-item text-muted">No tienes reservas activas.</li>';
+      }
+
+      // Mostrar notificaciones
+      if (data?.data?.notificacionesResidencia?.length > 0) {
+        resumenNotificaciones.innerHTML = data.data.notificacionesResidencia.map(n =>
+          `<li class="mb-2">${n.mensaje} <small class="text-muted">(${new Date(n.fecha).toLocaleDateString()})</small></li>`
+        ).join('');
+      } else {
+        resumenNotificaciones.innerHTML = '<li class="text-muted">No tienes notificaciones recientes.</li>';
+      }
+    } catch (err) {
+      console.error('Error:', err);
+      listaReservas.innerHTML = '<li class="list-group-item text-danger">Error al cargar reservas.</li>';
+      resumenNotificaciones.innerHTML = '<li class="text-danger">Error al cargar notificaciones.</li>';
+    }
+  }
+
   
     const openModalBtn = document.getElementById('btnAbrirModalReserva');
     const modalEl = document.getElementById('modalReservarAmenidad');
@@ -30,58 +82,40 @@ document.addEventListener('DOMContentLoaded', async function() {
       });
     }
 
-async function cargarDatosPanelPropietario() {
-  const res = await fetch('/fe-api/panelPropietario');
-  const data = await res.json();
-
-  // Referencias a los selects
-  const conjuntoSel = document.getElementById('conjuntoId');
-  const residenciaSel = document.getElementById('residenciaId');
-  const amenidadSel = document.getElementById('amenidad');
-  const precioTexto = document.getElementById('precioAmenidadTexto');
-
-  // Variables globales para conjuntos y residencias
-  window.conjuntos = data.conjuntos || [];
-  window.residencias = data.residencias || [];
-
-  // Rellenar select de conjuntos
-  conjuntoSel.innerHTML = '<option value="">Seleccione un conjunto</option>' +
-    window.conjuntos.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
-
-  // Limpiar selects dependientes
-  residenciaSel.innerHTML = '<option value="">Seleccione su residencia</option>';
-  amenidadSel.innerHTML = '<option value="">Seleccione una amenidad</option>';
-  precioTexto.textContent = "Seleccione una amenidad";
-
-  // Evento para actualizar residencias y amenidades al cambiar conjunto
-  conjuntoSel.addEventListener('change', function() {
-    const conjunto = window.conjuntos.find(c => c.id === conjuntoSel.value);
-
-    // Rellenar amenidades del conjunto seleccionado
-    if (conjunto) {
-      amenidadSel.innerHTML = '<option value="">Seleccione una amenidad</option>' +
-        (conjunto.amenidades || []).map(a => `<option value="${a.nombre}" data-costo="${a.costo}">${a.nombre}</option>`).join('');
-    } else {
-      amenidadSel.innerHTML = '<option value="">Seleccione una amenidad</option>';
+    async function cargarDatos() {
+      const query = `
+        query {
+          conjuntos {
+            id
+            nombre
+            amenidades {
+              nombre
+              costo
+            }
+          }
+          residences {
+            id
+            code
+            conjuntoId
+          }
+        }
+      `;
+      const res = await fetch('http://localhost:3001/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      });
+      const data = await res.json();
+      if (data.data) {
+        conjuntos = data.data.conjuntos;
+        residencias = data.data.residences;
+        conjuntoSel.innerHTML = '<option value="">Seleccione un conjunto</option>' +
+          conjuntos.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('');
+      }
+      console.log('datos cargados:', conjuntos, residencias);
     }
 
-    // Rellenar residencias del conjunto seleccionado
-    const resFiltradas = window.residencias.filter(r => String(r.conjuntoId) === conjuntoSel.value);
-    residenciaSel.innerHTML = '<option value="">Seleccione su residencia</option>' +
-      resFiltradas.map(r => `<option value="${r.id}">${r.code}</option>`).join('');
-
-    precioTexto.textContent = "Seleccione una amenidad";
-  });
-
-  // Evento para mostrar el precio de la amenidad seleccionada
-  amenidadSel.addEventListener('change', function() {
-    const selectedOption = amenidadSel.options[amenidadSel.selectedIndex];
-    const costo = selectedOption ? selectedOption.getAttribute('data-costo') : "";
-    precioTexto.textContent = costo !== "" ? `$${costo}` : "Seleccione una amenidad";
-  });
-}
-
-cargarDatosPanelPropietario();
+    cargarDatos();
 
     conjuntoSel.addEventListener('change', function() {
       const conjunto = conjuntos.find(c => c.id === conjuntoSel.value);

@@ -1,6 +1,10 @@
 //Define la estructura de una vivienda (apartamento/casa)
 const { Schema, model } = require('mongoose');
 
+const habitanteData = new Schema({
+  idPost: { type: Number, required: true }
+});
+/*
 const PagoSchema = new Schema({
   monto: { type: Number, required: true },
   fecha: { type: Date, required: true },
@@ -21,14 +25,15 @@ const ReciboServicioSchema = new Schema({
   estado: { type: String, required: true },
   observaciones: { type: String }
 }, { _id: false });
-
+*/
 const ResidenceSchema = new Schema({
-  code: { type: String, required: true},
+  code: { type: String, required: true, unique: true },
   conjuntoId: { type: Schema.Types.ObjectId, ref: 'Conjunto', required: true },
-  parqueaderos: [{ type: String }],
-  bodegas: [{ type: String }],
-  administracion: { type: AdministracionSchema, required: true },
-  recibosServicios: [ReciboServicioSchema]
+  userId: { type: Number, required: false, default: null }, // ID del usuario propietario/residente
+  parqueadero: { type: Number, required: false, default: null },
+  bodega: { type: Number, required: false, default: null },
+  //administracion: { type: AdministracionSchema, required: true },
+  //recibosServicios: [ReciboServicioSchema]
 }, { timestamps: true });
 
 module.exports = model('Residence', ResidenceSchema);

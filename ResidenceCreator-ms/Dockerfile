@@ -12,5 +12,5 @@ COPY . .
 
 EXPOSE 3001
 
-# Ejecuta el script de seed (para generar conjuntos y residencias de prueba) y luego inicia la aplicación
-CMD npm run seed && npm start
+# Solo inicia la aplicación (el seed se puede ejecutar manualmente si es necesario)
+CMD npm start

@@ -29,6 +29,10 @@ def status():
 def testAuth():
     try:
         response = requests.get('http://CL_ag:8000/auth/saludo')
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         data = response.json()
         return jsonify(data)
@@ -48,6 +52,10 @@ def registrar_usuario_conjunto():
             'http://CL_ag:8000/orc/registerUserCR',
             json=payload
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         data = response.json()
         return jsonify(data)
@@ -64,14 +72,106 @@ def login():
             'http://CL_ag:8000/auth/login',
             json=payload
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         data = response.json()
+        
+        # Agregar información de redirección según el rol
+        if 'rol' in data:
+            if data['rol'] == 'ADMIN_CR':
+                data['redirectUrl'] = '/admin'
+            elif data['rol'] == 'PROPIEDAD_CR':
+                data['redirectUrl'] = '/propietario'
+            elif data['rol'] == 'SEGURIDAD_CR':
+                data['redirectUrl'] = '/seguridad'
+            elif data['rol'] == 'MANTENIMIENTO_CR':
+                data['redirectUrl'] = '/mantenimiento'
+            elif data['rol'] == 'ASEO_CR':
+                data['redirectUrl'] = '/aseo'
+            else:
+                data['redirectUrl'] = '/'
+        else:
+            data['redirectUrl'] = '/'
+        
         flask_response = jsonify(data)
         # Copiar la cabecera Set-Cookie si existe
         
         if 'set-cookie' in response.headers:
             flask_response.headers['Set-Cookie'] = response.headers['set-cookie']
         return flask_response
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/admin-info', methods=['GET'])
+def obtener_admin_info():
+    try:
+        response = requests.get(
+            'http://CL_ag:8000/auth/admin-info',
+            cookies=request.cookies
+        )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-residence', methods=['POST'])
+def crear_residence():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/residence/crear-residence',
+            json=payload,
+            cookies=request.cookies
+        )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-usuario-propiedad', methods=['POST'])
+def crear_usuario_propiedad():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/residence/crear-usuario-propiedad',
+            json=payload,
+            cookies=request.cookies
+        )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-usuario-rol', methods=['POST'])
+def crear_usuario_rol():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/auth/crear-usuario-rol',
+            json=payload,
+            cookies=request.cookies
+        )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
+        response.raise_for_status()
+        return jsonify(response.json())
     except requests.RequestException as e:
         return jsonify({"error": str(e)}), 500
     
@@ -83,6 +183,10 @@ def crear_reserva():
     datos['hashConjunto'] = hash_conjunto  # Añadir el hash del conjunto al payload
     try:
         response = requests.post('http://CL_ag:8000/residence/crearReserva', json=datos)
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
@@ -94,6 +198,10 @@ def editar_reserva():
     datos = request.json
     try:
         response = requests.post('http://CL_ag:8000/residence/editarReserva', json=datos)
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
@@ -105,6 +213,10 @@ def eliminar_reserva():
     datos = request.json
     try:
         response = requests.post('http://CL_ag:8000/residence/eliminarReserva', json=datos)
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
@@ -118,6 +230,10 @@ def conjuntos_residencias():
     try:
         response = requests.get('http://CL_ag:8000/residence/conjuntosResidencias')
         response.raise_for_status()
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         return jsonify(response.json())
     except Exception as e:
         print("Error al llamar al gateway:", e)
@@ -129,6 +245,10 @@ def obtener_reservas():
     residencia_id = request.args.get('residenciaId')
     try:
         response = requests.get(f'http://CL_ag:8000/residence/reservas?residenciaId={residencia_id}')
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
