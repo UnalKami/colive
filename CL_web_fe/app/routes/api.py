@@ -29,6 +29,10 @@ def status():
 def testAuth():
     try:
         response = requests.get('http://CL_ag:8000/auth/saludo')
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         data = response.json()
         return jsonify(data)
@@ -48,6 +52,10 @@ def registrar_usuario_conjunto():
             'http://CL_ag:8000/orc/registerUserCR',
             json=payload
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         data = response.json()
         return jsonify(data)
@@ -64,6 +72,10 @@ def login():
             'http://CL_ag:8000/auth/login',
             json=payload
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         data = response.json()
         
@@ -100,6 +112,10 @@ def obtener_admin_info():
             'http://CL_ag:8000/auth/admin-info',
             cookies=request.cookies
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
@@ -114,6 +130,10 @@ def crear_residence():
             json=payload,
             cookies=request.cookies
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
@@ -128,6 +148,10 @@ def crear_usuario_propiedad():
             json=payload,
             cookies=request.cookies
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
@@ -142,6 +166,10 @@ def crear_usuario_rol():
             json=payload,
             cookies=request.cookies
         )
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except requests.RequestException as e:
@@ -155,6 +183,10 @@ def crear_reserva():
     datos['hashConjunto'] = hash_conjunto  # Añadir el hash del conjunto al payload
     try:
         response = requests.post('http://CL_ag:8000/residence/crearReserva', json=datos)
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
@@ -166,6 +198,10 @@ def editar_reserva():
     datos = request.json
     try:
         response = requests.post('http://CL_ag:8000/residence/editarReserva', json=datos)
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
@@ -177,6 +213,10 @@ def eliminar_reserva():
     datos = request.json
     try:
         response = requests.post('http://CL_ag:8000/residence/eliminarReserva', json=datos)
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
@@ -190,6 +230,10 @@ def conjuntos_residencias():
     try:
         response = requests.get('http://CL_ag:8000/residence/conjuntosResidencias')
         response.raise_for_status()
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         return jsonify(response.json())
     except Exception as e:
         print("Error al llamar al gateway:", e)
@@ -201,6 +245,10 @@ def obtener_reservas():
     residencia_id = request.args.get('residenciaId')
     try:
         response = requests.get(f'http://CL_ag:8000/residence/reservas?residenciaId={residencia_id}')
+        
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        
         response.raise_for_status()
         return jsonify(response.json())
     except Exception as e:
