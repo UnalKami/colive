@@ -60,9 +60,9 @@ Maneja el envío de correos entre los distintos actores del sistema mediante una
 Proporciona estadísticas agregadas y métricas sobre la actividad del sistema, útiles para los administradores.
 * **CL_auth_db (Base de Datos de Autenticación):**
 Almacena la información de usuarios, contraseñas encriptadas, roles y relaciones con conjuntos residenciales y residencias.
-# REVISAR
 * **CL_residence_db (Base de Datos de Conjuntos Residenciales):**
-Contiene la información estructural de los conjuntos, como edificios, apartamentos y zonas comunes.
+Base de datos NoSQL que almacena información sobre los conjuntos y las residencias.
+# REVISAR
 * **CL_guest_db (Base de Datos de Invitados):**
 Guarda la información de las visitas e invitados que los residentes autorizan para ingresar.
 * **CL_messaging_db (Base de Datos de Mensajería):**
@@ -160,16 +160,16 @@ Esta arquitectura asegura el aislamiento lógico de capas críticas, refuerza la
 #### Description of architectural elements and relations
 
 El despliegue se realiza localmente en una estación de trabajo que ejecuta múltiples contenedores Docker. Todos los servicios del sistema corren en contenedores que comparten el mismo host físico, organizado en las redes mencionadas anteriormente. Las características relevantes del equipo de despliegue son:
-# REVISAR
+
 Sistema operativo: [especificar, por ejemplo: Ubuntu 22.04 LTS / Windows 11 Pro WSL2]
 
-CPU: [modelo y núcleos, ej. AMD Ryzen 7 5800H, 8 núcleos / 16 hilos]
+CPU: Ryzen 7 7435HS, 16 Nucleos
 
-Memoria RAM: [ej. 16 GB DDR4]
+Memoria RAM: 8GB DDR4
 
-Almacenamiento: [ej. SSD 512 GB NVMe]
+Almacenamiento: SSD Adata 215GB
 
-# REVISAR
+
 | Componente          | Entorno de ejecución       | Red          | Justificación Tecnológica                                                                 |
 |---------------------|----------------------------|--------------|--------------------------------------------------------------------------------------------|
 | CL_web_rp           | NGINX                      | Pública (443:443) y Privada | NGINX ofrece alto rendimiento, soporte para HTTPS y una capa efectiva de seguridad y anonimidad para los componentes del backend. |
@@ -178,7 +178,7 @@ Almacenamiento: [ej. SSD 512 GB NVMe]
 | CL_ag               | FastAPI - Python           | Privada      | FastAPI permite crear APIs modernas y asincrónicas con excelente rendimiento.              |
 | CL_auth_lb          | NGINX                      | Privada      | Facilita el balanceo de carga entre múltiples instancias de microservicios.                |
 | CL_auth_ms (3)      | Spring Boot - Java         | Privada      | Spring Boot es robusto, ampliamente usado en autenticación y gestión de usuarios.          |
-| CL_residence_ms     | Express.js - JavaScript    | Privada      | Express permite una rápida creación de APIs RESTful, ideal para lógica de datos estructurados. |
+| CL_residence_ms     | Express.js - JavaScript    | Privada      | Express permite una rápida creación de APIs RESTful ademas de su compatibilidad con mongoose. |
 | CL_messaging_ms     | Scala                      | Privada      | Scala es potente para sistemas concurrentes y de mensajería con alto rendimiento.          |
 | CL_statistics_ms    | Django - Python            | Privada      | Django ofrece herramientas poderosas para el manejo de datos y reportes administrativos.   |
 | CL_auth_db          | PostgreSQL                 | Privada      | PostgreSQL es una base de datos robusta y segura, ideal para almacenar credenciales.       |
@@ -232,36 +232,17 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
 ### Security scenarios
 
 * Scenario 1: Secure Channel Pattern (HTTPS)
-    * Source: Atacante conectado a la misma red que un usuario de la aplicación.
-    * Stimulus: Interceptación del tráfico (Man in the middle) para robar información.
-    * Environment: Operaciones normales
-    * Artifact: Conector HTTPS Navegador <-> Proxy inverso web
-    * Response: Transmite la información cifrada.
-    * Response measure: Se reciben todos los paquetes sin alteración.
+
+![VistaDescomposicion](./readmeAssets/escenario1.png)
 
 * Scenario 2: Reverse Proxy Pattern
-    * Source: Atacante 
-    * Stimulus: Ataque de Denegación de Servicio (DoS)
-    * Environment: Operaciones normales
-    * Artifact: CL_web_rp, CL_desktop_rp
-    * Response: Identifica y rechaza las peticiones maliciosas.
-    * Response measure: Identifica el origen de las peticiones y bloquea la ip.
+![VistaDescomposicion](./readmeAssets/escenario2.png)
 
 * Scenario 3: Network Segmentation Pattern
-    * Source: Atacante
-    * Stimulus: 
-    * Environment:
-    * Artifact: 
-    * Response: 
-    * Response measure: 
+![VistaDescomposicion](./readmeAssets/escenario3.png)
 
 * Scenario 4: Authentication with Asymmetric JWT Pattern
-    * Source: Atacante que quiere acceder a información que no corresponde a su usuario
-    * Stimulus: Altera el payload del token
-    * Environment: Operaciones normales
-    * Artifact: CL_web_fe, CL_ag.
-    * Response: Rechaza la petición 
-    * Response measure: Detecta la alteración en el payload del token por el hash
+![VistaDescomposicion](./readmeAssets/escenario4.png)
 
 ### Applied architectural tactics
  * Encrypt Data (Resist Attack)
@@ -278,12 +259,8 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
 ### Performance scenarios
 
 * Scenario 1: Registro usuario administrador y conjunto
-    * Source: X usuarios
-    * Stimulus: X cantidad de peticion en un intervalo de Y tiempo
-    * Environment: Operaciones normales
-    * Artifact: CL_web_rp, CL_web_fe, CL_ag, CL_auth_ms, CL_residence_ms, CL_auth_db, CL_residence_db
-    * Response: Procesa todas las solicitudes.
-    * Response measure: X ms de respuesta por petición.
+![VistaDescomposicion](./readmeAssets/escenario1rend.png)
+
      
 ### Applied architectural tactics
 
