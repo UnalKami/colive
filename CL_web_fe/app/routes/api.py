@@ -66,6 +66,24 @@ def login():
         )
         response.raise_for_status()
         data = response.json()
+        
+        # Agregar información de redirección según el rol
+        if 'rol' in data:
+            if data['rol'] == 'ADMIN_CR':
+                data['redirectUrl'] = '/admin'
+            elif data['rol'] == 'PROPIEDAD_CR':
+                data['redirectUrl'] = '/propietario'
+            elif data['rol'] == 'SEGURIDAD_CR':
+                data['redirectUrl'] = '/seguridad'
+            elif data['rol'] == 'MANTENIMIENTO_CR':
+                data['redirectUrl'] = '/mantenimiento'
+            elif data['rol'] == 'ASEO_CR':
+                data['redirectUrl'] = '/aseo'
+            else:
+                data['redirectUrl'] = '/'
+        else:
+            data['redirectUrl'] = '/'
+        
         flask_response = jsonify(data)
         # Copiar la cabecera Set-Cookie si existe
         
@@ -80,6 +98,48 @@ def obtener_admin_info():
     try:
         response = requests.get(
             'http://CL_ag:8000/auth/admin-info',
+            cookies=request.cookies
+        )
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-residence', methods=['POST'])
+def crear_residence():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/residence/crear-residence',
+            json=payload,
+            cookies=request.cookies
+        )
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-usuario-propiedad', methods=['POST'])
+def crear_usuario_propiedad():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/residence/crear-usuario-propiedad',
+            json=payload,
+            cookies=request.cookies
+        )
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.RequestException as e:
+        return jsonify({"error": str(e)}), 500
+
+@api_bp.route('/crear-usuario-rol', methods=['POST'])
+def crear_usuario_rol():
+    try:
+        payload = request.get_json()
+        response = requests.post(
+            'http://CL_ag:8000/auth/crear-usuario-rol',
+            json=payload,
             cookies=request.cookies
         )
         response.raise_for_status()

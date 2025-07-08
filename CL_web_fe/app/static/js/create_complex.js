@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
             user: variablesUsuario
         };
 
-        fetch('fe-api/registrarUsuarioConjunto', {
+        fetch('/fe-api/registrarUsuarioConjunto', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
