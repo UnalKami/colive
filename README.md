@@ -284,7 +284,7 @@ Aunque los conectores internos del sistema (entre microservicios) usan HTTP sin 
 ![VistaDescomposicion](./readmeAssets/escenario1rend.png)
 
 * Scenario 2: Registro de visitantes peatonales y vehiculares 
-![VistaDescomposicion](./readmeAssets/escenario2rend.png)
+![VistaDescomposicion](./readmeAssets/escenario2ren.png)
      
 ### Applied architectural tactics
 
