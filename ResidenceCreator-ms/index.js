@@ -10,7 +10,7 @@ const Reserva = require('./models/Reserva'); //modelo de Reserva
 const visitantesRouter = require('./routes/visitantes');
 
 const app = express();
-// app.use(bodyParser.json());
+app.use(bodyParser.json());
 
 app.use('/api/visitantes', visitantesRouter);
 

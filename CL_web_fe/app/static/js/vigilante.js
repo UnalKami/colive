@@ -1,119 +1,107 @@
-document.getElementById('btnPeaton').onclick = function(e) {
+// Event listeners para abrir modales
+document.getElementById('btnPeaton').addEventListener('click', function(e) {
   e.preventDefault();
-  document.getElementById('dialogPeaton').showModal();
-};
-document.getElementById('btnVehiculo').onclick = function(e) {
+  new bootstrap.Modal(document.getElementById('modalPeaton')).show();
+});
+
+document.getElementById('btnVehiculo').addEventListener('click', function(e) {
   e.preventDefault();
-  document.getElementById('dialogVehiculo').showModal();
-};
+  new bootstrap.Modal(document.getElementById('modalVehiculo')).show();
+});
 
-document.getElementById('btnPeaton').onclick = function(e) {
+document.getElementById('btnSalida').addEventListener('click', function(e) {
   e.preventDefault();
-  // Obtener fecha y hora actual en formato compatible con datetime-local
-  const now = new Date();
-  const offset = now.getTimezoneOffset();
-  const localDate = new Date(now.getTime() - (offset * 60000));
-  document.getElementById('diaIngreso').value = localDate.toISOString().slice(0,16);
-  document.getElementById('dialogPeaton').showModal();
-};
+  new bootstrap.Modal(document.getElementById('modalSalida')).show();
+});
 
-document.getElementById('btnVehiculo').onclick = function(e) {
-  e.preventDefault();
-  // Obtener fecha y hora actual en formato compatible con datetime-local
-  const now = new Date();
-  const offset = now.getTimezoneOffset();
-  const localDate = new Date(now.getTime() - (offset * 60000));
-  document.getElementById('diaIngresoVehicular').value = localDate.toISOString().slice(0,16);
-  document.getElementById('registroVehicularDialog').showModal();
-};
+// Funciones para registrar visitantes
+async function registrarPeaton() {
+  const form = document.getElementById('formPeaton');
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData);
+  const token = localStorage.getItem('authToken');
 
+  try {
+    const response = await fetch('/residence/visitantes/peaton', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
 
-document.getElementById('btnSalida').onclick = function(e) {
-  e.preventDefault();
-  document.getElementById('salidaVehiculoDialog').showModal();
-};
-
-// Opcional: puedes agregar lógica para manejar el submit del formulario
-document.getElementById('formSaida').onsubmit = function(e) {
-  // Aquí puedes agregar la lógica para verificar la placa
-  // Por ejemplo, enviar los datos por fetch/AJAX
-  // e.preventDefault(); // Descomenta si quieres manejar el envío manualmente
-};
-
-// Para peatón
-document.getElementById('formPeaton').onsubmit = async function(e) {
-  e.preventDefault();
-
-  const datos = {
-    diaIngreso: this.diaIngreso.value,
-    nombreVisitante: this.nombreVisitante.value,
-    visitanteDocumento: this.visitanteDocumento.value,
-    Destino: this.Destino.value,
-    nombreAutoriza: this.nombreAutoriza.value
-  };
-
-  const respuesta = await fetch('/api/visitantes/peaton', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datos)
-  });
-  const data = await respuesta.json();
-
-  if (respuesta.ok) {
-    alert('Registro exitoso');
-    document.getElementById('registroDialog').close();
-  } else {
-    alert(data.error || 'Error al registrar');
+    const result = await response.json();
+    
+    if (response.ok) {
+      alert('Visitante peatón registrado exitosamente');
+      bootstrap.Modal.getInstance(document.getElementById('modalPeaton')).hide();
+      form.reset();
+    } else {
+      alert('Error: ' + result.error);
+    }
+  } catch (error) {
+    alert('Error de conexión: ' + error.message);
   }
-};
+}
 
-document.getElementById('formVehicular').onsubmit = async function(e) {
-  e.preventDefault();
+async function registrarVehiculo() {
+  const form = document.getElementById('formVehiculo');
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData);
+  data.espacioAsignado = parseInt(data.espacioAsignado);
+  const token = localStorage.getItem('authToken');
 
-  const datos = {
-    diaIngreso: this.diaIngreso.value,
-    nombreVisitante: this.nombreVisitante.value,
-    visitanteDocumento: this.visitanteDocumento.value,
-    Destino: this.Destino.value,
-    nombreAutoriza: this.nombreAutoriza.value,
-    placaVehiculo: this.placaVehiculo.value,
-    tipoVehiculo: this.tipoVehiculo.value,
-    espacioAsignado: this.espacioAsignado.value  
-};
+  try {
+    const response = await fetch('/residence/visitantes/vehicular', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
 
-  const respuesta = await fetch('/api/visitantes/vehicular', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(datos)
-  });
-
-  const data = await respuesta.json();
-
-  if (respuesta.ok) {
-    alert('Registro exitoso');
-    document.getElementById('registroVehicularDialog').close();
-  } else {
-    alert(data.error || 'Error al registrar');
+    const result = await response.json();
+    
+    if (response.ok) {
+      alert('Visitante vehicular registrado exitosamente');
+      bootstrap.Modal.getInstance(document.getElementById('modalVehiculo')).hide();
+      form.reset();
+    } else {
+      alert('Error: ' + result.error);
+    }
+  } catch (error) {
+    alert('Error de conexión: ' + error.message);
   }
-};
+}
 
-// Supón que tienes un formulario con id="formSaida"
-document.getElementById('formSaida').onsubmit = async function(e) {
-  e.preventDefault();
-  const placa = this.placaVehiculo.value;
+async function registrarSalida() {
+  const form = document.getElementById('formSalida');
+  const formData = new FormData(form);
+  const data = Object.fromEntries(formData);
+  const token = localStorage.getItem('authToken');
 
-  const respuesta = await fetch('/api/visitantes/vehicular/salida', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ placaVehiculo: placa })
-  });
+  try {
+    const response = await fetch('/residence/visitantes/vehicular/salida', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
 
-  const data = await respuesta.json();
-
-  if (respuesta.ok) {
-    alert('Salida registrada correctamente');
-    document.getElementById('salidaVehiculoDialog').close();
-  } else {
-    alert(data.error || 'Error al registrar la salida');
+    const result = await response.json();
+    
+    if (response.ok) {
+      alert('Salida registrada exitosamente');
+      bootstrap.Modal.getInstance(document.getElementById('modalSalida')).hide();
+      form.reset();
+    } else {
+      alert('Error: ' + result.error);
+    }
+  } catch (error) {
+    alert('Error de conexión: ' + error.message);
   }
-};
+}

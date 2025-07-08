@@ -16,9 +16,8 @@ const connectDB = async () => {
 
     // Conexión PostgreSQL
     await sequelize.authenticate();
-    console.log('PostgreSQL conectado');
-
-
+    await sequelize.sync({ alter: true });
+    console.log('PostgreSQL conectado y modelos sincronizados');
 };
 
 module.exports = {connectDB, sequelize};

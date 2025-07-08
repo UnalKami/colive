@@ -200,3 +200,44 @@ async def obtener_panel_propietario():
             "conjuntos": data["data"]["conjuntos"],
             "residencias": data["data"]["residences"]
         }
+
+# Funciones para visitantes
+async def registrar_visitante_peaton(visitante_data):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/api/visitantes/peaton",
+            json=visitante_data
+        )
+        response.raise_for_status()
+        return response.json()
+
+async def registrar_visitante_vehicular(visitante_data):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/api/visitantes/vehicular",
+            json=visitante_data
+        )
+        response.raise_for_status()
+        return response.json()
+
+async def registrar_salida_vehiculo(salida_data):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/api/visitantes/vehicular/salida",
+            json=salida_data
+        )
+        response.raise_for_status()
+        return response.json()
+
+async def obtener_visitantes_conjunto(idConjunto, fecha=None):
+    params = {}
+    if fecha:
+        params["fecha"] = fecha
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{RESIDENCE_MS_URL}/api/visitantes/conjunto/{idConjunto}",
+            params=params
+        )
+        response.raise_for_status()
+        return response.json()

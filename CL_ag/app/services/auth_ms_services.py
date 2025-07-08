@@ -90,3 +90,15 @@ async def delete_conjunto_auth(conjunto_id):
         response = await client.delete(f"{AUTH_MS_URL}/api/crear/conjunto/{conjunto_id}")
         response.raise_for_status()
         return response.json()
+
+async def verify_token(token):
+    """
+    Verify JWT token with the authentication microservice.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            f"{AUTH_MS_URL}/auth/verify-token",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        response.raise_for_status()
+        return response.json()

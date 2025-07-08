@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response, Header
 from pydantic import BaseModel
-from app.services.auth_ms_services import get_saludo, post_login
+from app.services.auth_ms_services import get_saludo, post_login, verify_token
 import httpx
 from httpx import HTTPStatusError
 
@@ -29,3 +29,15 @@ async def login(request: LoginRequest, response: Response):
         raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/verify-token")
+async def verify_token_endpoint(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token no proporcionado")
+    
+    token = authorization.split(" ")[1]
+    try:
+        user_data = await verify_token(token)
+        return user_data
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Token inválido")
