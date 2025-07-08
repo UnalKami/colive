@@ -74,7 +74,7 @@
       <a href="#">Gestión de Personal</a>
       <a href="#">Información General</a>
       <a href="#">Resultados Asambleas</a>
-      <a href="#">Consultar Contacto Apartamento</a>
+      <a href="/registro-rol">Registro de Usuarios</a>
       <a href="/propietario">Propietario</a>
       <a href="/reservas">Reservas</a>
     </div>
@@ -83,7 +83,7 @@
     <main class="container my-5">
       <h1 class="text-center page-title mb-4">Panel Administrativo</h1>
       <p class="lead text-center mb-5">
-        Bienvenido(a). Desde aquí puedes gestionar incidencias, personal, información general, asambleas y consultar contactos de apartamentos.
+        Bienvenido(a). Desde aquí puedes gestionar incidencias, personal, información general, asambleas y registrar nuevos usuarios del conjunto.
       </p>
 
       <!-- Tarjetas de acceso rápido -->
@@ -135,10 +135,10 @@
         <div class="col-md-5">
           <div class="card shadow-sm h-100 text-center border-0">
             <div class="card-body">
-              <i class="bi bi-house-door-fill fs-1 text-secondary"></i>
-              <h5 class="card-title mt-3">Contacto Apartamento</h5>
-              <p class="card-text">Consulta la información de contacto de cualquier apartamento.</p>
-              <a href="#" class="btn btn-primary w-100">Consultar Contacto</a>
+              <i class="bi bi-person-plus-fill fs-1 text-success"></i>
+              <h5 class="card-title mt-3">Registro de Usuarios</h5>
+              <p class="card-text">Registra nuevos usuarios del conjunto: propietarios, personal de seguridad, mantenimiento y aseo.</p>
+              <a href="/registro-rol" class="btn btn-primary w-100">Registrar Usuario</a>
             </div>
           </div>
         </div>
@@ -172,27 +172,6 @@
             <li>Asamblea Ordinaria 2025: <span class="text-success">Resultados publicados</span></li>
             <li>Votación de presupuesto: <span class="text-danger">Resultados ocultos</span></li>
           </ul>
-        </div>
-      </div>
-
-      <!-- Consulta de contacto apartamento -->
-      <div class="card shadow-sm border-0 mb-5">
-        <div class="card-header bg-secondary text-white">
-          <i class="bi bi-house-door-fill"></i> Consulta de Información de Contacto de Apartamento
-        </div>
-        <div class="card-body">
-          <form class="row g-3">
-            <div class="col-md-6">
-              <label for="numeroApto" class="form-label">Número de Apartamento</label>
-              <input type="text" class="form-control" id="numeroApto" placeholder="Ej: 302B">
-            </div>
-            <div class="col-md-6 d-flex align-items-end">
-              <button type="submit" class="btn btn-primary">Consultar</button>
-            </div>
-          </form>
-          <div id="resultadoContacto" class="mt-4">
-            <!-- Aquí se muestra la información de contacto consultada -->
-          </div>
         </div>
       </div>
     </main>

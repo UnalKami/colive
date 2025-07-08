@@ -58,6 +58,50 @@ async def get_admin_info(cookies):
         response.raise_for_status()
         return response.json()
 
+async def crear_usuario_por_rol(user_data):
+    """
+    Crear usuario según su rol específico en el microservicio de autenticación.
+    """
+    rol = user_data.get('rol')
+    
+    # Mapear rol a endpoint específico
+    endpoint_map = {
+        'SEGURIDAD_CR': '/api/registro/seguridad',
+        'MANTENIMIENTO_CR': '/api/registro/mantenimiento', 
+        'ASEO_CR': '/api/registro/aseo',
+        'PROPIEDAD_CR': '/api/registro/propietario'
+    }
+    
+    endpoint = endpoint_map.get(rol)
+    if not endpoint:
+        raise Exception(f"Rol no válido: {rol}")
+    
+    # Preparar datos para el microservicio
+    payload = {
+        "username": user_data["username"],
+        "nombre": user_data["nombre"],
+        "correo": user_data["correo"],
+        "password": user_data["password"],
+        "celular": int(user_data["celular"]) if user_data["celular"].isdigit() else 0
+    }
+    
+    async with httpx.AsyncClient() as client:
+        print(f"Creando usuario {rol} con datos: {payload}")
+        response = await client.post(f"{AUTH_MS_URL}{endpoint}", json=payload)
+        response.raise_for_status()
+        result = response.json()
+        
+        return {
+            "success": True,
+            "message": f"Usuario {rol} creado exitosamente",
+            "user": {
+                "id": result.get("usuarioId"),
+                "username": user_data["username"],
+                "nombre": user_data["nombre"],
+                "rol": rol
+            }
+        }
+
 async def delete_user(user_id):
     """
     Delete a user in the authentication microservice by user ID.

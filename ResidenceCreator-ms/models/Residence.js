@@ -29,6 +29,7 @@ const ReciboServicioSchema = new Schema({
 const ResidenceSchema = new Schema({
   code: { type: String, required: true, unique: true },
   conjuntoId: { type: Schema.Types.ObjectId, ref: 'Conjunto', required: true },
+  userId: { type: Number, required: false, default: null }, // ID del usuario propietario/residente
   parqueadero: { type: Number, required: false, default: null },
   bodega: { type: Number, required: false, default: null },
   //administracion: { type: AdministracionSchema, required: true },
