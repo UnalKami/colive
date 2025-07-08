@@ -326,7 +326,7 @@ Las pruebas de carga se usaron para verificar el comportamiento del sistema bajo
 
 ### *Resultados de rendimiento*
 En este tipo de pruebas se queria hallar el "knee point" de nuestro sistema, para poder indentificar la máxima recurrencia en operación normal que se tiene en el sistema, donde obtuvimos las siguientes metricas:
-1. **Escenario 1**:
+1. **Escenario 1**: Creación de adminitrador y conjunto (Escenario con mayor carga sobre los modulos)
 
 |Usuarios Virtuales|Tiempo Respuesta p50 (ms)|	Tiempo Respuesta p90 (ms)|Tiempo Respuesta p95 (ms)|Throughput Promedio (req/s)|Success Rate Promedio (%)|
 |---|----|----|---|---|----|
@@ -340,14 +340,34 @@ En este tipo de pruebas se queria hallar el "knee point" de nuestro sistema, par
 |80|8,500|25,400|35,200|4.2|8.90%|
 |100|18,340|39,560|45,910|2.6|69.20%|
 
-2. **Escenario 2**:
+2. **Escenario 2**: Registro de visitantes peatonales y vehiculares (Escenario con mayor carga por concurrencia)
+
+|Usuarios Virtuales	|Tiempo Respuesta p50 (ms)	|Tiempo Respuesta p90 (ms)	|Tiempo Respuesta p95 (ms)|	Throughput Promedio (req/s)	|Success Rate Promedio (%)|
+|-|-|-|-|-|-|
+|10	|420	|680	|850	|12.4	|99.20%|
+|20	|650	|1,100	|1,350	|18.8	|98.10%|
+|30	|890	|1,650	|2,100	|24.2	|96.50%|
+|40	|1,280|	2,400	|3,200	|26.1	|94.80%|
+|50	|1,750|	3,800	|4,900	|25.8	|92.40%|
+|60	|2,340	|5,600	|7,200	|23.4	|89.60%|
+|70	|3,120	|8,900	|12,400	|20.7	|86.20%|
+|80	|4,850	|14,200	|19,800	|17.2	|82.10%|
+|90	|7,680	|22,400	|31,500	|13.6	|76.80%|
+|100	|12,450	|35,200	|48,900	|9.8	|68.40%|
 
 ### *Puntos criticos*
 1. **API Gateway**: Se identifico que el API Gateway en su labor de orquestación es capaz de recibir todas las peteciones, sin embargo cuando estos superan las capacidades este colapsa y hace que las peticiones sean rechazadas
-2. 
-### *Propuestas de mejora*
+2. **Recursos computacionales**: Llegado a un numero de 80VUs hay un colapso por parte del equipo que realiza las prueba, por lo que si se espera revisar rendimiento de una manera mas exahustiva se recomienda hacer uso de una maquina con mejores atributos.
+3. **Optimización de los contenedores**: Hay contenedores que presentan un uso en situaciones que no son requeridos, por lo que existe un un mal uso de los recursos.
 
+### *Propuestas de mejora*
+1. Replicar el API Gateway para distribuir la carga de orquestación
+2. Optimizar los contenedores y limitar sus recursos.
+3. Realizar validación sobre las request para optimizarlas y evitar una sobre carga al Api Gateway.
+   
 ### *Grafica Knee Point*
+![Escenario #1_Tiempo de Respuesta_(ms) y Escenario #2_Tiempo de Respuesta_(ms)](https://github.com/user-attachments/assets/48810aa6-23c3-446e-90c2-604d808f9c56)
+
 ## **Prototype**
 ### Instructions for deploying the software system locally
 #### **Prerequisites**
