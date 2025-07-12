@@ -14,6 +14,8 @@ import com.javacomponent.authjavacomponent.repository.ConjuntoResidencialReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,4 +93,15 @@ public class RegistroService {
     // Eliminar el usuario
     usuarioRepository.delete(usuario);
 }
+
+
+
+    public String crearToken(Integer rolId) {
+        LocalDateTime now = LocalDateTime.now();
+
+        String rawToken = now.toString() + ":" + rolId;
+        String token = Base64.getEncoder().encodeToString(rawToken.getBytes());
+
+        return token;
+    }
 }

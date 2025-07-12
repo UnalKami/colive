@@ -2,6 +2,7 @@ package com.javacomponent.authjavacomponent.controller;
 
 import com.javacomponent.authjavacomponent.dto.RegistroRequestDTO;
 import com.javacomponent.authjavacomponent.model.Rol;
+import com.javacomponent.authjavacomponent.service.MessangingConecctionService;
 import com.javacomponent.authjavacomponent.service.RegistroService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,9 @@ public class RegistroController {
     @Autowired
     private RegistroService registroService;
 
+    @Autowired
+    private MessangingConecctionService messagingController;
+
     @PostMapping("/admin")
     public ResponseEntity<Map<String, Object>> registrarAdmin(@RequestBody RegistroRequestDTO dto) {
         try {
@@ -25,55 +29,40 @@ public class RegistroController {
         }
     }
 
-    @PostMapping("/propietario")
-    public ResponseEntity<Map<String, Object>> registrarPropietario(@RequestBody RegistroRequestDTO dto) {
+    @PostMapping("/{token}")
+    public ResponseEntity<Map<String, Object>> registrarUsuarioConToken(
+            @RequestBody RegistroRequestDTO dto,
+            @RequestParam("token") String token) {
         try {
-            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.PROPIEDAD_CR);
+            // Puedes usar el token aquí si lo necesitas
+            //TODO llamar al servicio para obtener id del rol
+            Long rolId =  messagingController.sesionActiva(token);
+            Map<String, Object> response = registroService.registrarUsuario(dto, rolId);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    @PostMapping("/residente")
-    public ResponseEntity<Map<String, Object>> registrarRecidente(@RequestBody RegistroRequestDTO dto) {
+    @GetMapping("/crearQR/{idRol}")
+    public ResponseEntity<Map<String, Object>> crearQr(@RequestBody Map<String, Object> request) {
         try {
-            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.RESIDENTE_CR);
+            Integer idRol = (Integer) request.get("idRol");
+            if (idRol == null) {
+                return ResponseEntity.badRequest().body(Map.of("error", "idRol no proporcionado"));
+            }
+            String token = registroService.crearToken(idRol);
+            String mensaje = messagingController.crearSesion(token, Long.valueOf(idRol));
+            Map<String, Object> response = Map.of(
+                    "token", token,
+                    "mensaje", mensaje
+            );
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-    }
+    } 
 
-    @PostMapping("/seguridad")
-    public ResponseEntity<Map<String, Object>> registrarSeguridad(@RequestBody RegistroRequestDTO dto) {
-        try {
-            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.SEGURIDAD_CR);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @PostMapping("/mantenimiento")
-    public ResponseEntity<Map<String, Object>> registrarMantenimiento(@RequestBody RegistroRequestDTO dto) {
-        try {
-            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.MANTENIMIENTO_CR);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @PostMapping("/aseo")
-    public ResponseEntity<Map<String, Object>> registrarAseo(@RequestBody RegistroRequestDTO dto) {
-        try {
-            Map<String, Object> response = registroService.registrarUsuario(dto, Rol.ASEO_CR);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
-    }
     @DeleteMapping("/usuario/{id}")
     public ResponseEntity<Map<String, Object>> eliminarUsuario(@PathVariable Long id) {
         try {
@@ -83,4 +72,5 @@ public class RegistroController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
 }
