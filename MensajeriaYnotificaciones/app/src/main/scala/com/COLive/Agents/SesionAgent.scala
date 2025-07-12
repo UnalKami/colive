@@ -48,7 +48,11 @@ object SesionAgent {
               // Buscar en Mongo y devolver el rolId en JSON
               RolTokenService.obtenerRolToken(token).onComplete {
                 case scala.util.Success(Some(idRol)) =>
-                  replyTo ! OperationResult(success = true, message = s"""{"idRol":"${idRol}"}""")
+                  //borrar el token de la cache
+                  active(tokens - token)
+                  //borrar el token de Mongo
+                  RolTokenService.eliminarRolToken(token)
+                  replyTo ! OperationResult(success = true, message = s"""{"idRol":"${idRol}","borrado":true}""")
                 case scala.util.Success(None) =>
                   replyTo ! OperationResult(success = false, message = "Token no encontrado")
                 case scala.util.Failure(ex) =>
