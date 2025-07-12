@@ -145,7 +145,7 @@ services:
       - CL_auth_db
 
   CL_residence_ms:
-    image: node:23.11.1-alpine3.21
+    image: conjunto-residencial-cl_residence_ms
     container_name: CL_residence-ms
     build:
       context: ./ResidenceCreator-ms  
@@ -165,8 +165,8 @@ services:
       context: ./MensajeriaYnotificaciones
       dockerfile: Dockerfile.sbt-alpine
     container_name: CL_messaging-ms
-    # ports:
-    #   - "7000:7000"
+    #ports:
+    #  - "7000:7000"
     environment:
       SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
       MONGO_URI: "mongodb://root:cincopatodos@cl_messaging_db:27017/correos?authSource=admin"
