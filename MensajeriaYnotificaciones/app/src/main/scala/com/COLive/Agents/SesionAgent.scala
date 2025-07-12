@@ -6,94 +6,77 @@ import akka.actor.typed.scaladsl.{Behaviors, TimerScheduler}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.RemoteAddress
 import akka.util.Timeout
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import com.COLive.Models.{TokenRequest, OperationResult, RolToken}
+import com.COLive.JsonSupport._
+import com.COLive.Services.RolTokenService
 
-import com.COLive.Models.{Token, TokenRequest, OperationResult}
-import com.COLive.JsonSupport._ 
-import java.net.InetAddress
-
-/**
- * Actor que gestiona tokens de sesión: crear, verificar, refrescar, eliminar.
- * TTL: 1 hora. Cada 10 min purga expirados.
- */
 object SesionAgent {
   // Comandos
   sealed trait Command
-  final case class SetSesionToken(token: Token, replyTo: ActorRef[OperationResult])    extends Command
-  final case class ActiveSesionToken(token: Token, replyTo: ActorRef[OperationResult]) extends Command
-  final case class DeleteSesionToken(token: Token, replyTo: ActorRef[OperationResult]) extends Command
-  final case class RefreshSesionToken(token: Token, replyTo: ActorRef[OperationResult]) extends Command
-
+  final case class SetSesionToken(tokenObj: TokenRequest, replyTo: ActorRef[OperationResult])    extends Command
+  final case class ActiveSesionToken(token: String, replyTo: ActorRef[OperationResult]) extends Command
   private case object Cleanup extends Command
 
-  private val TTL_MILLIS: Long = 60 * 60 * 1000
-
-  def apply(): Behavior[Command] =
+  def apply()(implicit ec: ExecutionContext): Behavior[Command] =
     Behaviors.withTimers { timers =>
       timers.startTimerAtFixedRate(Cleanup, 10.minutes)
       active(Map.empty)
     }
 
-  private def active(tokens: Map[Token, Long]): Behavior[Command] =
+  private def active(tokens: Map[String, Long])(implicit ec: ExecutionContext): Behavior[Command] =
     Behaviors.receive { (context, message) =>
       message match {
         case SetSesionToken(tokenObj, replyTo) =>
-          val expiry = System.currentTimeMillis() + TTL_MILLIS
-          replyTo ! OperationResult(success = true, message = s"Token registrado; expira en $expiry")
-          active(tokens + (tokenObj -> expiry))
+          // Guardar en Mongo
+          val rolToken = new RolToken(tokenObj.idRol, tokenObj.token)
+          RolTokenService.guardarRolToken(rolToken).onComplete {
+            case scala.util.Success(_) =>
+              replyTo ! OperationResult(success = true, message = s"Token registrado; expira en ${rolToken.expiry}")
+            case scala.util.Failure(ex) =>
+              replyTo ! OperationResult(success = false, message = s"Error al guardar token: ${ex.getMessage}")
+          }
+          active(tokens + (rolToken.token -> rolToken.expiry))
 
-        case ActiveSesionToken(tokenObj, replyTo) =>
+        case ActiveSesionToken(token, replyTo) =>
           val now = System.currentTimeMillis()
-          tokens.get(tokenObj) match {
+          tokens.get(token) match {
             case Some(expiry) if expiry > now =>
-              replyTo ! OperationResult(success = true, message = "Acceso concedido")
+              // Buscar en Mongo y devolver el rolId en JSON
+              RolTokenService.obtenerRolToken(token).onComplete {
+                case scala.util.Success(Some(idRol)) =>
+                  replyTo ! OperationResult(success = true, message = s"""{"idRol":"${idRol}"}""")
+                case scala.util.Success(None) =>
+                  replyTo ! OperationResult(success = false, message = "Token no encontrado")
+                case scala.util.Failure(ex) =>
+                  replyTo ! OperationResult(success = false, message = s"Error: ${ex.getMessage}")
+              }
               Behaviors.same
             case Some(_) =>
-              replyTo ! OperationResult(success = false, message = "Token expirado")
-              active(tokens - tokenObj)
+              // Token expirado, eliminar de Mongo
+              RolTokenService.eliminarRolToken(token)
+              active(tokens - token)
             case None =>
               replyTo ! OperationResult(success = false, message = "Token no encontrado")
               Behaviors.same
           }
 
-        case RefreshSesionToken(token, replyTo) =>
-          val now = System.currentTimeMillis()
-          tokens.get(token) match {
-            case Some(expiry) if expiry > now =>
-              val newExpiry = now + TTL_MILLIS
-              replyTo ! OperationResult(success = true, message = s"Token refrescado; nuevo expiry en $newExpiry")
-              active(tokens + (token -> newExpiry))
-            case Some(_) =>
-              replyTo ! OperationResult(success = false, message = "Token expirado, no se puede refrescar")
-              active(tokens - token)
-            case None =>
-              replyTo ! OperationResult(success = false, message = "Token no existe, no se puede refrescar")
-              Behaviors.same
-          }
-
-        case DeleteSesionToken(token, replyTo) =>
-          if tokens.contains(token) then
-            replyTo ! OperationResult(success = true, message = "Token eliminado")
-            active(tokens - token)
-          else
-            replyTo ! OperationResult(success = false, message = "Token no encontrado")
-            Behaviors.same
-
         case Cleanup =>
           val now = System.currentTimeMillis()
+          val expiredTokens = tokens.filter { case (_, expiry) => expiry <= now }
+          expiredTokens.keys.foreach { token =>
+            RolTokenService.eliminarRolToken(token)
+          }
           val cleaned = tokens.filter { case (_, expiry) => expiry > now }
           active(cleaned)
       }
     }
 }
 
-/**
- * Rutas HTTP para SesionAgent, bajo /msg/sesion.
- */
+// Rutas HTTP para SesionAgent, bajo /msg/sesion.
 object SesionAgentRoutes {
   def route(actor: ActorRef[SesionAgent.Command])(implicit system: ActorSystem[?]): Route = {
     implicit val timeout: Timeout = Timeout(3.seconds)
@@ -108,9 +91,8 @@ object SesionAgentRoutes {
             extractClientIP { clientIp =>
               val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
               entity(as[TokenRequest]) { dto =>
-                val tokenObj = Token(dto.token, ipStr)
                 val resultF: Future[OperationResult] =
-                  actor.ask(ref => SesionAgent.SetSesionToken(tokenObj, ref))
+                  actor.ask(ref => SesionAgent.SetSesionToken(dto, ref))
                 onSuccess(resultF) { result =>
                   if result.success then complete(StatusCodes.Created, result.message)
                   else complete(StatusCodes.InternalServerError, result.message)
@@ -125,38 +107,10 @@ object SesionAgentRoutes {
           extractClientIP { clientIp =>
             val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
             val resultF: Future[OperationResult] =
-              actor.ask(ref => SesionAgent.ActiveSesionToken(Token(token, ipStr), ref))
+              actor.ask(ref => SesionAgent.ActiveSesionToken(token, ref))
             onSuccess(resultF) { result =>
               if result.success then complete(StatusCodes.OK, result.message)
               else complete(StatusCodes.Unauthorized, result.message)
-            }
-          }
-        },
-
-        // PUT /msg/sesion/refrescar/{token}
-        path("refrescar" / Segment) { token =>
-          extractClientIP { clientIp =>
-            val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
-            val resultF: Future[OperationResult] =
-              actor.ask(ref => SesionAgent.RefreshSesionToken(Token(token, ipStr), ref))
-            onSuccess(resultF) { result =>
-              if result.success then complete(StatusCodes.OK, result.message)
-              else complete(StatusCodes.Unauthorized, result.message)
-            }
-          }
-        },
-
-        // DELETE /msg/sesion/{token}
-        path(Segment) { token =>
-          delete {
-            extractClientIP { clientIp =>
-              val ipStr = clientIp.toOption.map(_.getHostAddress).getOrElse("desconocido")
-              val resultF: Future[OperationResult] =
-                actor.ask(ref => SesionAgent.DeleteSesionToken(Token(token, ipStr), ref))
-              onSuccess(resultF) { result =>
-                if result.success then complete(StatusCodes.OK, result.message)
-                else complete(StatusCodes.NotFound, result.message)
-              }
             }
           }
         }
