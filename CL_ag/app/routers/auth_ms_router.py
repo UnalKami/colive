@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Response, Request
 from pydantic import BaseModel
-from app.services.auth_ms_services import get_saludo, post_login, get_admin_info, crear_usuario_por_rol
+from app.services.auth_ms_services import get_saludo, post_login, get_admin_info, crear_usuario_por_rol, get_token_rol
 import httpx
 from httpx import HTTPStatusError
 
@@ -51,6 +51,15 @@ async def obtener_admin_info(request: Request):
 async def crear_usuario_rol(request: CrearUsuarioRolRequest):
     try:
         return await crear_usuario_por_rol(request.dict())
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@router.get("/obtenerTokenRol/{rol}")
+async def obtener_token_rol(rol: int):
+    try:
+        return await get_token_rol(rol)
     except httpx.HTTPStatusError as e:
         raise HTTPException(status_code=e.response.status_code, detail=e.response.text)
     except Exception as e:

@@ -65,3 +65,7 @@ def setSMTP():
 @frontend_bp.route('/sendMail')
 def sendEmail():
     return render_template('sendMail.html')
+
+@frontend_bp.route('/generarQR')
+def generarQR():
+    return render_template('generarQR.html')

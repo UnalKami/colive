@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Generar QR para Rol</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../static/css/registro.css" />
+  <style>
+    header { background-color: #3d464e; }
+    .btn-generate {
+      background-color: #198754;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 0.5rem 2rem;
+      margin-top: 1rem;
+    }
+    .btn-generate:hover {
+      background-color: #145c32;
+      color: #fff;
+    }
+    .qr-container {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    #qrCode {
+      margin: 0 auto;
+      display: block;
+      max-width: 300px;
+    }
+    .form-label { font-weight: 500; }
+  </style>
+  <!-- QRCode.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- HEADER -->
+    <header class="border-bottom shadow-sm py-2">
+      <div class="container d-flex justify-content-between align-items-center">
+        <a href="../index.html">
+          <img src="../static/img/colive_logo.png" alt="Colive Logo" style="height: 50px;" />
+        </a>
+        <div>
+          <a class="btn-login" href="../login/login.html">Iniciar Sesión</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="register-container">
+      <div id="background1">
+        <div class="shape1"></div>
+        <div class="shape1"></div>
+      </div>
+      <div id="register-container">
+        <img src="../static/img/Colive_Logo_.png" alt="Colive Logo" />
+        <form id="qr-form" novalidate>
+          <h3 class="mb-3">Generar QR para registro de usuario por rol</h3>
+          <div class="mb-4">
+            <label for="rolSelect" class="form-label">Rol</label>
+            <select class="form-select" id="rolSelect" required>
+              <option value="" disabled selected>Selecciona un rol</option>
+              <option value="1">Administrador</option>
+              <option value="2">Propietario</option>
+              <option value="3">Residente</option>
+              <option value="4">Seguridad</option>
+              <option value="5">Mantenimiento</option>
+              <option value="6">Aseo</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona un rol.</div>
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="enviarCorreoCheck">
+              <label class="form-check-label" for="enviarCorreoCheck">
+                Enviar QR por correo
+              </label>
+            </div>
+          </div>
+          <div id="correoFields" style="display:none;">
+            <div class="mb-3">
+              <label for="correoInput" class="form-label">Para</label>
+              <input type="email" class="form-control" id="correoInput" name="correoInput" maxlength="100" placeholder="destinatario@ejemplo.com">
+              <div class="form-text">Correo destinatario.</div>
+            </div>
+            <div class="mb-3">
+              <label for="fromInput" class="form-label">De</label>
+              <input type="email" class="form-control" id="fromInput" name="fromInput" maxlength="100" placeholder="remitente@ejemplo.com" required>
+              <div class="form-text">
+                Si no tienes un correo registrado, puedes hacerlo en
+                <a href="/setSMTP" class="link-primary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Configurar Remitente</a>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="usernameInput" class="form-label">Usuario</label>
+              <input type="text" class="form-control" id="usernameInput" name="usernameInput" maxlength="100" placeholder="Usuario del remitente" required>
+              <div class="form-text">Usuario registrado para el envío.</div>
+            </div>
+          </div>
+          <div class="d-flex flex-column align-items-center mt-4">
+            <button type="submit" class="btn btn-generate btn-lg">Generar QR</button>
+          </div>
+        </form>
+        <div class="qr-container">
+          <canvas id="qrCode" style="display:none;"></canvas>
+          <div id="qrLink" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer py-3 shadow-lg border-top" style="background-color: #3d464e;">
+      <div class="container fontFooter">
+        <nav class="row justify-content-between">
+          <div class="col-12 col-md-3 d-flex align-items-center justify-content-center mb-3 mb-md-0">
+            <img src="../static/img/Colive_Logo_.png" alt="Logo" class="img-fluid" width="250" height="50" />
+          </div>
+          <ul class="col-12 col-md-2 list-unstyled px-3 mb-3 mb-md-0">
+            <li class="footer-section fw-bold mb-2">COLIVE co-ownership</li>
+          </ul>
+          <ul class="col-12 col-md-3 list-unstyled px-4 mb-3 mb-md-0">
+            <li class="footer-section fw-bold mb-2">Enlaces</li>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/products">Productos</a></li>
+            <li><a href="/about/about.html">Nosotros</a></li>
+            <li><a href="/contact">Contáctanos</a></li>
+            <li><a href="/encuesta">Califícanos</a></li>
+            <li><a href="/terms-and-conditions">Términos y Condiciones</a></li>
+            <li><a href="https://heyzine.com/flip-book/c951be1b87.html">Manual de Usuario</a></li>
+            <li><a href="/preguntas">Preguntas Frecuentes</a></li>
+          </ul>
+          <ul class="col-12 col-md-3 list-unstyled px-4 text-center mb-3 mb-md-0">
+            <li class="footer-section fw-bold mb-2">Síguenos</li>
+            <li class="d-flex justify-content-center gap-3">
+              <a href="https://www.facebook.com/profile.php?id=61557990925535" target="_blank"><i class="bi bi-facebook fs-2"></i></a>
+              <a href="https://www.instagram.com/_natu_tienda/" target="_blank"><i class="bi bi-instagram fs-2"></i></a>
+              <a href="mailto:Colive@gmail.com" target="_blank"><i class="bi bi-envelope fs-2"></i></a>
+            </li>
+          </ul>
+        </nav>
+        <div class="container mt-2">
+          <p class="text-center mb-0 fw-bold">Colive@gmail.com</p>
+          <p class="text-center mb-0 fw-bold">Realizado por el equipo Colive</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.getElementById('qr-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const rol = document.getElementById('rolSelect').value;
+      const correo = document.getElementById('correoInput').value.trim();
+      const qrCanvas = document.getElementById('qrCode');
+      const qrLinkDiv = document.getElementById('qrLink');
+
+      // Validación simple
+      let valid = true;
+      if (!rol) {
+        document.getElementById('rolSelect').classList.add('is-invalid');
+        valid = false;
+      } else {
+        document.getElementById('rolSelect').classList.remove('is-invalid');
+      }
+      if (!valid) return;
+
+      // Espera el token correctamente
+      let token;
+      try {
+        token = await obtenerToken(rol);
+      } catch (err) {
+        qrLinkDiv.innerHTML = `<span class="text-danger">Error obteniendo token: ${err.message}</span>`;
+        return;
+      }
+      if (!token) {
+        qrLinkDiv.innerHTML = `<span class="text-danger">No se pudo obtener el token</span>`;
+        return;
+      }
+
+      // URL destino del QR
+      const url = `${location.origin}/crear-usuario-rol?token=${token}`;
+
+      // Generar QR
+      qrCanvas.style.display = 'block';
+      QRCode.toCanvas(qrCanvas, url, { width: 256 }, function (error) {
+        if (error) {
+          qrLinkDiv.innerHTML = '<span class="text-danger">Error generando QR</span>';
+        } else {
+          qrLinkDiv.innerHTML = `<a href="${url}" target="_blank" class="btn btn-outline-primary mt-2">Ir a registro de usuario por rol</a>`;
+        }
+      });
+
+      // TODO actualizar los datos de acuerdo al checkbox de correo
+      const enviarCorreo = document.getElementById('enviarCorreoCheck').checked;
+      const de = document.getElementById('fromInput').value.trim();
+      const username = document.getElementById('usernameInput').value.trim();
+
+      if (enviarCorreo) {
+        // Validación de campos de correo
+        if (!correo || !de || !username) {
+          qrLinkDiv.innerHTML += `<div class="mt-2 text-danger">Completa todos los campos de correo.</div>`;
+          return;
+        }
+        const mailData = {
+          de: de,
+          username: username,
+          para: correo,
+          asunto: "QR para registro de usuario",
+          cuerpo: `<p>Escanea el siguiente QR para registrar el usuario seleccionado:</p>
+                   <p><strong>Rol:</strong> ${rol}</p>
+                   <p><strong>Token:</strong> ${token}</p>
+                   <p><img src="${qrCanvas.toDataURL()}" alt="QR"></p>
+                   <p>O haz clic en el siguiente enlace:<br>
+                   <a href="${url}">${url}</a></p>`
+        };
+        fetch(`${location.origin}/fe-api/enviarCorreo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(mailData)
+        })
+        .then(resp => resp.text())
+        .then(text => {
+          qrLinkDiv.innerHTML += `<div class="mt-2 text-success">Correo encolado para envio: ${correo}</div>`;
+        })
+        .catch(err => {
+          qrLinkDiv.innerHTML += `<div class="mt-2 text-danger">Error enviando correo: ${err.message}</div>`;
+        });
+      }
+    });
+
+    // Función corregida para obtener el token
+    async function obtenerToken(rol) {
+      const response = await fetch(`${location.origin}/fe-api/obtenerTokenRol?rol=${rol}`);
+      if (!response.ok) throw new Error('Error al obtener el token');
+      const data = await response.json();
+      if (data.token) {
+        return data.token;
+      }
+      throw new Error('Token no encontrado en la respuesta');
+    }
+
+    // Mostrar/ocultar campos de correo
+    document.getElementById('enviarCorreoCheck').addEventListener('change', function() {
+      const correoFields = document.getElementById('correoFields');
+      if (this.checked) {
+        correoFields.style.display = 'block';
+        document.getElementById('correoInput').setAttribute('required', 'required');
+        document.getElementById('fromInput').setAttribute('required', 'required');
+        document.getElementById('usernameInput').setAttribute('required', 'required');
+      } else {
+        correoFields.style.display = 'none';
+        document.getElementById('correoInput').removeAttribute('required');
+        document.getElementById('fromInput').removeAttribute('required');
+        document.getElementById('usernameInput').removeAttribute('required');
+      }
+    });
+  </script>
+</body>
+</html>

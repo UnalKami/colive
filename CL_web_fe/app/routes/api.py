@@ -311,3 +311,21 @@ def panel_propietario():
     except Exception as e:
         print("Error al llamar al gateway:", e)
         return jsonify({"error": str(e)}), 500
+    
+@api_bp.route('/obtenerTokenRol', methods=['GET'])
+def obtener_token():
+    rol = request.args.get('rol')
+    if not rol:
+        return jsonify({"error": "Falta el parámetro 'rol'"}), 400
+    try:
+        # Llama al gateway con POST y body, aunque sea GET externo
+        response = requests.get(
+            f'http://CL_ag:8000/auth/obtenerTokenRol/{rol}'
+        )
+        if(response.elapsed.total_seconds() > ESPERA_MAXIMA):
+            return jsonify({"error": "La solicitud tardó demasiado tiempo"}), 504
+        response.raise_for_status()
+        return jsonify(response.json())
+    except Exception as e:
+        print("Error al llamar al gateway:", e)
+        return jsonify({"error": str(e)}), 500

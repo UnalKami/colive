@@ -146,3 +146,13 @@ async def delete_conjunto_auth(conjunto_id):
         response = await client.delete(f"{AUTH_MS_URL}/api/crear/conjunto/{conjunto_id}")
         response.raise_for_status()
         return response.json()
+    
+async def get_token_rol(rol: int):
+    """
+    Obtiene un token para un rol específico desde el microservicio de autenticación.
+    El microservicio Java espera el parámetro idRol en el body.
+    """
+    async with httpx.AsyncClient() as client:
+        response = await client.get(f"{AUTH_MS_URL}/api/registro/crearQR/{rol}")
+        response.raise_for_status()
+        return response.json()

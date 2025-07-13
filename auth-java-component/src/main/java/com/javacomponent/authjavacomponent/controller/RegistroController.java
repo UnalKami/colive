@@ -45,12 +45,8 @@ public class RegistroController {
     }
 
     @GetMapping("/crearQR/{idRol}")
-    public ResponseEntity<Map<String, Object>> crearQr(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<Map<String, Object>> crearQr(@PathVariable Integer idRol) {
         try {
-            Integer idRol = (Integer) request.get("idRol");
-            if (idRol == null) {
-                return ResponseEntity.badRequest().body(Map.of("error", "idRol no proporcionado"));
-            }
             String token = registroService.crearToken(idRol);
             String mensaje = messagingController.crearSesion(token, Long.valueOf(idRol));
             Map<String, Object> response = Map.of(
