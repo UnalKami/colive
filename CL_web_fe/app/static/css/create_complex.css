@@ -10,10 +10,6 @@
     --input-color: #edededf0;
 }
 
-.uppercase {
-    text-transform: uppercase;
-}
-
 body {
     position: relative;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -26,13 +22,14 @@ body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: url('../img/loginBckg.jpg') no-repeat center center;
-    background-size:cover;
-    opacity: 0.3; /* Adjust opacity as needed */
+    background: 
+        linear-gradient(rgba(22, 29, 39, 0.3), rgba(22, 29, 39, 0.8)),
+        url('../img/loginBckg.jpg') no-repeat center center;
+    background-size: cover;
     z-index: 0;
     pointer-events: none;
 }
-    
+
 .header {
     padding: 1rem;
     text-align: center;

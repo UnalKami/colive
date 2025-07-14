@@ -1,9 +1,13 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request, Header, Depends
 from pydantic import BaseModel
 from app.services.residence_ms_services import (
     crear_reserva, validar_reserva_disponible,
     editar_reserva, eliminar_reserva,
-    obtener_conjuntos_residencias, obtener_reservas, obtener_panel_propietario, crear_residence_con_admin, crear_usuario_propiedad_con_admin
+    obtener_conjuntos_residencias, obtener_reservas,
+    obtener_panel_propietario,
+    registrar_visitante_peaton, registrar_visitante_vehicular,
+    registrar_salida_vehiculo, obtener_visitantes_conjunto,
+    crear_residence_con_admin, crear_usuario_propiedad_con_admin
 )
 
 router = APIRouter()
@@ -27,6 +31,26 @@ class EditarReservaInput(BaseModel):
 class EliminarReservaInput(BaseModel):
     id: str
 
+class VisitantePeatonInput(BaseModel):
+    nombreVisitante: str
+    visitanteDocumento: str
+    destino: str
+    nombreAutoriza: str
+    idConjunto: str
+
+class VisitanteVehicularInput(BaseModel):
+    nombreVisitante: str
+    visitanteDocumento: str
+    destino: str
+    nombreAutoriza: str
+    placaVehiculo: str
+    tipoVehiculo: str
+    espacioAsignado: int
+    idConjunto: str
+
+class SalidaVehiculoInput(BaseModel):
+    placaVehiculo: str
+    idConjunto: str
 class CrearResidenceRequest(BaseModel):
     code: str
     parqueadero: int = None
@@ -154,5 +178,63 @@ async def panel_propietario_endpoint():
     try:
         data = await obtener_panel_propietario()
         return data
+    except Exception as e:
+        return {"error": str(e)}
+
+# Middleware para verificar autenticación
+async def verify_auth_token(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token no proporcionado")
+    
+    token = authorization.split(" ")[1]
+    try:
+        from app.services.auth_ms_services import verify_token
+        user_data = await verify_token(token)
+        return user_data
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Token inválido")
+
+# Endpoints para visitantes
+@router.post("/visitantes/peaton")
+async def registrar_peaton_endpoint(visitante: VisitantePeatonInput, user_data: dict = Depends(verify_auth_token)):
+    if user_data.get('role_name') != 'VIGILANTE':
+        raise HTTPException(status_code=403, detail="Acceso denegado")
+    
+    try:
+        result = await registrar_visitante_peaton(visitante.dict())
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.post("/visitantes/vehicular")
+async def registrar_vehicular_endpoint(visitante: VisitanteVehicularInput, user_data: dict = Depends(verify_auth_token)):
+    if user_data.get('role_name') != 'VIGILANTE':
+        raise HTTPException(status_code=403, detail="Acceso denegado")
+    
+    try:
+        result = await registrar_visitante_vehicular(visitante.dict())
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.post("/visitantes/vehicular/salida")
+async def registrar_salida_endpoint(salida: SalidaVehiculoInput, user_data: dict = Depends(verify_auth_token)):
+    if user_data.get('role_name') != 'VIGILANTE':
+        raise HTTPException(status_code=403, detail="Acceso denegado")
+    
+    try:
+        result = await registrar_salida_vehiculo(salida.dict())
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.get("/visitantes/conjunto/{idConjunto}")
+async def obtener_visitantes_endpoint(idConjunto: str, fecha: str = None, user_data: dict = Depends(verify_auth_token)):
+    if user_data.get('role_name') != 'VIGILANTE':
+        raise HTTPException(status_code=403, detail="Acceso denegado")
+    
+    try:
+        result = await obtener_visitantes_conjunto(idConjunto, fecha)
+        return result
     except Exception as e:
         return {"error": str(e)}

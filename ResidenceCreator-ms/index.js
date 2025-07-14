@@ -11,6 +11,10 @@ const visitantesRouter = require('./routes/visitantes');
 const residencesRouter = require('./routes/residences');
 
 const app = express();
+app.use(bodyParser.json());
+
+app.use('/api/visitantes', visitantesRouter);
+
 
 connectDB();
 
