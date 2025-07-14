@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async function() {
           }
         }
       `;
-      const res = await fetch('http://localhost:3001/graphql', {
+      const res = await fetch('/graphql', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
       console.log('datos cargados:', conjuntos, residencias);
     }
-
+    
     cargarDatos();
 
     conjuntoSel.addEventListener('change', function() {
