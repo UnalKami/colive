@@ -52,7 +52,6 @@ object MongoService {
   private val collection = database.getCollection("salida_correos", classOf[SalidaCorreo])
   private val colaCollection = database.getCollection("cola_envio", classOf[CorreoEnCola])
 
-
   /** Guarda o actualiza la configuración SMTP en Mongo.
     * Retorna Future[UpdateResult] del replaceOne(upsert=true).
     */

@@ -1,7 +1,6 @@
 package com.COLive.Models
 
-final case class TokenRequest(token: String)
-final case class Token(token: String, ip: String)
+final case class TokenRequest(token: String, idRol: Int)
 final case class OperationResult(success: Boolean, message: String)
 
 // DTO de respuesta: lista de configuraciones
