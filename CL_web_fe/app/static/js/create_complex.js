@@ -102,19 +102,41 @@ document.addEventListener('DOMContentLoaded', function() {
     //-- Terminos y condiciones --//
     const openLink       = document.getElementById('openTermsLink');
     const termsDialog    = document.getElementById('termsDialog');
+    const termsContent   = document.getElementById('termsContent');
     const closeButtons   = termsDialog.querySelectorAll('[data-action="close"]');
 
     openLink.addEventListener('click', function (e) {
         e.preventDefault();
-        if (typeof termsDialog.showModal === 'function') {
-        termsDialog.showModal();
-        } else {
-        alert('Tu navegador no soporta <dialog>. Actualiza tu navegador.');
-        }
+    
+        fetch('/terminos-condiciones')
+            .then(response => response.text())
+            .then(html => {
+                // Extract only the body content
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const bodyContent = doc.querySelector('.container.terms-container');
+                
+                if (bodyContent) {
+                    termsContent.innerHTML = bodyContent.outerHTML;
+                } else {
+                    termsContent.innerHTML = html;
+                }
+                
+                if (typeof termsDialog.showModal === 'function') {
+                    termsDialog.showModal();
+                } else {
+                    alert('Tu navegador no soporta <dialog>. Actualiza tu navegador.');
+                }
+            })
+            .catch(error => {
+                termsContent.innerHTML = 'Error cargando términos y condiciones';
+                termsDialog.showModal();
+            });
     });
-    closeButtons.forEach(btn => {
-        btn.addEventListener('click', () => termsDialog.close());
-    });
+
+closeButtons.forEach(btn => {
+    btn.addEventListener('click', () => termsDialog.close());
+});
 
     //--Codigo para poner los campos para numero de parqueaderos y almacenes--//
     var parking = document.getElementById('parking');

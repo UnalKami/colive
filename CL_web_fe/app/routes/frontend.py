@@ -18,6 +18,11 @@ frontend_bp = Blueprint('frontend', __name__)
 def index():
     return render_template('index.html')
 
+@frontend_bp.route("/terminos-condiciones")
+@public_route
+def terminos_condiciones():
+    return render_template("terminos-condiciones.html")
+
 @frontend_bp.route('/about')
 @public_route
 def about():
