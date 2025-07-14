@@ -130,6 +130,7 @@ body {
 
 .btn-primary {
   background: var(--other-color);
+  border: 1px var(--other-color);
   color: var(--background-color);
   font-weight: 400;
   padding: 0.5rem 1.5rem;
