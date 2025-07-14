@@ -2,13 +2,14 @@
 :root {
     --primary-color: #007bff;
     --primary-hover: #0056b3;
-    --background-color: #f8f9fa;
+    --background-color: #161d27;
     --text-color: #333;
     --error-color: #dc3545;
     --base-color: #c8ae89;
     --second-color: #968979;
     --border-color: #646460;
     --input-color: #edededf0;
+    --other-color: #cbb28a;
 }
 
 body {
@@ -28,9 +29,10 @@ body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: url('../img/loginBckg.jpg') no-repeat center center;
-    background-size:cover;
-    opacity: 0.3; /* Adjust opacity as needed */
+    background: 
+        linear-gradient(rgba(22, 29, 39, 0.3), rgba(22, 29, 39, 0.8)),
+        url('../img/loginBckg.jpg') no-repeat center center;
+    background-size: cover;
     z-index: 0;
     pointer-events: none;
 }
@@ -59,14 +61,21 @@ body::before {
 /* Botón de login */
 #btnLogin {
   margin-top: 20px;
-  background-color:var(--base-color);
-  border-color:var(--base-color);
-  color:#333;
+  background-color:var(--other-color);
+  border-color:var(--other-color);
+  color: var(--background-color);
 }
 
 #btnLogin:hover{
   background-color: var(--border-color);
-  color:var(--background-color);
+  color: white;
+}
+
+.register-container h2 {
+  text-align: center;
+  color: var(--text-color);
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
 }
 
 /* Estilo para el selector de conjunto */

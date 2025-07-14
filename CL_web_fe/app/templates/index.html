@@ -28,9 +28,31 @@
     </div>
   </nav>
 
-  <!-- HERO ESTÁTICO -->
+  <!-- HERO CON CARRUSEL -->
   <section id="hero">
-    <div class="hero-overlay"></div>
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+      </div>
+      
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img src="../static/img/Carrusel/carrusel1.jpg" class="d-block w-100" alt="Conjunto 1">
+          <div class="hero-overlay"></div>
+        </div>
+        <div class="carousel-item">
+          <img src="../static/img/Carrusel/carrusel2.jpg" class="d-block w-100" alt="Conjunto 2">
+          <div class="hero-overlay"></div>
+        </div>
+        <div class="carousel-item">
+          <img src="../static/img/Carrusel/carrusel3.jpg" class="d-block w-100" alt="Conjunto 3">
+          <div class="hero-overlay"></div>
+        </div>
+      </div>
+    </div>
+    
     <div class="hero-content">
       <div class="container text-center text-white">
         <h1 class="display-2 fw-bold mb-4">Bienvenido a COLive</h1>
