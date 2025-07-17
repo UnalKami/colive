@@ -91,7 +91,7 @@ services:
   # LÓGICA #
 
   CL_auth_ms1:
-    image: openjdk:24-slim-bookworm
+    image: cl_auth_ms
     container_name: CL_auth_ms1
     hostname: cl-auth-ms1
     build:
@@ -109,7 +109,7 @@ services:
       - private-network
 
   CL_auth_ms2:
-    image: openjdk:24-slim-bookworm
+    image: cl_auth_ms
     container_name: CL_auth_ms2
     hostname: cl-auth-ms2
     build:
@@ -127,7 +127,7 @@ services:
       - CL_auth_db
 
   CL_auth_ms3:
-    image: openjdk:24-slim-bookworm
+    image: cl_auth_ms
     container_name: CL_auth_ms3
     hostname: cl-auth-ms3
     build:
