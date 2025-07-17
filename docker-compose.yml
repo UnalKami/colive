@@ -1,3 +1,5 @@
+version: '3.9'
+
 networks:
   private-network:
     driver: bridge    
@@ -9,87 +11,74 @@ volumes:
   cl_residence_db_data:
   cl_messaging_db_data:
   pg_guest_data:
-  
+
 services:
 
-  # RED PÚBLICA # (Accesibles desde internet)
+  # RED PÚBLICA #
   CL_web_rp:
-   image: nginx:1.28.0-alpine-perl
-   container_name: CL_web_rp
-   ports:
-       - "80:80"
-       - "443:443"
-   volumes:
-     - ./CL_web_rp/nginx:/etc/nginx
-     - ./CL_web_rp/nginx/ssl:/etc/nginx/ssl
-   depends_on:
-     - CL_web_fe
-   networks:
+    image: cl_web_rp:latest
+    build:
+      context: ./CL_web_rp
+    container_name: CL_web_rp
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - CL_web_fe
+    networks:
       - public-network
       - private-network
 
   CL_desktop_rp:
-   image: nginx:1.28.0-alpine-perl
-   container_name: CL_desktop_rp
-   ports:
-       - "8080:8080"
-       - "8443:8443"
-   volumes:
-     - ./CL_desktop_rp/nginx:/etc/nginx
-     - ./CL_desktop_rp/nginx/ssl:/etc/nginx/ssl
-   depends_on:     
-     - CL_ag
-   networks:
+    image: cl_desktop_rp:latest
+    build:
+      context: ./CL_desktop_rp
+    container_name: CL_desktop_rp
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+    depends_on:     
+      - CL_ag
+    networks:
       - public-network
       - private-network 
 
-  # RED PRIVADA# (No accesibles desde internet)
+  # RED PRIVADA #
 
-  # PRESENTACION #
-
+  # PRESENTACIÓN #
   CL_web_fe:
     image: cl_web_fe:latest
     build: 
       context: ./CL_web_fe      
     container_name: CL_web_fe
-    # ports:
-    #   - "5000:5000"
     environment:
       - FLASK_ENV=development
     restart: unless-stopped
-    volumes:
-      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     networks:
       - private-network
   
-  # COMUNICACIÖN #
-
+  # COMUNICACIÓN #
   CL_ag:
     image: cl_ag:latest
     build:
       context: ./CL_ag
     container_name: CL_ag
-    #ports:
-    #  - "8000:8000"
-    volumes:
-      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     networks:
       - private-network
 
   CL_auth_lb:
-    image: nginx:1.28.0-alpine-perl
-    container_name: CL_auth_lb   
-    volumes:
-      - ./CL_auth_lb/nginx:/etc/nginx
+    image: cl_auth_lb:latest
+    build:
+      context: ./CL_auth_lb
+    container_name: CL_auth_lb
     depends_on:
       - CL_auth_ms1
       - CL_auth_ms2
       - CL_auth_ms3
     networks: 
-        - private-network
-  
-  # LÓGICA #
+      - private-network
 
+  # LÓGICA #
   CL_auth_ms1:
     image: cl_auth_ms
     container_name: CL_auth_ms1
@@ -99,10 +88,7 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=cincopatodos      
-    volumes:
-      - ./JWT_private.key:/run/secrets/JWT_private.key:ro
-      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
+      - SPRING_DATASOURCE_PASSWORD=cincopatodos
     depends_on:
       - CL_auth_db
     networks:
@@ -112,45 +98,33 @@ services:
     image: cl_auth_ms
     container_name: CL_auth_ms2
     hostname: cl-auth-ms2
-    build:
-      context: ./auth-java-component
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
-    volumes:
-      - ./JWT_private.key:/run/secrets/JWT_private.key:ro
-      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
-    networks:
-      - private-network
     depends_on:
       - CL_auth_db
+    networks:
+      - private-network
 
   CL_auth_ms3:
     image: cl_auth_ms
     container_name: CL_auth_ms3
     hostname: cl-auth-ms3
-    build:
-      context: ./auth-java-component
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
-    volumes:
-      - ./JWT_private.key:/run/secrets/JWT_private.key:ro
-      - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
-    networks:
-      - private-network
     depends_on:
       - CL_auth_db
+    networks:
+      - private-network
 
   CL_residence_ms:
     image: conjunto-residencial-cl_residence_ms
     container_name: CL_residence-ms
     build:
       context: ./ResidenceCreator-ms  
-    #ports:
-    #   - "3001:3001"
     depends_on:
       - CL_residence_db
       - CL_guest_db
@@ -165,10 +139,8 @@ services:
       context: ./MensajeriaYnotificaciones
       dockerfile: Dockerfile.sbt-alpine
     container_name: CL_messaging-ms
-    #ports:
-    #  - "7000:7000"
     environment:
-      SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
+      SMTP_SECRET_KEY: "claveaes12345678"
       MONGO_URI: "mongodb://root:cincopatodos@cl_messaging_db:27017/correos?authSource=admin"
     command: ["sbt", "run"]
     depends_on:
@@ -178,17 +150,10 @@ services:
       - private-network
 
   CL_stadistics_ms:
-    image: cl_stadistics_ms:latest
+    image: cl_stadistics_ms
     build: ./stadistics
-    #image: conjunto-residencial-cl-stadistics-ms
-    container_name: stadistics
+    container_name: CL_stadistics_ms
     command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - ./stadistics:/app
-    #ports:
-    #  - "8010:8010"
-    #env_file:
-    #  - ./stadistics/.env
     depends_on:
       - CL_ag
       - CL_web_fe
@@ -201,16 +166,13 @@ services:
       - POSTGRES_DB=db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=cincopatodos
-    # …
     networks:
       - private-network
 
-# DATOS #
+  # DATOS #
 
   CL_auth_db:
     container_name: CL_auth_db
-    #ports:
-    #  - 5432:5432
     image: postgres:16.9-alpine3.21 
     restart: unless-stopped
     environment:
@@ -230,8 +192,6 @@ services:
   CL_residence_db:
     image: mongo:8.0.9-noble
     container_name: CL_residence_db
-    #ports:
-    #  - "27017:27017" 
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
@@ -244,8 +204,6 @@ services:
   CL_messaging_db:
     image: mongo:8.0.9-noble
     container_name: CL_messaging_db
-    #ports:
-    #  - "27018:27017" 
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
@@ -257,8 +215,6 @@ services:
 
   CL_guest_db:
     container_name: CL_guest_db
-    #ports:
-    #  - 5433:5432
     image: postgres:16.9-alpine3.21 
     restart: unless-stopped
     environment:
@@ -274,7 +230,7 @@ services:
       - pg_guest_data:/var/lib/postgresql/data
     networks:
       - private-network
-      
+
   kali:
     build:
       context: .
