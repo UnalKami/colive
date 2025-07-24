@@ -1,11 +1,23 @@
 // Este script asume endpoints como /api/dashboard/general y /api/dashboard/incidencias
 
-function toggleSidebar() {
-  document.getElementById('sidebarCategorias').classList.toggle('show');
-}
-document.addEventListener('click', e => {
-  const sb = document.getElementById('sidebarCategorias');
-  if (!sb.contains(e.target) && !e.target.closest('[onclick="toggleSidebar()"]')) sb.classList.remove('show');
+// Add this to your existing script or create a new one
+document.addEventListener('DOMContentLoaded', function() {
+  const cachedComplexName = localStorage.getItem('complexName');
+
+  if (cachedComplexName) {
+    document.getElementById('complexName').textContent = cachedComplexName;
+  } else {
+    // Fetch complex name
+    fetch('/fe-api/complex-info')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('complexName').textContent = data.name;
+      })
+      .catch(error => {
+        console.error('Error fetching complex name:', error);
+        document.getElementById('complexName').textContent = '';
+      });
+  }
 });
 
 // Cargar datos reales de la API de stadistics

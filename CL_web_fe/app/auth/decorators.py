@@ -23,7 +23,7 @@ def require_roles(*required_roles):
                         "code": "INSUFFICIENT_PERMISSIONS"                        
                     }), 403
                 else:
-                    return redirect('/')  # Redirigir a vista principal
+                    return redirect('/noService')  # Redirigir a página de servicio no disponible
 
             return f(*args, **kwargs)
         return wrapper

@@ -5,45 +5,24 @@
   <title>Enviar Correo</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="../static/css/registro.css" />
-  <style>
-    .ck-editor__editable_inline {
-      min-height: 200px;
-      background: #fafbfc;
-      border-radius: 6px;
-    }
-    .ck.ck-editor {
-      margin-top: 8px;
-      margin-bottom: 12px;
-    }
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-      padding: 2rem 2.5rem;
-      background: #fff;
-      max-width: 600px;
-      margin: 2rem auto;
-    }
-    .form-label {
-      font-weight: 500;
-    }
-    .success { color: green; }
-    .error { color: red; }
-  </style>
+  <link rel="stylesheet" href="../static/css/sendEmail.css" />
   <!-- CKEditor 5 CDN -->
   <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 </head>
 <body>
   <div class="wrapper">
     <!-- HEADER -->
-    <header class="border-bottom shadow-sm py-2" style="background-color: #3d464e;">
+    <header class="border-bottom shadow-sm py-2">
       <div class="container d-flex justify-content-between align-items-center">
-        <a href="../index.html">
+        <a>
           <img src="../static/img/colive_logo.png" alt="Colive Logo" style="height: 50px;" />
         </a>
-        <div>
-          <a class="btn-login" href="../login/login.html">Iniciar Sesión</a>
-        </div>
+      <a href="javascript:history.back()" class="btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          </svg>
+          Volver
+      </a>
       </div>
     </header>
 
@@ -96,42 +75,50 @@
       </div>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer py-3 shadow-lg border-top" style="background-color: #3d464e;">
-      <div class="container fontFooter">
-        <nav class="row justify-content-between">
-          <div class="col-12 col-md-3 d-flex align-items-center justify-content-center mb-3 mb-md-0">
-            <img src="../static/img/Colive_Logo_.png" alt="Logo" class="img-fluid" width="250" height="50" />
-          </div>
-          <ul class="col-12 col-md-2 list-unstyled px-3 mb-3 mb-md-0">
-            <li class="footer-section fw-bold mb-2">COLIVE co-ownership</li>
+   <!--- FOOTER-->
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <img src="../static/img/colive_logo.png" width="150" alt="Colive" class="mb-3">
+          <p>Gestión moderna para conjuntos residenciales en Colombia.</p>
+        </div>
+        <div class="col-md-2">
+          <h6>Enlaces</h6>
+          <ul class="list-unstyled">
+            <li><a href="https://github.com/UnalKami/colive">Nuestro repositorio</a></li>
+            <li><a href="#servicios">Terminos y condiciones</a></li>
           </ul>
-          <ul class="col-12 col-md-3 list-unstyled px-4 mb-3 mb-md-0">
-            <li class="footer-section fw-bold mb-2">Enlaces</li>
-            <li><a href="/">Inicio</a></li>
-            <li><a href="/products">Productos</a></li>
-            <li><a href="/about/about.html">Nosotros</a></li>
-            <li><a href="/contact">Contáctanos</a></li>
-            <li><a href="/encuesta">Califícanos</a></li>
-            <li><a href="/terms-and-conditions">Términos y Condiciones</a></li>
-            <li><a href="https://heyzine.com/flip-book/c951be1b87.html">Manual de Usuario</a></li>
-            <li><a href="/preguntas">Preguntas Frecuentes</a></li>
-          </ul>
-          <ul class="col-12 col-md-3 list-unstyled px-4 text-center mb-3 mb-md-0">
-            <li class="footer-section fw-bold mb-2">Síguenos</li>
-            <li class="d-flex justify-content-center gap-3">
-              <a href="https://www.facebook.com/profile.php?id=61557990925535" target="_blank"><i class="bi bi-facebook fs-2"></i></a>
-              <a href="https://www.instagram.com/_natu_tienda/" target="_blank"><i class="bi bi-instagram fs-2"></i></a>
-              <a href="mailto:Colive@gmail.com" target="_blank"><i class="bi bi-envelope fs-2"></i></a>
-            </li>
-          </ul>
-        </nav>
-        <div class="container mt-2">
-          <p class="text-center mb-0 fw-bold">Colive@gmail.com</p>
-          <p class="text-center mb-0 fw-bold">Realizado por el equipo Colive</p>
+        </div>
+        <div class="col-md-3">
+        <h6>Colaboradores</h6>
+        <div class="colaboradores">
+          <p>Daniel Felipe Villamor</p>
+          <p>Byron Daniel Giraldo</p>
+          <p>Camilo Andrés Roncancio</p>
+          <p>Ivan Yesid Sepúlveda</p>
+          <p>Javier Santiago Vargas</p>
+          <p>Jonathan Steven Ochoa</p>
+          <p>Julian David Huertas</p>
         </div>
       </div>
-    </footer>
+      <div class="col-md-3">
+        <h6>Contacto</h6>
+        <p><i class="bi bi-envelope me-2"></i>colive.service@gmail.com</p>
+        <p><i class="bi bi-geo-alt me-2"></i>Bogotá, Colombia</p>
+      </div>
+      <hr class="my-4">
+      <div class="text-center">
+        <small>&copy; 2025 Colive. Todos los derechos reservados.</small>
+      </div>
+      <div class="text-center">
+        <small>Swarch 1B</small>
+      </div>
+    </div>
+  </footer>
+
+  </div>
+
   </div>
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

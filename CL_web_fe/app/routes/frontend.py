@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template    
 from app.auth.public_routes import public_route
 from app.auth.decorators import require_roles
 
@@ -23,6 +23,11 @@ def index():
 def terminos_condiciones():
     return render_template("terminos-condiciones.html")
 
+@frontend_bp.route('/noService')
+@public_route
+def contacto():
+    return render_template('No_disponible.html')
+
 @frontend_bp.route('/about')
 @public_route
 def about():
@@ -44,7 +49,7 @@ def pruebaConexionAuth():
     return render_template('pruebaSaludo.html')
 
 @frontend_bp.route('/propietario')
-#solo el rol de propietario puede acceder
+@require_roles('PROPIEDAD_CR')
 def propietario():
     return render_template('panel_propietario.html')
 
@@ -60,13 +65,16 @@ def admin():
     return render_template('adminhome.html')
 
 @frontend_bp.route('/registro-rol')
+@require_roles('ADMIN_CR')
 def registro_rol():
     return render_template('registroUsuarioRol.html')
 
 @frontend_bp.route('/setSMTP')
+@require_roles('ADMIN_CR')
 def setSMTP():
     return render_template('setSMTP.html')
 
 @frontend_bp.route('/sendMail')
+@require_roles('ADMIN_CR', 'ADMINISTRATIVO_CR')
 def sendEmail():
     return render_template('sendMail.html')

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Servicio No Disponible - COLive</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: 
+                linear-gradient(rgba(22, 29, 39, 0.3), rgba(22, 29, 39, 0.8)),
+                url('../img/loginBckg.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: 0;
+            pointer-events: none;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            z-index: 1;
+        }
+        .logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #c8ae89;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #646460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="../static/img/colive_logo.png" alt="COLive Logo" class="logo">
+        <h1>Acceso Denegado</h1>
+        <p>Lo sentimos, no tienes permisos para acceder a este servicio.</p>
+        <p>Si crees que deberías tener acceso, contacta al administrador del sistema.</p>
+        <a href="javascript:history.back()" class="btn">Volver al Inicio</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,140 @@
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --background-color: #161d27;
+    --text-color: #333;
+    --error-color: #dc3545;
+    --base-color: #c8ae89;
+    --second-color: #968979;
+    --border-color: #646460;
+    --input-color: #edededf0;
+    --other-color: #cbb28a;
+}
+
+html, body { 
+    height: 100%; 
+    margin: 0; 
+    background-color: #f2f2f2; 
+    font-family: 'Montserrat', sans-serif;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1; 
+}
+
+nav {
+    z-index: 100; 
+}
+
+.custom-navbar {
+    background-color: var(--background-color);
+}
+
+.navbar-brand {
+    margin-left: 2rem;
+}
+
+.navbar-nav {
+    justify-content: center;
+}
+
+.navbar-nav .nav-link {
+  color: white;
+  margin: 0 10px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.navbar-nav .nav-link:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+
+.btn-logout {
+    background-color: var(--error-color);
+    color: white;
+    padding: 0.375rem 1rem;
+    margin-right: 2rem;
+    font-weight: bold;
+}
+
+.btn-logout:hover {
+    background-color: #811f29;
+    color: var(--background-color);
+}
+
+.btn-primary {
+  background: var(--other-color);
+  color: var(--text-color);
+  border-color: var(--other-color);
+}
+
+.btn-primary:hover {
+  background: var(--second-color);
+  color: white;
+  border: var(--second-color);
+}
+
+.page-title { 
+    font-weight: 600; 
+    margin-bottom: 1.5rem; 
+    color: #3d464e; 
+}
+/* Footer */
+.footer {
+  background: var(--background-color);
+  color: white;
+  padding: 3rem 0 1rem;
+  margin-top: 4rem;
+}
+
+.footer h6 {
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.footer a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: white;
+}
+
+.footer ul li {
+  margin-bottom: 0.5rem;
+}
+
+.colaboradores p {
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.social-links a {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.social-links a:hover {
+  color: #007bff;
+}
+
+.footer hr {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.footer i {
+  color: #007bff;
+}
