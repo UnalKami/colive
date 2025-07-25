@@ -1,4 +1,4 @@
-# **Prototipo 3 Arquitectura de Software 2025-1**
+# **Prototipo 4 Arquitectura de Software 2025-1**
 
 # **Team**
 ### Equipo 1B
@@ -228,6 +228,21 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
 
 
 # **Quality Attributes**
+###**Reliability**
+### Reliability scenarios
+
+* Scenario 1: Replication Pattern
+  
+* Scenario 2: Service Discovery Pattern
+
+* Scenario 3: Cluster Pattern.
+
+* Scenario 4: team Pattern
+
+### Applied architectural tactics
+
+### Applied architectural patterns
+
 ### **Security**
 ### Security scenarios
 
