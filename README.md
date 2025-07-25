@@ -218,20 +218,36 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
 
 
 # **Quality Attributes**
-###**Reliability**
+### **Reliability**
 ### Reliability scenarios
 
-* Scenario 1: Replication Pattern (Hot Spare)
+* Scenario 1: Replication Pattern
+![VistaDescomposicion](./readmeAssets/escenarioReplication.png)
   
 * Scenario 2: Service Discovery Pattern
+![VistaDescomposicion](./readmeAssets/escenarioDiscovery.png)
 
 * Scenario 3: Cluster Pattern.
+![VistaDescomposicion](./readmeAssets/escenarioCluster.png)
 
-* Scenario 4: team Pattern
+* Scenario 4: Cold Spare
+![VistaDescomposicion](./readmeAssets/escenarioColdSpare.png)
 
 ### Applied architectural tactics
+ * **Redundant Spare (Recover from Faults > Preparation and Repair):** Mantiene componentes de respaldo para reemplazar fallos, minimizando tiempo de inactividad.
+ * **Reconfiguration (Recover from Faults > Preparation and Repair):** Reorganiza dinámicamente los recursos del sistema para adaptarse a fallos o cambios.
 
 ### Applied architectural patterns
+ **1. Replication Pattern:**  Crea múltiples copias de datos o servicios para mejorar disponibilidad y tolerancia a fallos.
+
+ **2. Active Redundancy (Hot Spare) Pattern:** Componentes redundantes operan en paralelo, permitiendo una conmutación inmediata ante fallos.
+
+ **3. Spare (Cold Spare) Pattern:** Componentes de respaldo inactivos que se activan tras un fallo, con mayor tiempo de recuperación.
+
+ **4. Service Discovery Pattern:** Detecta y gestiona dinámicamente la ubicación de servicios en entornos distribuidos.
+
+ **5. Cluster Pattern:** Agrupa múltiples nodos para trabajar como una única unidad, mejorando escalabilidad y disponibilidad.
+
 
 ### **Security**
 ### Security scenarios
