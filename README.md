@@ -3,13 +3,13 @@
 # **Team**
 ### Equipo 1B
 
-- Daniel Felipe Villamor (Arquitecto líder)
+- Julian David Huertas Dominguez (Arquitecto líder)
+- Daniel Felipe Villamor 
 - Byron Daniel Giraldo Castro
 - Camilo Andres Roncancio Toca 
 - Ivan Yesid Sepulveda Paez
 - Javier Santiago Vargas Parra
 - Jonathan Steven Ochoa Celis
-- Julian David Huertas Dominguez
 
 # **Software System**
 ### Name: **COLive**
@@ -145,30 +145,20 @@ Las capas mantienen una relación de "allowed to use", donde una capa puede hace
 
 ### **Deployment Structure**
 #### Deployment View
- ![DeploymentView](./readmeAssets/DeploymentViewP3.png)
+ ![DeploymentView](./readmeAssets/VistaDespliegueP4.png)
 #### Description of architectural patterns used
 **Patrón de segmentación de red:** Para el despliegue de COLive se implementó el patrón de segmentación de red, con el objetivo de proteger los servicios internos y reducir la superficie de exposición del sistema frente a accesos no autorizados.
 
 Este patrón se aplicó definiendo dos subredes internas en Docker:
 
-* Red pública: Permite la exposición controlada de ciertos servicios hacia el exterior, en este caso, exclusivamente los proxies inversos (CL_web_rp y CL_desktop_rp). Estos servicios están mapeados a puertos de la máquina host y pueden ser accedidos desde el navegador o la aplicación de escritorio.
+* Red pública: Permite la exposición controlada de ciertos servicios hacia el exterior, en este caso, exclusivamente los proxies inversos (CL_web_rp y CL_desktop_rp). Estas instancias cuentan con direcciones ip públicas.
 
-* Red privada: Contiene los componentes internos del sistema como microservicios, bases de datos y otros servicios que no deben ser accedidos directamente desde el exterior. Solo los componentes en la red pública que también pertenecen a esta red (los proxies) pueden redirigir solicitudes hacia estos servicios internos, utilizando el sistema de nombres (DNS interno) que proporciona Docker.
+* Red privada: Contiene los componentes internos del sistema como microservicios, bases de datos y otros servicios que no deben ser accedidos directamente desde el exterior. Solo los componentes en la red pública que también pertenecen a esta red (los proxies) pueden redirigir solicitudes hacia estos servicios internos, utilizando el Service Connect del clúster ECS.
 
 Esta arquitectura asegura el aislamiento lógico de capas críticas, refuerza la seguridad a nivel de red y simplifica el control de acceso a servicios internos.
 #### Description of architectural elements and relations
 
-El despliegue se realiza localmente en una estación de trabajo que ejecuta múltiples contenedores Docker. Todos los servicios del sistema corren en contenedores que comparten el mismo host físico, organizado en las redes mencionadas anteriormente. Las características relevantes del equipo de despliegue son:
-
-* Sistema operativo: Ubuntu T24
-
-* CPU: Ryzen 7 7435HS - 16 Núcleos
-
-* Memoria RAM: 8GB DDR4/DDR5
-
-* Almacenamiento: 215GB SSD Adata
-
-* GPU: RTX 3050 4GB VRAM
+El despliegue se realiza en la nube de AWS mediante un clúster ECS con instancias EC2.
 
 | Componente          | Entorno de ejecución       | Red          | Justificación Tecnológica                                                                 |
 |---------------------|----------------------------|--------------|--------------------------------------------------------------------------------------------|
@@ -231,7 +221,7 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
 ###**Reliability**
 ### Reliability scenarios
 
-* Scenario 1: Replication Pattern
+* Scenario 1: Replication Pattern (Hot Spare)
   
 * Scenario 2: Service Discovery Pattern
 
