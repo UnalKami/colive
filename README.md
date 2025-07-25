@@ -38,62 +38,62 @@ El sistema está estructurado como un conjunto de microservicios independientes,
 
 ### Elementos arquitectónicos
 #### Componentes:
-* **CL_desktop_fe (Frontend de escritorio):**
+* **cl-desktop-fe (Frontend de escritorio):**
 Aplicación de escritorio instalada en los dispositivos de los usuarios. Sirve como cliente para consumir los servicios del sistema a través de un proxy inverso.
-* **CL_web_rp (Reverse Proxy Web):**
+* **cl-web-rp (Reverse Proxy Web):**
 Proxy inverso que actúa como intermediario entre los navegadores web y el frontend web del sistema, facilitando la seguridad, el enrutamiento y el manejo de certificados SSL.
-* **CL_desktop_rp (Reverse Proxy Escritorio):**
+* **cl-desktop-rp (Reverse Proxy Escritorio):**
 Proxy inverso utilizado por la aplicación de escritorio para comunicarse de forma segura con el sistema, facilitando el acceso centralizado y seguro al API Gateway.
-* **CL_web_fe (Frontend Web):**
+* **cl-web-fe (Frontend Web):**
 Aplicación web que presenta la interfaz gráfica del sistema a los usuarios desde navegadores. Presenta un lado servidor donde se hace Server Side Rendering y se expone una Closed-API para consumir los servicios del backend a través del API Gateway.
-* **CL_ag (API Gateway):**
+* **cl-ag (API Gateway):**
 Punto de entrada unificado para todos los frontends. Se encarga de enrutar las solicitudes a los microservicios apropiados y orquestar funcionalidades que requieren múltiples microservicios.
-* **CL_auth_lb (Load Balancer de Autenticación):**
+* **cl-auth-lb (Load Balancer de Autenticación):**
 Distribuye las solicitudes de autenticación entre múltiples instancias del microservicio de autenticación, favoreciendo la escalabilidad y disponibilidad del sistema.
-* **CL_auth_ms (Microservicio de Autenticación) [3 instancias]**:
+* **cl-auth-ms (Microservicio de Autenticación) [3 instancias]**:
 Gestiona la creación de usuarios, inicio de sesión, la verificación de credenciales y la emisión de tokens. Está replicado para tolerancia a fallos y mayor rendimiento. 
-* **CL_residence_ms (Microservicio de Conjuntos Residenciales):**
+* **cl-residence-ms (Microservicio de Conjuntos Residenciales):**
 Encargado de las funcionalidades relacionadas con los conjuntos residenciales, residentes y apartamentos: gestión de conjuntos, reservas y parqueaderos.
-* **CL_messaging_ms (Microservicio de Mensajería):**
+* **cl-messaging-ms (Microservicio de Mensajería):**
 Maneja el envío de correos entre los distintos actores del sistema mediante una cola de mensajería interna.
-* **CL_statistics_ms (Microservicio de Estadísticas):**
+* **cl-stadistics-ms (Microservicio de Estadísticas):**
 Proporciona estadísticas agregadas y métricas sobre la actividad del sistema, útiles para los administradores.
-* **CL_auth_db (Base de Datos de Autenticación):**
+* **cl-auth-db (Base de Datos de Autenticación):**
 Almacena la información de usuarios, contraseñas encriptadas, roles y relaciones con conjuntos residenciales y residencias.
-* **CL_residence_db (Base de Datos de Conjuntos Residenciales):**
+* **cl-residence-db (Base de Datos de Conjuntos Residenciales):**
 Base de datos NoSQL que almacena información sobre los conjuntos, reservas, residencias y entradas de visitantes.
-* **CL_messaging_db (Base de Datos de Mensajería):**
+* **cl-messaging-db (Base de Datos de Mensajería):**
 Almacena la cola de correos dentro del sistema.
-* **CL_guest_db (Base de Datos de Invitados):**
+* **cl-guest-db (Base de Datos de Invitados):**
 Guarda la información de las visitas peatonales y vehiculares para ser administrados por un usuario vigilante.
 
 #### Conectores y relaciones
-* **Navegador → HTTPS → CL_web_rp:**  Los navegadores web se comunican de forma segura mediante HTTPS con el proxy inverso web.
-* **CL_desktop_fe → HTTPS → CL_desktop_rp:**
+* **Navegador → HTTPS → cl-web-rp:**  Los navegadores web se comunican de forma segura mediante HTTPS con el proxy inverso web.
+* **cl-desktop-fe → HTTPS → cl-desktop-rp:**
 La aplicación de escritorio establece conexiones HTTPS seguras con su respectivo proxy inverso.
-* **CL_web_rp → HTTP → CL_web_fe:**
+* **cl-web-rp → HTTP → cl-web-fe:**
 El proxy inverso redirige las solicitudes al frontend web usando HTTP interno.
-* **CL_desktop_rp → HTTP → CL_ag:**
+* **cl-desktop-rp → HTTP → cl-ag:**
 El proxy inverso de escritorio enruta las solicitudes hacia el API Gateway mediante HTTP.
-* **CL_web_fe → HTTP → CL_ag:**
+* **cl-web-fe → HTTP → cl-ag:**
 El lado servidor del frontend web consume los servicios backend mediante peticiones HTTP al API Gateway.
-* **CL_ag → HTTP → CL_auth_lb:**
+* **cl-ag → HTTP → cl-auth-lb:**
 El API Gateway enruta las solicitudes dirigidas al microservicio de autenticación a su respectivo balanceador de carga.
-* **CL_auth_lb → HTTP (REST) → CL_auth_ms (3):**
+* **cl-auth-lb → HTTP (REST) → cl-auth-ms (3):**
 El balanceador distribuye las solicitudes REST entre las tres instancias del microservicio de autenticación.
-* **CL_ag → HTTP (GraphQL) → CL_residence_ms:**
+* **cl-ag → HTTP (GraphQL) → cl-residence-ms:**
 Las operaciones sobre conjuntos residenciales y residencias son manejadas por el microservicio correspondiente a través de una interfaz GraphQL.
-* **CL_ag → HTTP (REST) → CL_messaging_ms:**
+* **cl-ag → HTTP (REST) → cl-messaging-ms:**
 El API Gateway dirige las solicitudes REST relacionadas con mensajería hacia el microservicio encargado.
-* **CL_ag → HTTP (REST) → CL_statistics_ms:**
+* **cl-ag → HTTP (REST) → cl-stadistics-ms:**
 El API Gateway enruta las consultas de estadísticas al microservicio especializado.
-* **CL_auth_ms → TCP/JDBC → CL_auth_db:**
+* **cl-auth-ms → TCP/JDBC → cl-auth-db:**
 Conexión JDBC sobre TCP para acceder a la base de datos relacional de autenticación.
-* **CL_residence_ms → TCP/Mongoose → CL_residence_db:**
+* **cl-residence-ms → TCP/Mongoose → cl-residence-db:**
 Conexión a base de datos NoSQL usando el driver Mongoose (Node.js).
-* **CL_messaging_ms → TCP/Reactive Streams MongoDB → CL_messaging_db:**
+* **cl-messaging-ms → TCP/Reactive Streams MongoDB → cl-messaging-db:**
 Conexión entre el microservicio de mensajería (Scala) y la base de datos MongoDB usando el driver oficial Reactive Streams de MongoDB (asincrónico y no bloqueante).
-* **CL_residence_ms → TCP/pg → CL_guest_db:**
+* **cl-residence-ms → TCP/pg → cl-guest-db:**
 Conexión PostgreSQL usando el driver pg para acceder a la base de datos de invitados.
 
 
@@ -151,7 +151,7 @@ Las capas mantienen una relación de "allowed to use", donde una capa puede hace
 
 Este patrón se aplicó definiendo dos subredes internas en Docker:
 
-* Red pública: Permite la exposición controlada de ciertos servicios hacia el exterior, en este caso, exclusivamente los proxies inversos (CL_web_rp y CL_desktop_rp). Estos servicios están mapeados a puertos de la máquina host y pueden ser accedidos desde el navegador o la aplicación de escritorio.
+* Red pública: Permite la exposición controlada de ciertos servicios hacia el exterior, en este caso, exclusivamente los proxies inversos (cl-web-rp y cl-desktop-rp). Estos servicios están mapeados a puertos de la máquina host y pueden ser accedidos desde el navegador o la aplicación de escritorio.
 
 * Red privada: Contiene los componentes internos del sistema como microservicios, bases de datos y otros servicios que no deben ser accedidos directamente desde el exterior. Solo los componentes en la red pública que también pertenecen a esta red (los proxies) pueden redirigir solicitudes hacia estos servicios internos, utilizando el sistema de nombres (DNS interno) que proporciona Docker.
 
@@ -172,19 +172,19 @@ El despliegue se realiza localmente en una estación de trabajo que ejecuta múl
 
 | Componente          | Entorno de ejecución       | Red          | Justificación Tecnológica                                                                 |
 |---------------------|----------------------------|--------------|--------------------------------------------------------------------------------------------|
-| CL_web_rp           | NGINX                      | Pública (443:443) y Privada | NGINX ofrece alto rendimiento, soporte para HTTPS y una capa efectiva de seguridad y anonimidad para los componentes del backend. |
-| CL_desktop_rp       | NGINX                      | Pública (8443:8443) y Privada | NGINX ofrece alto rendimiento, soporte para HTTPS y una capa efectiva de seguridad y anonimidad para los componentes del backend. Gateway.         |
-| CL_web_fe           | Flask - Python             | Privada      | Flask es ligero, flexible y rápido para construir aplicaciones web de tipo SSR.      |
-| CL_ag               | FastAPI - Python           | Privada      | FastAPI permite crear APIs modernas y asincrónicas con excelente rendimiento.              |
-| CL_auth_lb          | NGINX                      | Privada      | Facilita el balanceo de carga entre múltiples instancias de microservicios.                |
-| CL_auth_ms (3)      | Spring Boot - Java         | Privada      | Spring Boot es robusto, ampliamente usado en autenticación y gestión de usuarios.          |
-| CL_residence_ms     | Express.js - JavaScript    | Privada      | Express permite una rápida creación de APIs RESTful ademas de su compatibilidad con mongoose. |
-| CL_messaging_ms     | Scala                      | Privada      | Scala es potente para sistemas concurrentes y de mensajería con alto rendimiento.          |
-| CL_statistics_ms    | Django - Python            | Privada      | Django ofrece herramientas poderosas para el manejo de datos y reportes administrativos.   |
-| CL_auth_db          | PostgreSQL                 | Privada      | PostgreSQL es una base de datos robusta y segura, ideal para almacenar credenciales.       |
-| CL_residence_db     | MongoDB                    | Privada      | MongoDB permite modelar documentos flexibles para estructuras jerárquicas como conjuntos.  |
-| CL_guest_db         | PostgreSQL                 | Privada      | Permite integridad relacional para datos sensibles como las visitas de invitados.          |
-| CL_messaging_db     | MongoDB                    | Privada      | Adecuado para mensajes en tiempo real por su esquema flexible y facilidad de escalado.     |
+| cl-web-rp           | NGINX                      | Pública (443:443) y Privada | NGINX ofrece alto rendimiento, soporte para HTTPS y una capa efectiva de seguridad y anonimidad para los componentes del backend. |
+| cl-desktop-rp       | NGINX                      | Pública (8443:8443) y Privada | NGINX ofrece alto rendimiento, soporte para HTTPS y una capa efectiva de seguridad y anonimidad para los componentes del backend. Gateway.         |
+| cl-web-fe           | Flask - Python             | Privada      | Flask es ligero, flexible y rápido para construir aplicaciones web de tipo SSR.      |
+| cl-ag               | FastAPI - Python           | Privada      | FastAPI permite crear APIs modernas y asincrónicas con excelente rendimiento.              |
+| cl-auth-lb          | NGINX                      | Privada      | Facilita el balanceo de carga entre múltiples instancias de microservicios.                |
+| cl-auth-ms (3)      | Spring Boot - Java         | Privada      | Spring Boot es robusto, ampliamente usado en autenticación y gestión de usuarios.          |
+| cl-residence-ms     | Express.js - JavaScript    | Privada      | Express permite una rápida creación de APIs RESTful ademas de su compatibilidad con mongoose. |
+| cl-messaging-ms     | Scala                      | Privada      | Scala es potente para sistemas concurrentes y de mensajería con alto rendimiento.          |
+| cl-stadistics-ms    | Django - Python            | Privada      | Django ofrece herramientas poderosas para el manejo de datos y reportes administrativos.   |
+| cl-auth-db          | PostgreSQL                 | Privada      | PostgreSQL es una base de datos robusta y segura, ideal para almacenar credenciales.       |
+| cl-residence-db     | MongoDB                    | Privada      | MongoDB permite modelar documentos flexibles para estructuras jerárquicas como conjuntos.  |
+| cl-guest-db         | PostgreSQL                 | Privada      | Permite integridad relacional para datos sensibles como las visitas de invitados.          |
+| cl-messaging-db     | MongoDB                    | Privada      | Adecuado para mensajes en tiempo real por su esquema flexible y facilidad de escalado.     |
 
 
 ### **Decomposition Structure**
@@ -193,19 +193,19 @@ El despliegue se realiza localmente en una estación de trabajo que ejecuta múl
 #### Description of architectural elements and relations
 
 **1. Módulo de Autenticación (Login)**
-Este módulo permite a los usuarios autenticarse en el sistema utilizando sus credenciales (nombre de usuario y contraseña). El flujo comienza desde el cliente (web o escritorio), atraviesa los proxies (CL_web_rp o CL_desktop_rp), y llega al API Gateway (CL_ag). Este último enruta la solicitud al balanceador de carga (CL_auth_lb), que distribuye la validación entre tres instancias del microservicio de autenticación (CL_auth_ms).
+Este módulo permite a los usuarios autenticarse en el sistema utilizando sus credenciales (nombre de usuario y contraseña). El flujo comienza desde el cliente (web o escritorio), atraviesa los proxies (cl-web-rp o cl-desktop-rp), y llega al API Gateway (cl-ag). Este último enruta la solicitud al balanceador de carga (cl-auth-lb), que distribuye la validación entre tres instancias del microservicio de autenticación (cl-auth-ms).
 
-El microservicio consulta la base de datos de autenticación (CL_auth_db) para verificar las credenciales. En caso de éxito, se firma un token JWT usando una llave privada, y se devuelve al cliente como una cookie segura, estableciendo la sesión del usuario.
+El microservicio consulta la base de datos de autenticación (cl-auth-db) para verificar las credenciales. En caso de éxito, se firma un token JWT usando una llave privada, y se devuelve al cliente como una cookie segura, estableciendo la sesión del usuario.
 
 **2. Módulo de Registro de Usuarios y Conjuntos**
-Este módulo gestiona la creación de nuevos conjuntos residenciales y la asociación del primer usuario como administrador del conjunto. El flujo sigue el mismo camino que el módulo de autenticación hasta llegar al API Gateway, pero allí se activa una orquestación entre los microservicios de autenticación (CL_auth_ms) y conjuntos residenciales (CL_residence_ms).
+Este módulo gestiona la creación de nuevos conjuntos residenciales y la asociación del primer usuario como administrador del conjunto. El flujo sigue el mismo camino que el módulo de autenticación hasta llegar al API Gateway, pero allí se activa una orquestación entre los microservicios de autenticación (cl-auth-ms) y conjuntos residenciales (cl-residence-ms).
 
-El Gateway registra al usuario en la base de datos de autenticación (CL_auth_db), luego registra el conjunto en CL_residence_db, y finalmente asocia el conjunto con el usuario mediante una relación que conecta el ObjectId de MongoDB con el identificador del usuario. En caso de fallos durante el proceso, el Gateway ejecuta un rollback transaccional, eliminando cualquier información parcial para garantizar la integridad del sistema.
+El Gateway registra al usuario en la base de datos de autenticación (cl-auth-db), luego registra el conjunto en cl-residence-db, y finalmente asocia el conjunto con el usuario mediante una relación que conecta el ObjectId de MongoDB con el identificador del usuario. En caso de fallos durante el proceso, el Gateway ejecuta un rollback transaccional, eliminando cualquier información parcial para garantizar la integridad del sistema.
 
 Adicionalmente, este módulo permite que un administrador cree nuevos usuarios con roles específicos (propietario, residente, personal de aseo, vigilancia, mantenimiento, administrativo), y los asocie a su conjunto residencial correspondiente.
     
 **3. Módulo de Mensajería SMTP**
-Este módulo permite a los usuarios del sistema enviar comunicaciones internas por correo electrónico. Luego de atravesar el flujo tradicional hasta el API Gateway, las solicitudes se redirigen al microservicio de mensajería (CL_messaging_ms), donde los usuarios pueden:
+Este módulo permite a los usuarios del sistema enviar comunicaciones internas por correo electrónico. Luego de atravesar el flujo tradicional hasta el API Gateway, las solicitudes se redirigen al microservicio de mensajería (cl-messaging-ms), donde los usuarios pueden:
 
    * Registrar una cuenta de correo saliente (por ejemplo, del conjunto residencial).
 
@@ -213,7 +213,7 @@ Este módulo permite a los usuarios del sistema enviar comunicaciones internas p
 
    * Enviar correos a múltiples destinatarios internos, filtrando por roles, apartamentos o edificios (por ejemplo, enviar un comunicado a todos los propietarios).
 
-   El microservicio de mensajería utiliza una base de datos MongoDB (CL_messaging_db) para almacenar la configuración y el historial de los mensajes enviados.
+   El microservicio de mensajería utiliza una base de datos MongoDB (cl-messaging-db) para almacenar la configuración y el historial de los mensajes enviados.
 
 **4. Módulo de Servicios Residenciales**
 Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar reservas y uso de espacios comunes dentro del conjunto residencial, como:
@@ -224,7 +224,7 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
    * Parqueaderos
    * Zonas BBQ u otras amenidades
 
-   La lógica de este módulo se ejecuta en el microservicio CL_residence_ms, el cual gestiona las reglas de disponibilidad, restricciones por tipo de usuario y control de concurrencia. Toda la información relevante se almacena en CL_residence_db (estructura del conjunto) y CL_guest_db (asociaciones con usuarios).
+   La lógica de este módulo se ejecuta en el microservicio cl-residence-ms, el cual gestiona las reglas de disponibilidad, restricciones por tipo de usuario y control de concurrencia. Toda la información relevante se almacena en cl-residence-db (estructura del conjunto) y cl-guest-db (asociaciones con usuarios).
 
 
 # **Quality Attributes**
@@ -253,7 +253,7 @@ Este módulo ofrece a los residentes y propietarios la posibilidad de gestionar 
  **1. Secure Channel Pattern (HTTPS):** Para proteger la confidencialidad e integridad de los datos en tránsito entre los clientes (navegador y app de escritorio) y el sistema, se implementa HTTPS mediante servidores NGINX que funcionan como proxies inversos. Estos servidores gestionan los certificados SSL y cifran toda la comunicación entrante desde Internet antes de redirigirla al resto del sistema.
 Aunque los conectores internos del sistema (entre microservicios) usan HTTP sin cifrado, esto no representa una vulnerabilidad, ya que dichos servicios solo son accesibles desde la red privada interna de Docker, protegida por el patrón de segmentación de red.
 
-2. **Reverse Proxy Pattern:** Se utiliza NGINX como reverse proxy en los puntos de entrada (CL_web_rp, CL_desktop_rp) para:
+2. **Reverse Proxy Pattern:** Se utiliza NGINX como reverse proxy en los puntos de entrada (cl-web-rp, cl-desktop-rp) para:
 
     * Manejar las conexiones HTTPS.
 
@@ -273,7 +273,7 @@ Aunque los conectores internos del sistema (entre microservicios) usan HTTP sin 
 
  4. **Authentication with Asymmetric JWT Pattern:** El microservicio de autenticación genera un token JWT firmado con una llave privada tras validar las credenciales del usuario. Este token se almacena como cookie segura en el navegador o la app de escritorio.
 
-    Cuando un componente del sistema (como CL_web_fe o CL_ag) recibe una solicitud, verifica la firma del JWT con una llave pública, garantizando su integridad y origen.
+    Cuando un componente del sistema (como cl-web-fe o cl-ag) recibe una solicitud, verifica la firma del JWT con una llave pública, garantizando su integridad y origen.
 
     Esto permite autenticar al usuario, validar su rol y autorizar o denegar el acceso a vistas y recursos protegidos, evitando accesos indebidos incluso si se altera el contenido del token.
  
@@ -294,7 +294,7 @@ Aunque los conectores internos del sistema (entre microservicios) usan HTTP sin 
 
 ### Applied architectural patterns
 
-1. **Load Balancer Pattern:** Se implementó un balanceador de carga (CL_auth_lb) utilizando NGINX, configurado con el algoritmo por defecto Round Robin, para distribuir equitativamente las solicitudes entrantes entre tres instancias del microservicio de autenticación (CL_auth_ms).
+1. **Load Balancer Pattern:** Se implementó un balanceador de carga (cl-auth-lb) utilizando NGINX, configurado con el algoritmo por defecto Round Robin, para distribuir equitativamente las solicitudes entrantes entre tres instancias del microservicio de autenticación (cl-auth-ms).
 
     Este microservicio fue seleccionado para replicación debido a su alta carga operativa, ya que gestiona procesos críticos como el inicio de sesión, el registro de usuarios administradores, y la creación de nuevos usuarios con roles específicos.
 
@@ -310,7 +310,7 @@ Esto evita que el sistema se sature con conexiones persistentes, permitiendo a l
 |-------------------|------|---------|-------|
 |CPU|Ryzen 7 7435HS|16 Nucleos|Procesamiento de los microservicios|
 |RAM|DDR4/DDR5|8GB|Almacenamiento temporal de sesiones, cache de autenticación JWT, buffers de bases de datos y memoria heap de aplicaciones Java|
-|Almacenamiento|SSD Adata|215GB|Persistencia de datos en bases de datos (CL_auth_db, CL_residence_db, CL_guest_db, CL_messaging_db) y logs del sistema|
+|Almacenamiento|SSD Adata|215GB|Persistencia de datos en bases de datos (cl-auth-db, cl-residence-db, cl-guest-db, cl-messaging-db) y logs del sistema|
 |Red|Fibra Optica/WiFi|100 Mbps|Comunicación entre contenedores Docker, transferencia de datos HTTP/HTTPS y conexiones TCP a bases de datos|
 |GPU|RTX 3050|4GB VRAM|Renderizado de interfaces web y desktop, aceleración de operaciones gráficas en frontends|
 

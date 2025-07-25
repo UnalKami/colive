@@ -5,17 +5,17 @@ networks:
     driver: bridge 
 
 volumes:
-  cl_auth_db_data:
-  cl_residence_db_data:
-  cl_messaging_db_data:
-  pg_guest_data:
+  cl-auth-db-data:
+  cl-residence-db-data:
+  cl-messaging-db-data:
+  pg-guest-data:
   
 services:
 
   # RED PÚBLICA # (Accesibles desde internet)
-  CL_web_rp:
+  cl-web-rp:
    image: nginx:1.28.0-alpine-perl
-   container_name: CL_web_rp
+   container_name: cl-web-rp
    ports:
        - "80:80"
        - "443:443"
@@ -23,14 +23,14 @@ services:
      - ./CL_web_rp/nginx:/etc/nginx
      - ./CL_web_rp/nginx/ssl:/etc/nginx/ssl
    depends_on:
-     - CL_web_fe
+     - cl-web-fe
    networks:
       - public-network
       - private-network
 
-  CL_desktop_rp:
+  cl-desktop-rp:
    image: nginx:1.28.0-alpine-perl
-   container_name: CL_desktop_rp
+   container_name: cl-desktop-rp
    ports:
        - "8080:8080"
        - "8443:8443"
@@ -38,7 +38,7 @@ services:
      - ./CL_desktop_rp/nginx:/etc/nginx
      - ./CL_desktop_rp/nginx/ssl:/etc/nginx/ssl
    depends_on:     
-     - CL_ag
+     - cl-ag
    networks:
       - public-network
       - private-network 
@@ -47,11 +47,11 @@ services:
 
   # PRESENTACION #
 
-  CL_web_fe:
-    image: cl_web_fe:latest
+  cl-web-fe:
+    image: cl-web-fe:latest
     build: 
-      context: ./CL_web_fe      
-    container_name: CL_web_fe
+      context: ./CL_web_fe     
+    container_name: cl-web-fe
     # ports:
     #   - "5000:5000"
     environment:
@@ -64,11 +64,11 @@ services:
   
   # COMUNICACIÖN #
 
-  CL_ag:
-    image: cl_ag:latest
+  cl-ag:
+    image: cl-ag:latest
     build:
       context: ./CL_ag
-    container_name: CL_ag
+    container_name: cl-ag
     #ports:
     #  - "8000:8000"
     volumes:
@@ -76,46 +76,46 @@ services:
     networks:
       - private-network
 
-  CL_auth_lb:
+  cl-auth-lb:
     image: nginx:1.28.0-alpine-perl
-    container_name: CL_auth_lb   
+    container_name: cl-auth-lb   
     volumes:
       - ./CL_auth_lb/nginx:/etc/nginx
     depends_on:
-      - CL_auth_ms1
-      - CL_auth_ms2
-      - CL_auth_ms3
+      - cl-auth-ms1
+      - cl-auth-ms2
+      - cl-auth-ms3
     networks: 
         - private-network
   
   # LÓGICA #
 
-  CL_auth_ms1:
+  cl-auth-ms1:
     image: openjdk:24-slim-bookworm
-    container_name: CL_auth_ms1
+    container_name: cl-auth-ms1
     hostname: cl-auth-ms1
     build:
       context: ./auth-java-component  
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cl-auth-db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=cincopatodos      
     volumes:
       - ./JWT_private.key:/run/secrets/JWT_private.key:ro
       - ./JWT_public.key.pub:/run/secrets/JWT_public.key.pub:ro
     depends_on:
-      - CL_auth_db
+      - cl-auth-db
     networks:
       - private-network
 
-  CL_auth_ms2:
+  cl-auth-ms2:
     image: openjdk:24-slim-bookworm
-    container_name: CL_auth_ms2
+    container_name: cl-auth-ms2
     hostname: cl-auth-ms2
     build:
       context: ./auth-java-component
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cl-auth-db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
     volumes:
@@ -124,16 +124,16 @@ services:
     networks:
       - private-network
     depends_on:
-      - CL_auth_db
+      - cl-auth-db
 
-  CL_auth_ms3:
+  cl-auth-ms3:
     image: openjdk:24-slim-bookworm
-    container_name: CL_auth_ms3
+    container_name: cl-auth-ms3
     hostname: cl-auth-ms3
     build:
       context: ./auth-java-component
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://CL_auth_db:5432/db
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://cl-auth-db:5432/db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=cincopatodos
     volumes:
@@ -142,43 +142,43 @@ services:
     networks:
       - private-network
     depends_on:
-      - CL_auth_db
+      - cl-auth-db
 
-  CL_residence_ms:
-    image: conjunto-residencial-cl_residence_ms
-    container_name: CL_residence-ms
+  cl-residence-ms:
+    image: conjunto-residencial-cl-residence-ms
+    container_name: cl-residence-ms
     build:
       context: ./ResidenceCreator-ms  
     #ports:
     #   - "3001:3001"
     depends_on:
-      - CL_residence_db
-      - CL_guest_db
+      - cl-residence-db
+      - cl-guest-db
     env_file:
       - ./ResidenceCreator-ms/.env
     networks:
       - private-network
 
-  CL_messaging_ms:
-    image: cl_messaging_ms:latest
+  cl-messaging-ms:
+    image: cl-messaging-ms:latest
     build:
       context: ./MensajeriaYnotificaciones
       dockerfile: Dockerfile.sbt-alpine
-    container_name: CL_messaging-ms
+    container_name: cl-messaging-ms
     #ports:
     #  - "7000:7000"
     environment:
       SMTP_SECRET_KEY: "claveaes12345678" # Clave AES de 16 bytes
-      MONGO_URI: "mongodb://root:cincopatodos@cl_messaging_db:27017/correos?authSource=admin"
+      MONGO_URI: "mongodb://root:cincopatodos@cl-messaging-db:27017/correos?authSource=admin"
     command: ["sbt", "run"]
     depends_on:
-      - CL_messaging_db
+      - cl-messaging-db
     restart: unless-stopped
     networks:
       - private-network
 
-  CL_stadistics_ms:
-    image: cl_stadistics_ms:latest
+  cl-stadistics-ms:
+    image: cl-stadistics-ms:latest
     build: ./stadistics
     #image: conjunto-residencial-cl-stadistics-ms
     container_name: stadistics
@@ -187,16 +187,16 @@ services:
       - ./stadistics:/app
     #ports:
     #  - "8010:8010"
+      - cl-web-fe
     #env_file:
     #  - ./stadistics/.env
     depends_on:
-      - CL_ag
-      - CL_web_fe
-      - CL_residence_ms
-      - CL_auth_db
-      - CL_residence_db
+      - cl-ag
+      - cl-residence-ms
+      - cl-auth-db
+      - cl-residence-db
     environment:
-      - POSTGRES_HOST=CL_auth_db
+      - POSTGRES_HOST=cl-auth-db
       - POSTGRES_PORT=5432
       - POSTGRES_DB=db
       - POSTGRES_USER=postgres
@@ -207,8 +207,8 @@ services:
 
 # DATOS #
 
-  CL_auth_db:
-    container_name: CL_auth_db
+  cl-auth-db:
+    container_name: cl-auth-db
     #ports:
     #  - 5432:5432
     image: postgres:16.9-alpine3.21 
@@ -223,13 +223,13 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - cl_auth_db_data:/var/lib/postgresql/data
+      - cl-auth-db-data:/var/lib/postgresql/data
     networks:
       - private-network
 
-  CL_residence_db:
+  cl-residence-db:
     image: mongo:8.0.9-noble
-    container_name: CL_residence_db
+    container_name: cl-residence-db
     #ports:
     #  - "27017:27017" 
     environment:
@@ -237,13 +237,13 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
       - MONGO_INITDB_DATABASE=residence_db
     volumes:
-      - cl_residence_db_data:/data/db
+      - cl-residence-db-data:/data/db
     networks:
       - private-network
 
-  CL_messaging_db:
+  cl-messaging-db:
     image: mongo:8.0.9-noble
-    container_name: CL_messaging_db
+    container_name: cl-messaging-db
     #ports:
     #  - "27018:27017" 
     environment:
@@ -251,12 +251,12 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=cincopatodos
       - MONGO_INITDB_DATABASE=messaging_db
     volumes:
-      - cl_messaging_db_data:/data/db
+      - cl-messaging-db-data:/data/db
     networks:
       - private-network
 
-  CL_guest_db:
-    container_name: CL_guest_db
+  cl-guest-db:
+    container_name: cl-guest-db
     #ports:
     #  - 5433:5432
     image: postgres:16.9-alpine3.21 
@@ -271,17 +271,17 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - pg_guest_data:/var/lib/postgresql/data
+      - pg-guest-data:/var/lib/postgresql/data
     networks:
       - private-network
       
-  kali:
-    build:
-      context: .
-      dockerfile: Dockerfile.kali
-    container_name: kali
-    tty: true
-    stdin_open: true
-    privileged: true
-    networks:
-      - private-network
+#  kali:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile.kali
+#    container_name: kali
+#    tty: true
+#    stdin_open: true
+#    privileged: true
+#    networks:
+#     - private-network

@@ -13,15 +13,15 @@
 ### 2. Configuración de Red
 ```
 Servicios corriendo:
-✅ CL_ag (API Gateway) - Puerto interno 8000
-✅ CL_residence-ms - Puerto interno 3001  
-✅ CL_web_rp (Proxy Web) - Puerto 80/443
+✅ cl-ag (API Gateway) - Puerto interno 8000
+✅ cl-residence-ms - Puerto interno 3001  
+✅ cl-web-rp (Proxy Web) - Puerto 80/443
 ❌ Routing incorrecto entre proxy y gateway
 ```
 
 ### 3. Arquitectura de Red
 ```
-Cliente → CL_web_rp (nginx) → ??? → CL_ag (FastAPI) → CL_residence-ms
+Cliente → cl-web-rp (nginx) → ??? → cl-ag (FastAPI) → cl-residence-ms
                                ↑
                         Conexión faltante
 ```
@@ -29,21 +29,21 @@ Cliente → CL_web_rp (nginx) → ??? → CL_ag (FastAPI) → CL_residence-ms
 ## Soluciones Requeridas
 
 ### Opción 1: Configurar Nginx Proxy
-Agregar en `CL_web_rp/nginx/nginx.conf`:
+Agregar en `cl-web-rp/nginx/nginx.conf`:
 ```nginx
 location /auth/ {
-    proxy_pass http://CL_ag:8000/auth/;
+    proxy_pass http://cl-ag:8000/auth/;
 }
 
 location /residence/ {
-    proxy_pass http://CL_ag:8000/residence/;
+    proxy_pass http://cl-ag:8000/residence/;
 }
 ```
 
 ### Opción 2: Exponer API Gateway Directamente
 Modificar `docker-compose.yml`:
 ```yaml
-CL_ag:
+cl-ag:
   ports:
     - "8000:8000"
 ```
@@ -51,7 +51,7 @@ CL_ag:
 ### Opción 3: Usar Red Interna de Docker
 Ejecutar pruebas desde dentro del contenedor:
 ```bash
-docker exec -it CL_ag k6 run /tests/visitantes_load_test.js
+docker exec -it cl-ag k6 run /tests/visitantes_load_test.js
 ```
 
 ## Recomendación

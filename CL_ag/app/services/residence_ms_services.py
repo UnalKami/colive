@@ -5,11 +5,52 @@ async def register_conjunto(conjunto_data):
     """
     Register a conjunto in the residence microservice.
     """
+    mutation = '''
+    mutation CreateConjunto($nombre: String!, $nombreAdministrador: String!, $direccion: String!, $ciudad: String!, $departamento: String!) {
+      createConjunto(
+        nombre: $nombre
+        nombreAdministrador: $nombreAdministrador
+        direccion: $direccion
+        ciudad: $ciudad
+        departamento: $departamento
+      ) {
+        id
+        nombre
+        nombreAdministrador
+        direccion
+        ciudad
+        departamento
+      }
+    }
+    '''
+    
+    # Handle both direct data and GraphQL structure
+    if "variables" in conjunto_data:
+        vars_data = conjunto_data["variables"]
+        variables = {
+            "nombre": vars_data["nombre"],
+            "nombreAdministrador": vars_data["nombreAdministrador"],
+            "direccion": vars_data["direccion"],
+            "ciudad": vars_data["ciudad"],
+            "departamento": vars_data["departamento"]
+        }
+    else:
+        variables = {
+            "nombre": conjunto_data["nombre"],
+            "nombreAdministrador": conjunto_data.get("nombreAdministrador", "Admin"),
+            "direccion": conjunto_data["direccion"],
+            "ciudad": conjunto_data["ciudad"],
+            "departamento": conjunto_data.get("departamento", "Default")
+        }
+    
     async with httpx.AsyncClient() as client:
         print(f"Registering conjunto with data: {conjunto_data}")
         try:
             print('dentro del try')
-            response = await client.post(f"{RESIDENCE_MS_URL}/graphql", json=conjunto_data)
+            response = await client.post(
+                f"{RESIDENCE_MS_URL}/graphql", 
+                json={"query": mutation, "variables": variables}
+            )
             response.raise_for_status()  # Raise an error for bad responses
         except httpx.HTTPStatusError as exc:
             print('dentro del except')
@@ -152,7 +193,10 @@ async def crear_usuario_propiedad_con_admin(data, cookies):
         print(f"[ERROR] HTTP Error: {e.response.status_code} - {e.response.text}")
         raise Exception(f"Error HTTP {e.response.status_code}: {e.response.text}")
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
         print(f"[ERROR] Error general: {str(e)}")
+        print(f"[ERROR] Traceback: {error_details}")
         raise Exception(f"Error al crear usuario y propiedad: {str(e)}")
 
 async def crear_reserva(reserva_data):
@@ -368,3 +412,32 @@ async def obtener_visitantes_conjunto(idConjunto, fecha=None):
         )
         response.raise_for_status()
         return response.json()
+    
+async def obtener_reservas_por_usuario(user_id: str, conjunto_id: str):
+    """Obtener reservas filtradas por usuario y conjunto"""
+    query = '''
+    query ReservasPorUsuario($userId: ID!, $conjuntoId: ID!) {
+      reservasPorUsuario(userId: $userId, conjuntoId: $conjuntoId) {
+        id
+        conjuntoId
+        residenciaId
+        amenidad
+        fecha
+        horaInicio
+        horaFin
+        estado
+        motivo
+        cantidadPersonas
+        observaciones
+      }
+    }
+    '''
+    variables = {"userId": user_id, "conjuntoId": conjunto_id}
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{RESIDENCE_MS_URL}/graphql",
+            json={"query": query, "variables": variables}
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["data"]["reservasPorUsuario"]

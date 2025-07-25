@@ -130,5 +130,5 @@ curl http://localhost:8000/health
 ### Error: Base de datos
 ```bash
 # Verificar conexión a PostgreSQL
-docker-compose logs CL_residence_db
+docker-compose logs cl-residence-db
 ```

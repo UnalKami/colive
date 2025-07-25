@@ -3,12 +3,13 @@ from pydantic import BaseModel
 from app.services.residence_ms_services import (
     crear_reserva, validar_reserva_disponible,
     editar_reserva, eliminar_reserva,
-    obtener_conjuntos_residencias, obtener_reservas,
+    obtener_reservas_por_usuario, 
     obtener_panel_propietario,
     registrar_visitante_peaton, registrar_visitante_vehicular,
     registrar_salida_vehiculo, obtener_visitantes_conjunto,
     crear_residence_con_admin, crear_usuario_propiedad_con_admin
 )
+from app.auth_utils import get_user_from_request
 
 router = APIRouter()
 
@@ -238,3 +239,61 @@ async def obtener_visitantes_endpoint(idConjunto: str, fecha: str = None, user_d
         return result
     except Exception as e:
         return {"error": str(e)}
+    
+@router.get("/reservas")
+async def obtener_reservas_endpoint(request: Request):
+    """Obtener reservas del usuario autenticado usando información del token"""
+    try:
+        user_data = get_user_from_request(request)
+        user_id = user_data.get("userId")
+        conjunto_id = user_data.get("conjuntoId")
+        
+        if not user_id or not conjunto_id:
+            raise HTTPException(status_code=400, detail="Token no contiene información de usuario o conjunto")
+        
+        data = await obtener_reservas_por_usuario(user_id=user_id, conjunto_id=conjunto_id)
+        return {"reservas": data}
+    except Exception as e:
+        return {"error": str(e)}
+
+@router.post("/crearReserva")
+async def crear_reserva_endpoint(reserva: ReservaInput, request: Request):
+    """Crear reserva usando información del token del usuario"""
+    try:
+        user_data = get_user_from_request(request)
+        conjunto_id = user_data.get("conjuntoId")
+        
+        if not conjunto_id:
+            raise HTTPException(status_code=400, detail="Token no contiene información del conjunto")
+        
+        # Usar el conjunto del token en lugar del enviado en el request
+        reserva_data = reserva.dict()
+        reserva_data["conjuntoId"] = conjunto_id
+        
+        # Validación de solapamiento y doble reserva
+        validacion = await validar_reserva_disponible(
+            amenidad=reserva_data["amenidad"],
+            fecha=reserva_data["fecha"],
+            horaInicio=reserva_data["horaInicio"],
+            horaFin=reserva_data["horaFin"],
+            residenciaId=reserva_data["residenciaId"],
+            conjuntoId=conjunto_id
+        )
+        
+        if not validacion.get("disponible", False):
+            return {
+                "disponible": False,
+                "motivo": validacion.get("motivo", "Reserva no disponible")
+            }
+        
+        reserva_result = await crear_reserva(reserva_data)
+        return {
+            "disponible": True,
+            "reserva": reserva_result.get("data", {}).get("crearReserva"),
+            "motivo": None
+        }
+    except Exception as e:
+        return {
+            "disponible": False,
+            "motivo": "Error interno al crear la reserva."
+        }

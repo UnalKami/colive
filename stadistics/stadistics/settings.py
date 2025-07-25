@@ -84,7 +84,7 @@ DATABASES = {
         'NAME': os.getenv('POSTGRES_DB'),         # "db"
         'USER': os.getenv('POSTGRES_USER'),       # "postgres"
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),# "cincopatodos"
-        'HOST': os.getenv('POSTGRES_HOST'),       # "CL_auth_db"
+        'HOST': os.getenv('POSTGRES_HOST'),       # "cl-auth-db"
         'PORT': os.getenv('POSTGRES_PORT'),       # "5432"
     },
     'mysql_db': {

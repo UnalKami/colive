@@ -217,5 +217,46 @@ document.getElementById('formEditarReserva').addEventListener('submit', async fu
     }
 
 });
-    
+
+
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+  const reservasTbody = document.querySelector('tbody');
+  let reservasCache = [];
+
+  // Cargar reservas automáticamente al iniciar (sin necesidad de selección)
+  async function cargarReservas() {
+    reservasTbody.innerHTML = `<tr><td colspan="5" class="text-center">Cargando reservas...</td></tr>`;
+
+    try {
+      const res = await fetch('/fe-api/reservas');
+      const data = await res.json();
+
+      if (data.reservas && data.reservas.length > 0) {
+        reservasCache = data.reservas;
+        reservasTbody.innerHTML = data.reservas.map(r => `
+          <tr data-reserva-id="${r.id}">
+            <td>${r.amenidad}</td>
+            <td>${formatTimestamp(r.fecha)}</td>
+            <td>${r.horaInicio}</td>
+            <td>${r.horaFin}</td>
+            <td>
+              <button class="btn btn-warning btn-sm me-2">Editar</button>
+              <button class="btn btn-danger btn-sm btn-eliminar">Eliminar</button>
+            </td>
+          </tr>
+        `).join('');
+      } else {
+        reservasCache = [];
+        reservasTbody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No hay reservas registradas.</td></tr>`;
+      }
+    } catch (error) {
+      reservasTbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error al cargar reservas.</td></tr>`;
+    }
+  }
+
+  // Cargar reservas al iniciar
+  cargarReservas();
+
 });

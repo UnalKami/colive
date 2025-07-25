@@ -106,13 +106,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadComplexes() {
     try {
-        const response = await fetch('/residence/conjuntosResidencias');
-        const data = await response.json();
-        
-        console.log('Response data:', data); // Para debug
-        
         const selectElement = document.getElementById('complex');
         if (!selectElement) return; // Verificar que existe el elemento
+        
+        const response = await fetch('/fe-api/conjuntosResidencias');
+        
+        // Si no está autenticado, simplemente no cargar los complejos
+        if (response.status === 401 || response.status === 403) {
+            console.log('Authentication required for complexes');
+            return;
+        }
+        
+        const data = await response.json();
         
         // Manejar diferentes estructuras de respuesta
         let complexes = data;
@@ -128,6 +133,6 @@ async function loadComplexes() {
             });
         }
     } catch (error) {
-        console.error('Error loading complexes:', error);
+        console.log('Complexes not loaded:', error.message);
     }
 }
